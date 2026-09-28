@@ -22,7 +22,7 @@
         <ol>
             <li><a href="#e1"><span class="n">01</span> Isolation from Canvas</a></li>
             <li><a href="#e2"><span class="n">02</span> Data only through hooks</a></li>
-            <li><a href="#e3"><span class="n">03</span> Sample data is always labelled</a></li>
+            <li><a href="#e3"><span class="n">03</span> Canvas is the only source of record</a></li>
             <li><a href="#e4"><span class="n">04</span> Folder layout</a></li>
             <li><a href="#e5"><span class="n">05</span> Styling</a></li>
             <li><a href="#e6"><span class="n">06</span> Accessibility</a></li>
@@ -55,8 +55,7 @@
         <div class="rule-body">
             <p>Components never call <code>fetch</code>, the Canvas API or <code>chrome.*</code>. Every source lives in
                 <code>services/hooks/use-*.ts</code> and returns a <code>Loadable&lt;T&gt;</code> —
-                <code>{ data, loading, error, isSample }</code> — so swapping sample data for Canvas changes the hook and
-                no view.</p>
+                <code>{ data, loading, error }</code>, rendered by <code>&lt;LoadState&gt;</code>.</p>
             <p>Canvas calls are same-origin <code>fetch('/api/v1/…')</code> from the content script, which carries the
                 student's session. Calls to our backend go through the extension's background service worker, not
                 the page, so Canvas's CSP and CORS never apply to them.</p>
@@ -65,12 +64,15 @@
 
     <section class="rule" id="e3">
         <div class="rule-head"><span class="num crit">03</span>
-            <h3>Sample data is always labelled</h3>
+            <h3>Canvas is the only source of record</h3>
         </div>
         <div class="rule-body">
-            <p>Anything from <code>services/sample/</code> is invented. A hook returning it sets
-                <code>isSample: true</code>, and every view showing it renders <code>&lt;SampleBadge&gt;</code>. When
-                real data lands, delete the sample — never keep it as a silent fallback.</p>
+            <p>Every grade, date and policy the widget or the assistant shows comes from the Canvas API. Invented
+                data exists only as the preview harness's fixtures in <code>extension/preview/</code>, which the
+                build never bundles. The assistant is told to state only what a tool returned, and tool results
+                carry times already in the student's zone (<code>localStamp</code>).</p>
+            <div class="note warn">Canvas access is <strong>read-only</strong>: <code>canvas-api.ts</code> only issues
+                GET. Anything that writes to Canvas (submitting, messaging) is a product decision, not a refactor.</div>
         </div>
     </section>
 
@@ -83,8 +85,12 @@
                 <li><code>components/&lt;feature&gt;/</code> — one folder per view; <code>shell/</code> is the launcher
                     and panel chrome, <code>common/</code> the shared pieces.</li>
                 <li><code>services/hooks/</code> data · <code>services/types/</code> view-models ·
-                    <code>services/format/</code> pure formatting · <code>services/canvas/</code> Canvas-specific
-                    helpers.</li>
+                    <code>services/format/</code> pure formatting · <code>services/canvas/</code> the REST client
+                    and mappers · <code>services/tools/</code> tool executors · <code>services/chat/</code> the tool
+                    loop.</li>
+                <li>A new tool is added to <code>@canvas-assistant/shared</code> first; the executor map in
+                    <code>services/tools/index.ts</code> is typed by the shared names, so a missing executor fails to
+                    compile.</li>
                 <li>A type both the extension and the API use moves to <code>@canvas-assistant/shared</code>.</li>
                 <li>Pure logic gets a test in <code>extension/tests/</code>.</li>
             </ul>
@@ -130,8 +136,9 @@
                     and refresh Canvas.</li>
                 <li>The bundle is an IIFE — content scripts are classic scripts and cannot contain
                     <code>import</code>.</li>
-                <li><code>bun run --cwd extension preview</code> serves a stand-in dashboard on :5174 for work without
-                    a Canvas login.</li>
+                <li><code>bun run --cwd extension preview</code> serves a stand-in dashboard on :5174 over a fake
+                    Canvas API, with chat going to the real backend — the whole tool loop runs without a Canvas
+                    login.</li>
             </ul>
         </div>
     </section>

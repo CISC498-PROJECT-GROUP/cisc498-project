@@ -9,25 +9,25 @@ student asks it about their classes — what is due, what a syllabus says, where
 and it answers from the courses they are enrolled in. It also offers quick views: grade breakdown,
 upcoming deadlines across every course, and where to get help.
 
-The build is a **prototype**, delivered in three milestones:
+The build is a **working prototype**:
 
-1. **The widget on Canvas** — done. The extension injects the assistant on the dashboard. Its data
-   is placeholder (`extension/src/services/sample/`, badged "Sample data" in every view that shows
-   it) and the chat answers with a fixed stub.
-2. **AI integration** — the chat calls `backend/`, which calls the model. The model key lives in the
-   backend and never in the extension.
-3. **Canvas API** — the hooks read the student's real courses, assignments, grades and syllabi. The
-   content script runs on the Canvas origin, so a same-origin `fetch('/api/v1/…')` carries the
-   student's own session: no token, no OAuth, and it sees exactly what the student can see.
+- **The widget** — the extension injects the assistant on the dashboard (only there), in a shadow
+  root, with home, chat, grades, deadlines and support views.
+- **Canvas data** — every view reads the student's real courses, grades and planner. The content
+  script runs on the Canvas origin, so a same-origin `fetch('/api/v1/…')` carries the student's own
+  session: no token, no OAuth, and it sees exactly what the student can see. Read-only.
+- **AI chat** — questions go to `backend/`, which calls Claude (`claude-opus-5`) with twelve Canvas
+  tools (courses, planner, assignments, grade breakdown, announcements, syllabus, pages, modules,
+  files, reading a PDF). The **extension runs the tools** — it holds the Canvas session — and loops;
+  the backend owns the key, the frozen system prompt and the tool definitions, and stores nothing.
 
-No database for now.
+No database.
 
 Two rules follow from the subject matter and override convenience:
 
-1. **Never pass invented data off as the student's record.** Placeholder data is always flagged
-   (`isSample` on every hook's result, which renders the badge) and the sample folder is deleted, not
-   kept as a fallback, once real data flows. A grade or a due date the assistant states must come
-   from Canvas.
+1. **Never pass invented data off as the student's record.** A grade, date or policy the widget or
+   the assistant shows must come from Canvas. Invented data exists only as the preview harness's
+   fixtures in `extension/preview/`, which are never bundled into the extension.
 2. **A student's data goes nowhere it doesn't need to.** Canvas content is sent to the backend only
    to answer the question asked, is never logged (see `svc-log.ts`), and is never stored.
 
@@ -120,7 +120,8 @@ Each app's `tsconfig.json` extends the root `tsconfig.base.json` and overrides o
 ## Common commands
 
 From the repo root: `bun install` (once, for the whole workspace), then:
-- `bun run dev` — build the extension in watch mode. `bun run dev:api` — the API on **:3010**.
+- `bun run dev` — build the extension in watch mode. `bun run dev:api` — the API on
+  **127.0.0.1:3010** (needs `ANTHROPIC_API_KEY` in `backend/.env` for chat).
 - `bun run build` — one-off extension build into `extension/dist/`.
 - `bun run lint` — typecheck both. `bun run test` — both suites.
 
@@ -129,8 +130,9 @@ From the repo root: `bun install` (once, for the whole workspace), then:
 Chrome does not pick up a rebuild on its own.
 
 **Without a Canvas login:** `bun run --cwd extension preview` serves a stand-in dashboard on
-**:5174** that runs the same `content.js`. Only valid while the content script uses no `chrome.*`
-API.
+**:5174** that runs the same `content.js` against a fake Canvas API (`extension/preview/canvas/`),
+with chat going to the real backend. Where the extension would use `chrome.runtime` (backend calls,
+file downloads) it falls back to a direct fetch — see `services/config.ts`.
 
 Backend (inside `backend/`): `bun run dev` (watch), `bun run test`, `bun run lint`,
 `bun run format` (Prettier — 4-space, 250 width, single quotes; the extension uses the same config).
@@ -158,7 +160,11 @@ routers) → `src/services/<module>/` (business logic). A repositories layer arr
   `rsp(c, data, stc, message)` with the `stc`/`err` enums — never raw `c.json`. Hono-Context helpers
   live here (a module's `common.ts`), never in services.
 - `src/services/<module>/` — business logic. `tests/{routes,services}/` mirror the same shape.
-- `src/services/common/svc-*.ts` — cross-cutting clients (env, response, log, …).
+- `src/services/common/svc-*.ts` — cross-cutting clients (env, response, log, the Anthropic SDK).
+- `src/services/chat/` — `POST /chat/turn`: one model call per step. Opus 5, adaptive thinking at
+  `CHAT_EFFORT` (default medium), `fallbacks: "default"` for classifier refusals, prompt caching on
+  tools + system + conversation. The system prompt in `chat-prompt.ts` is frozen — nothing
+  per-request goes in it.
 
 ## Extension architecture
 
@@ -171,9 +177,15 @@ onto Canvas. Path alias `@/*` → `extension/src`.
   trip back to the menu). Keyboard events are stopped at this root — Canvas binds global shortcuts
   on `document`, and typing in the chat box would otherwise trigger them.
 - `components/<feature>/` — `shell/` is the launcher and panel chrome; `home/`, `chat/`,
-  `grades/`, `deadlines/`, `support/` are the views; `common/` holds the icon set and badges.
-- `services/hooks/use-*.ts` — every data source. `services/types/` — view-models.
-  `services/format/` — pure formatting. `services/sample/` — placeholder data, deleted in milestone 3.
+  `grades/`, `deadlines/`, `support/` are the views; `common/` holds the icon set and load states.
+- `background.ts` — the service worker. It relays backend calls (avoiding the page's CORS and
+  Chrome's local-network prompt) and file downloads (Canvas file URLs redirect cross-origin).
+- `services/hooks/use-*.ts` — every data source. `services/canvas/` — the REST client and the
+  loaders/mappers. `services/tools/` — one executor per shared tool name. `services/chat/` — the
+  tool loop and the conversation context. `services/format/` — dates and the Markdown parser.
+- The chat conversation is **append-only** and sent back verbatim, thinking blocks included. The
+  student context (name, courses, time zone) rides in the first user message and each question is
+  stamped with the time asked, so the backend's system prompt never changes and stays cached.
 - Styling: `src/styles/*.css`, imported as text and joined into one `<style>` in the shadow root by
   `styles/index.ts`. Colours come from the tokens in `tokens.css` — never hardcoded in a component.
   The accent is the school's own Canvas brand colour (`--ic-brand-primary`, which inherits into the
