@@ -1,0 +1,147 @@
+<meta charset="utf-8" />
+<title>Extension conventions — Canvas Assistant</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="docs.css" />
+
+<header class="hero">
+    <div class="wrap">
+        <h1>Extension conventions</h1>
+        <p>Required reading before any work in <code>extension/</code>. The extension runs inside someone else's
+            page — Canvas — so most of these rules are about not disturbing it and not being disturbed by it.</p>
+    </div>
+</header>
+
+<div class="wrap">
+    <div class="stackline">
+        <strong>Chrome</strong> Manifest V3 &middot; <strong>Preact</strong> + hooks &middot; <strong>TypeScript</strong>
+        strict &middot; bundled by <strong>Bun.build</strong> &middot; Shadow DOM
+    </div>
+
+    <nav class="toc">
+        <h2>Contents</h2>
+        <ol>
+            <li><a href="#e1"><span class="n">01</span> Isolation from Canvas</a></li>
+            <li><a href="#e2"><span class="n">02</span> Data only through hooks</a></li>
+            <li><a href="#e3"><span class="n">03</span> Canvas is the only source of record</a></li>
+            <li><a href="#e4"><span class="n">04</span> Folder layout</a></li>
+            <li><a href="#e5"><span class="n">05</span> Styling</a></li>
+            <li><a href="#e6"><span class="n">06</span> Accessibility</a></li>
+            <li><a href="#e7"><span class="n">07</span> Build, load, preview</a></li>
+        </ol>
+    </nav>
+
+    <section class="rule" id="e1">
+        <div class="rule-head"><span class="num crit">01</span>
+            <h3>Isolation from Canvas</h3>
+        </div>
+        <div class="rule-body">
+            <ul>
+                <li>Everything renders inside the shadow root created in <code>content.tsx</code>. Never append to
+                    Canvas's DOM or read its layout.</li>
+                <li>Keyboard events stop at the widget root (<code>app.tsx</code>). Canvas binds global shortcuts on
+                    <code>document</code>; a key typed in our input would otherwise reach them.</li>
+                <li>The content script mounts only where <code>canvas-page.ts</code> allows (the dashboard). Widening
+                    that is a product decision, not a refactor.</li>
+            </ul>
+            <div class="note warn">Content scripts run in an isolated world: the page's <code>window.ENV</code> and
+                scripts are invisible to us. Read Canvas through its REST API, not its globals.</div>
+        </div>
+    </section>
+
+    <section class="rule" id="e2">
+        <div class="rule-head"><span class="num crit">02</span>
+            <h3>Data only through hooks</h3>
+        </div>
+        <div class="rule-body">
+            <p>Components never call <code>fetch</code>, the Canvas API or <code>chrome.*</code>. Every source lives in
+                <code>services/hooks/use-*.ts</code> and returns a <code>Loadable&lt;T&gt;</code> —
+                <code>{ data, loading, error }</code>, rendered by <code>&lt;LoadState&gt;</code>.</p>
+            <p>Canvas calls are same-origin <code>fetch('/api/v1/…')</code> from the content script, which carries the
+                student's session. Calls to our backend go through the extension's background service worker, not
+                the page, so Canvas's CSP and CORS never apply to them.</p>
+        </div>
+    </section>
+
+    <section class="rule" id="e3">
+        <div class="rule-head"><span class="num crit">03</span>
+            <h3>Canvas is the only source of record</h3>
+        </div>
+        <div class="rule-body">
+            <p>Every grade, date and policy the widget or the assistant shows comes from the Canvas API. Invented
+                data exists only as the preview harness's fixtures in <code>extension/preview/</code>, which the
+                build never bundles. The assistant is told to state only what a tool returned, and tool results
+                carry times already in the student's zone (<code>localStamp</code>).</p>
+            <div class="note warn">Canvas access is <strong>read-only</strong>: <code>canvas-api.ts</code> only issues
+                GET. Anything that writes to Canvas (submitting, messaging) is a product decision, not a refactor.</div>
+        </div>
+    </section>
+
+    <section class="rule" id="e4">
+        <div class="rule-head"><span class="num">04</span>
+            <h3>Folder layout</h3>
+        </div>
+        <div class="rule-body">
+            <ul>
+                <li><code>components/&lt;feature&gt;/</code> — one folder per view; <code>shell/</code> is the launcher
+                    and panel chrome, <code>common/</code> the shared pieces.</li>
+                <li><code>services/hooks/</code> data · <code>services/types/</code> view-models ·
+                    <code>services/format/</code> pure formatting · <code>services/canvas/</code> the REST client
+                    and mappers · <code>services/tools/</code> tool executors · <code>services/chat/</code> the tool
+                    loop.</li>
+                <li>A new tool is added to <code>@canvas-assistant/shared</code> first; the executor map in
+                    <code>services/tools/index.ts</code> is typed by the shared names, so a missing executor fails to
+                    compile.</li>
+                <li>A type both the extension and the API use moves to <code>@canvas-assistant/shared</code>.</li>
+                <li>Pure logic gets a test in <code>extension/tests/</code>.</li>
+            </ul>
+        </div>
+    </section>
+
+    <section class="rule" id="e5">
+        <div class="rule-head"><span class="num">05</span>
+            <h3>Styling</h3>
+        </div>
+        <div class="rule-body">
+            <ul>
+                <li>Plain CSS in <code>src/styles/</code>, one file per area, joined by <code>styles/index.ts</code>.
+                    Every class is prefixed <code>ca-</code>.</li>
+                <li>Colours come from the tokens in <code>tokens.css</code> — never a hex in a component. A per-course
+                    colour is passed as the <code>--ca-course</code> custom property.</li>
+                <li>The accent is <code>var(--ic-brand-primary)</code>, the school's Canvas theme colour.</li>
+                <li>Resets use <code>:where()</code> so they carry zero specificity and never beat a component class.</li>
+            </ul>
+        </div>
+    </section>
+
+    <section class="rule" id="e6">
+        <div class="rule-head"><span class="num">06</span>
+            <h3>Accessibility</h3>
+        </div>
+        <div class="rule-body">
+            <p>Real <code>&lt;button&gt;</code>, <code>&lt;a href&gt;</code> and <code>&lt;input&gt;</code> +
+                <code>&lt;label&gt;</code>; <code>aria-label</code> on icon-only buttons; touch targets at least 40px;
+                Escape closes the panel and returns focus to the launcher; motion respects
+                <code>prefers-reduced-motion</code>.</p>
+        </div>
+    </section>
+
+    <section class="rule" id="e7">
+        <div class="rule-head"><span class="num">07</span>
+            <h3>Build, load, preview</h3>
+        </div>
+        <div class="rule-body">
+            <ul>
+                <li><code>bun run dev</code> rebuilds <code>extension/dist/</code> on change. Load that folder via
+                    <code>chrome://extensions</code> → <em>Load unpacked</em>; after each rebuild press the reload arrow
+                    and refresh Canvas.</li>
+                <li>The bundle is an IIFE — content scripts are classic scripts and cannot contain
+                    <code>import</code>.</li>
+                <li><code>bun run --cwd extension preview</code> serves a stand-in dashboard on :5174 over a fake
+                    Canvas API, with chat going to the real backend — the whole tool loop runs without a Canvas
+                    login.</li>
+            </ul>
+        </div>
+    </section>
+</div>
+
+<footer>Update this page in the same commit that changes a convention. See <code>CLAUDE.md</code>.</footer>

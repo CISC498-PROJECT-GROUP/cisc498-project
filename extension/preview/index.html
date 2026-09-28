@@ -1,0 +1,33 @@
+<!doctype html>
+<!-- Stand-in for a Canvas dashboard — see scripts/preview.ts. `--ic-brand-primary` is the variable
+     real Canvas defines on :root from the school's theme; the widget reads it for its accent. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Dashboard</title>
+<style>
+:root { --ic-brand-primary: #00539f; }
+body { margin: 0; font-family: 'Lato Extended', Lato, 'Helvetica Neue', Arial, sans-serif; color: #2d3b45; display: flex; min-height: 100vh; }
+nav { width: 84px; background: #2d3b45; }
+main { flex: 1; padding: 24px 40px; }
+h1 { font-size: 26px; font-weight: 400; border-bottom: 1px solid #c7cdd1; padding-bottom: 16px; margin: 0 0 24px; }
+.cards { display: grid; grid-template-columns: repeat(auto-fill, 262px); gap: 24px; }
+.card { border: 1px solid #c7cdd1; border-radius: 4px; overflow: hidden; }
+.card div:first-child { height: 146px; }
+.card p { margin: 12px; font-weight: 700; }
+</style>
+</head>
+<body>
+<nav aria-label="Global"></nav>
+<main>
+<h1>Dashboard</h1>
+<div class="cards">
+<div class="card"><div style="background:#3b6e8f"></div><p>CISC 220: Data Structures</p></div>
+<div class="card"><div style="background:#7a4e9a"></div><p>MATH 242: Calculus II</p></div>
+<div class="card"><div style="background:#b5542d"></div><p>ENGL 110: Seminar in Composition</p></div>
+<div class="card"><div style="background:#2e7d5b"></div><p>PHYS 207: Physics I</p></div>
+</div>
+</main>
+<script src="/content.js"></script>
+</body>
+</html>

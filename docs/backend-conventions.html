@@ -1,0 +1,117 @@
+<meta charset="utf-8" />
+<title>Backend conventions — Canvas Assistant</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="docs.css" />
+
+<header class="hero">
+    <div class="wrap">
+        <h1>Backend conventions</h1>
+        <p>Required reading before any work in <code>backend/</code>. The rules below are enforced by
+            <code>tests/architecture/</code> where they can be — the rest are on review.</p>
+    </div>
+</header>
+
+<div class="wrap">
+    <div class="stackline">
+        <strong>Bun</strong> runtime &middot; <strong>Hono</strong> router &middot; <strong>TypeScript</strong> strict
+        &middot; tests on the Bun test runner &middot; no database yet
+    </div>
+
+    <nav class="toc">
+        <h2>Contents</h2>
+        <ol>
+            <li><a href="#l1"><span class="n">01</span> The layers</a></li>
+            <li><a href="#l2"><span class="n">02</span> Routes</a></li>
+            <li><a href="#l3"><span class="n">03</span> Services</a></li>
+            <li><a href="#l4"><span class="n">04</span> Environment</a></li>
+            <li><a href="#l5"><span class="n">05</span> Logging &amp; student data</a></li>
+            <li><a href="#l6"><span class="n">06</span> Tests</a></li>
+        </ol>
+    </nav>
+
+    <section class="rule" id="l1">
+        <div class="rule-head"><span class="num crit">01</span>
+            <h3>The layers</h3>
+        </div>
+        <div class="rule-body">
+            <p><code>src/routes/&lt;module&gt;/</code> → <code>src/services/&lt;module&gt;/</code>.</p>
+            <p>Each layer may only reach the one directly below it. <code>src/api/</code> is not a layer and must
+                never appear. When a database arrives, a <code>src/repositories/</code> layer goes below services and
+                becomes the only place a query may live.</p>
+        </div>
+    </section>
+
+    <section class="rule" id="l2">
+        <div class="rule-head"><span class="num">02</span>
+            <h3>Routes</h3>
+        </div>
+        <div class="rule-body">
+            <ul>
+                <li>One folder per module: <code>routes/&lt;module&gt;/&lt;module&gt;.ts</code> exporting
+                    <code>router_&lt;module&gt;</code>. No naked <code>.ts</code> files at <code>routes/</code>.</li>
+                <li>Routers stay thin — parse, validate, delegate. No business logic.</li>
+                <li>Respond ONLY through <code>rsp(c, data, stc, message)</code> with the <code>stc</code>/<code>err</code>
+                    enums — never raw <code>c.json</code>. Every caller parses one envelope:
+                    <code>{ data, statusCode, message }</code>.</li>
+                <li>Hono-<code>Context</code> helpers live here (a module's <code>common.ts</code>), never in services.</li>
+                <li>Mount every router in <code>src/index.ts</code>.</li>
+            </ul>
+        </div>
+    </section>
+
+    <section class="rule" id="l3">
+        <div class="rule-head"><span class="num">03</span>
+            <h3>Services</h3>
+        </div>
+        <div class="rule-body">
+            <ul>
+                <li><code>services/&lt;module&gt;/</code> holds the business logic. Feature services never import
+                    <code>hono</code>.</li>
+                <li><code>services/common/svc-*.ts</code> — cross-cutting clients (env, response, log, the model
+                    transport).</li>
+                <li>Functional modules — no classes, no DI container.</li>
+            </ul>
+        </div>
+    </section>
+
+    <section class="rule" id="l4">
+        <div class="rule-head"><span class="num">04</span>
+            <h3>Environment</h3>
+        </div>
+        <div class="rule-body">
+            <p>A new env var goes into <code>EnvKey</code> + <code>app_env</code> + <code>getEnvStatus()</code> in
+                <code>svc-env.ts</code> <strong>and</strong> <code>.env.example</code>, in the same commit. Read env only
+                through <code>app_env</code> — never <code>process.env.X</code> anywhere else.</p>
+            <div class="note warn">A missing credential is a <strong>warning</strong>, not a crash. The API must still
+                boot and answer <code>/health</code>, so the extension can tell "backend down" from "backend up but not
+                configured".</div>
+        </div>
+    </section>
+
+    <section class="rule" id="l5">
+        <div class="rule-head"><span class="num crit">05</span>
+            <h3>Logging &amp; student data</h3>
+        </div>
+        <div class="rule-body">
+            <p>Log through <code>createLogger(tag)</code> from <code>svc-log.ts</code>: one line per event,
+                <code>[tag] message key=value</code>.</p>
+            <div class="note warn"><strong>Never log</strong> an API key, a student's question, Canvas content, or model
+                output. Counts, statuses, timings and field names only. Student data is used to answer the question asked
+                and is not stored.</div>
+        </div>
+    </section>
+
+    <section class="rule" id="l6">
+        <div class="rule-head"><span class="num">06</span>
+            <h3>Tests</h3>
+        </div>
+        <div class="rule-body">
+            <p><code>tests/routes/</code> and <code>tests/services/</code> mirror the <code>src/</code> shape exactly.
+                Tests never talk to live infra — stub <code>fetch</code> or the <code>svc-*</code> boundary.
+                <code>tests/architecture/</code> holds the structural tests (layering, the 200-line limit across the
+                whole repo); they run with everything else.</p>
+        </div>
+    </section>
+</div>
+
+<footer>Update this page in the same commit that changes a convention. See <code>CLAUDE.md</code>.</footer>

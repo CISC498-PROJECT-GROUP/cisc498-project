@@ -1,0 +1,159 @@
+/* The list views — grades, deadlines, support — and the small pieces they share. */
+
+.ca-list-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 2px 4px;
+}
+
+.ca-list-head--spaced {
+    padding-top: 12px;
+}
+
+.ca-section {
+    margin: 0;
+    padding: 0 2px 2px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--ca-muted);
+}
+
+.ca-badge {
+    padding: 3px 9px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--ca-muted);
+    border: 1px solid var(--ca-line-2);
+    border-radius: 999px;
+    white-space: nowrap;
+}
+
+.ca-card {
+    background: var(--ca-surface);
+    border: 1px solid var(--ca-line);
+    border-radius: var(--ca-radius);
+    overflow: hidden;
+}
+
+.ca-strong {
+    font-weight: 700;
+}
+
+.ca-muted {
+    color: var(--ca-muted);
+}
+
+.ca-small {
+    font-size: 12px;
+}
+
+.ca-empty {
+    margin: 24px 0;
+    text-align: center;
+    color: var(--ca-muted);
+}
+
+.ca-stripe {
+    flex-shrink: 0;
+    width: 6px;
+    height: 38px;
+    border-radius: 999px;
+    background: var(--ca-course);
+}
+
+/* Grades */
+.ca-grade-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    min-height: 60px;
+    padding: 10px 14px;
+    text-align: left;
+    background: transparent;
+    border: none;
+}
+
+.ca-grade-name,
+.ca-grade-score {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.ca-grade-name {
+    flex: 1;
+}
+
+.ca-grade-score {
+    align-items: flex-end;
+}
+
+.ca-grade-pct {
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.ca-grade-letter {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--ca-accent);
+}
+
+.ca-grade-cats {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 14px 14px 16px 32px;
+    border-top: 1px solid var(--ca-divider);
+}
+
+.ca-cat-head {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+    font-size: 13px;
+}
+
+.ca-bar {
+    height: 6px;
+    border-radius: 999px;
+    background: var(--ca-divider);
+    overflow: hidden;
+}
+
+.ca-bar-fill {
+    height: 100%;
+    border-radius: 999px;
+    background: var(--ca-course);
+}
+
+.ca-outline-btn {
+    margin-top: 6px;
+    min-height: 44px;
+    font-weight: 700;
+    color: var(--ca-accent);
+    background: var(--ca-surface);
+    border: 1px solid var(--ca-accent);
+    border-radius: 10px;
+}
+
+.ca-outline-btn:hover {
+    background: var(--ca-accent-soft);
+}
+
+.ca-empty--error {
+    color: var(--ca-warn-ink);
+}
+
+.ca-card-link {
+    align-self: flex-start;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ca-accent);
+}

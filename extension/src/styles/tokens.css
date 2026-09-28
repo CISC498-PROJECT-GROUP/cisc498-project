@@ -1,0 +1,69 @@
+/* Design tokens. Components never hardcode a colour — they use these. The accent follows the
+   school's Canvas theme: --ic-brand-primary is defined by Canvas on the page's :root and custom
+   properties inherit into the shadow root. The hex is the fallback when a page lacks it. */
+
+:host {
+    all: initial;
+}
+
+.ca-root {
+    --ca-accent: var(--ic-brand-primary, #2b59c3);
+    --ca-accent-soft: color-mix(in srgb, var(--ca-accent) 12%, white);
+    --ca-on-accent: #ffffff;
+    --ca-ink: #1c1f23;
+    --ca-muted: #5b6168;
+    --ca-faint: #8a8f95;
+    --ca-line: #e4e2dc;
+    --ca-line-2: #d5d2ca;
+    --ca-divider: #eeece6;
+    --ca-surface: #ffffff;
+    --ca-ground: #fafaf7;
+    --ca-tile-bg: #f4f3ef;
+    --ca-online: #7ee0a8;
+    --ca-warn-ink: #8a3b12;
+    --ca-warn-bg: #fce9dc;
+    --ca-done-ink: #1f6a45;
+    --ca-done-bg: #e3f3ea;
+    --ca-shadow-panel: 0 24px 60px rgba(20, 24, 30, 0.22), 0 2px 8px rgba(20, 24, 30, 0.08);
+    --ca-shadow-launcher: 0 10px 24px rgba(20, 24, 30, 0.25);
+    --ca-font: 'Lato Extended', Lato, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    --ca-radius: 12px;
+
+    font-family: var(--ca-font);
+    font-size: 14px;
+    line-height: 1.4;
+    color: var(--ca-ink);
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Resets are wrapped in :where() so they carry zero specificity — any component class, however
+   plain, overrides them. Without it `.ca-root button` outranks `.ca-launcher` and every button
+   loses its colour. */
+:where(.ca-root) *,
+:where(.ca-root) *::before,
+:where(.ca-root) *::after {
+    box-sizing: border-box;
+}
+
+:where(.ca-root) :is(button, input) {
+    font: inherit;
+    color: inherit;
+}
+
+:where(.ca-root) button {
+    cursor: pointer;
+}
+
+.ca-root :focus-visible {
+    outline: 2px solid var(--ca-accent);
+    outline-offset: 2px;
+}
+
+.ca-sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+}
