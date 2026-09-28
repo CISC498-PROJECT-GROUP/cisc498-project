@@ -1,0 +1,17 @@
+{
+    "name": "canvas-assistant",
+    "private": true,
+    "version": "0.0.1",
+    "workspaces": [
+        "backend",
+        "extension",
+        "packages/*"
+    ],
+    "scripts": {
+        "dev": "bun run --cwd extension dev",
+        "dev:api": "bun run --cwd backend dev",
+        "build": "bun run --cwd extension build",
+        "lint": "bun run --cwd backend lint && bun run --cwd extension lint",
+        "test": "bun run --cwd backend test && bun run --cwd extension test"
+    }
+}
