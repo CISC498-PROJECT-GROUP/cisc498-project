@@ -1,30 +1,61 @@
-// Everything due in the next two weeks, across all courses, soonest first.
+// Everything due in the next two weeks, grouped by day, overdue work first. "To do" hides what is
+// already turned in; "All" shows it.
 
+import { useState } from 'preact/hooks';
+import { Icon } from '@/components/common/icon';
 import { LoadState } from '@/components/common/load-state';
+import { Segmented } from '@/components/common/segmented';
 import { DeadlineRow } from '@/components/deadlines/deadline-row';
+import { groupDeadlines, type DeadlineFilter } from '@/services/format/group-deadlines';
 import { useCourses } from '@/services/hooks/use-courses';
-import { useDeadlines, WINDOW_DAYS } from '@/services/hooks/use-deadlines';
+import { useDeadlines } from '@/services/hooks/use-deadlines';
 
-export function DeadlinesView() {
+const FILTERS: { value: DeadlineFilter; label: string }[] = [
+    { value: 'todo', label: 'To do' },
+    { value: 'all', label: 'All' },
+];
+
+export function DeadlinesView({ onAsk }: { onAsk: (question: string) => void }) {
     const deadlines = useDeadlines();
     const courses = useCourses();
+    const [filter, setFilter] = useState<DeadlineFilter>('todo');
     const now = new Date();
-    const open = deadlines.data.filter((d) => !d.submitted).length;
+    const groups = groupDeadlines(deadlines.data, now, filter);
+    const ready = !deadlines.loading && !deadlines.error;
 
     return (
-        <div class="ca-body ca-list">
-            <LoadState state={deadlines} label="your deadlines" />
-            {!deadlines.loading && !deadlines.error && (
-                <div class="ca-list-head">
-                    <span class="ca-muted">
-                        Next {WINDOW_DAYS} days · {open} to do{open !== deadlines.data.length ? `, ${deadlines.data.length - open} done` : ''}
+        <div class="ca-body">
+            <div class="ca-toolbar">
+                <span class="ca-toolbar-title">Next 14 days</span>
+                <Segmented label="Show" value={filter} options={FILTERS} onChange={setFilter} />
+            </div>
+            <LoadState state={deadlines} rows={4} />
+            {ready && groups.length === 0 && (
+                <div class="ca-empty-state">
+                    <span class="ca-empty-icon" aria-hidden="true">
+                        <Icon name="check" size={22} />
                     </span>
+                    <p>{filter === 'todo' ? "You're all caught up for the next two weeks." : 'Nothing dated in the next two weeks.'}</p>
                 </div>
             )}
-            {!deadlines.loading && !deadlines.error && deadlines.data.length === 0 && <p class="ca-empty">Nothing due in the next two weeks.</p>}
-            {deadlines.data.map((deadline) => (
-                <DeadlineRow key={deadline.id} deadline={deadline} course={courses.data.find((c) => c.id === deadline.courseId)} now={now} />
+            {groups.map((group) => (
+                <section key={group.label} class="ca-group">
+                    <h3 class={`ca-group-label ${group.overdue ? 'ca-group-label--alert' : ''}`}>
+                        {group.label}
+                        <span class="ca-group-count">{group.items.length}</span>
+                    </h3>
+                    <div class="ca-list-card">
+                        {group.items.map((d) => (
+                            <DeadlineRow key={d.id} deadline={d} course={courses.data.find((c) => c.id === d.courseId)} overdue={group.overdue} />
+                        ))}
+                    </div>
+                </section>
             ))}
+            {ready && groups.length > 0 && (
+                <button type="button" class="ca-ask-row" onClick={() => onAsk('Help me plan my week: what should I work on first, given what is due and how much each is worth?')}>
+                    Help me plan my week →
+                </button>
+            )}
         </div>
     );
 }

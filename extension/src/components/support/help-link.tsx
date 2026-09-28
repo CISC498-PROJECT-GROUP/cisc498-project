@@ -11,16 +11,16 @@ interface HelpLinkProps {
 
 export function HelpLink({ href, icon, label, description }: HelpLinkProps) {
     return (
-        <a class="ca-card ca-link-row" href={href} target="_blank" rel="noopener noreferrer">
-            <span class="ca-tile ca-tile--sm">
-                <Icon name={icon} size={18} />
+        <a class="ca-row ca-row--link" href={href} target="_blank" rel="noopener noreferrer">
+            <span class="ca-row-icon">
+                <Icon name={icon} size={17} />
             </span>
-            <span class="ca-menu-text">
-                <span class="ca-menu-label">{label}</span>
-                <span class="ca-menu-desc">{description}</span>
+            <span class="ca-row-main">
+                <span class="ca-row-title">{label}</span>
+                <span class="ca-row-meta">{description}</span>
             </span>
-            <span class="ca-chevron">
-                <Icon name="external" size={16} />
+            <span class="ca-row-end">
+                <Icon name="external" size={15} />
             </span>
         </a>
     );

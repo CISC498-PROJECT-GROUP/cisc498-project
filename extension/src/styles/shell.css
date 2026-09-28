@@ -1,60 +1,120 @@
-/* The launcher, the floating panel, and the headers and icon buttons shared by every view. */
+/* The launcher, the floating panel, the headers and icon buttons shared by every view. */
 
 .ca-launcher {
     position: fixed;
-    right: 28px;
-    bottom: 28px;
+    right: 24px;
+    bottom: 24px;
     z-index: 2147483000;
-    width: 60px;
-    height: 60px;
+    width: 56px;
+    height: 56px;
     padding: 0;
     border: none;
     border-radius: 999px;
-    background: var(--ca-accent);
+    background: linear-gradient(145deg, var(--ca-accent), var(--ca-accent-strong));
     color: var(--ca-on-accent);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: var(--ca-shadow-launcher);
-    transition: transform 120ms ease;
+    box-shadow:
+        0 8px 20px -6px color-mix(in srgb, var(--ca-accent) 60%, transparent),
+        0 2px 6px rgba(15, 18, 24, 0.18);
+    transition:
+        transform 200ms var(--ca-ease),
+        box-shadow 200ms var(--ca-ease);
 }
 
 .ca-launcher:hover {
-    transform: scale(1.05);
+    transform: translateY(-2px) scale(1.03);
+}
+
+.ca-launcher:active {
+    transform: scale(0.96);
+}
+
+.ca-launcher-icon {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition:
+        opacity 180ms var(--ca-ease),
+        transform 260ms var(--ca-ease);
+}
+
+.ca-launcher-icon--open,
+.ca-launcher--open .ca-launcher-icon--closed {
+    opacity: 0;
+    transform: rotate(-60deg) scale(0.6);
+}
+
+.ca-launcher--open .ca-launcher-icon--open {
+    opacity: 1;
+    transform: none;
+}
+
+.ca-launcher--busy::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 999px;
+    border: 2px solid var(--ca-accent);
+    animation: ca-ring 1.4s var(--ca-ease) infinite;
+}
+
+@keyframes ca-ring {
+    from {
+        opacity: 0.7;
+        transform: scale(0.94);
+    }
+    to {
+        opacity: 0;
+        transform: scale(1.22);
+    }
 }
 
 .ca-panel {
     position: fixed;
-    right: 28px;
-    bottom: 104px;
+    right: 24px;
+    bottom: 92px;
     z-index: 2147483000;
-    width: 384px;
-    height: 620px;
+    width: 400px;
+    height: min(660px, calc(100vh - 116px));
     max-width: calc(100vw - 32px);
-    max-height: calc(100vh - 128px);
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    background: var(--ca-surface);
-    border: 1px solid var(--ca-line);
-    border-radius: 18px;
+    background: var(--ca-ground);
+    border-radius: 20px;
     box-shadow: var(--ca-shadow-panel);
-    animation: ca-rise 160ms ease-out;
+    transform-origin: calc(100% - 28px) calc(100% + 40px);
+    animation: ca-pop 240ms var(--ca-ease);
+    transition:
+        width 260ms var(--ca-ease),
+        height 260ms var(--ca-ease);
 }
 
-@keyframes ca-rise {
+.ca-panel--expanded {
+    width: min(760px, calc(100vw - 48px));
+    height: calc(100vh - 116px);
+}
+
+@keyframes ca-pop {
     from {
         opacity: 0;
-        transform: translateY(8px);
+        transform: translateY(10px) scale(0.96);
     }
 }
 
-@media (prefers-reduced-motion: reduce) {
-    .ca-panel {
-        animation: none;
-    }
-    .ca-launcher {
-        transition: none;
+.ca-view {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    animation: ca-enter 220ms var(--ca-ease);
+}
+
+@keyframes ca-enter {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
     }
 }
 
@@ -62,11 +122,12 @@
     flex: 1;
     min-height: 0;
     overflow-y: auto;
-    padding: 16px;
+    padding: 14px 16px 20px;
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    background: var(--ca-ground);
+    gap: 10px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--ca-line-2) transparent;
 }
 
 /* A scrolling flex column squashes its children to fit instead of scrolling — keep them whole. */
@@ -77,21 +138,23 @@
 .ca-subheader {
     display: flex;
     align-items: center;
-    gap: 6px;
-    padding: 12px 12px 12px 8px;
+    gap: 2px;
+    padding: 10px 8px 10px 6px;
+    background: var(--ca-surface);
     border-bottom: 1px solid var(--ca-line);
 }
 
 .ca-subheader-title {
     flex: 1;
-    margin: 0;
-    font-size: 16px;
+    margin: 0 0 0 4px;
+    font-size: 15px;
     font-weight: 700;
+    letter-spacing: -0.01em;
 }
 
 .ca-icon-btn {
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
     padding: 0;
     border: none;
     border-radius: 10px;
@@ -99,10 +162,15 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: background 120ms;
 }
 
-.ca-icon-btn:hover {
-    background: var(--ca-tile-bg);
+.ca-icon-btn:hover:not(:disabled) {
+    background: var(--ca-sunken);
+}
+
+.ca-icon-btn:disabled {
+    opacity: 0.4;
 }
 
 .ca-icon-btn--muted {
@@ -110,22 +178,12 @@
 }
 
 .ca-icon-btn--on-accent {
-    width: 36px;
-    height: 36px;
-    background: rgba(255, 255, 255, 0.14);
+    width: 32px;
+    height: 32px;
     color: var(--ca-on-accent);
+    background: rgba(255, 255, 255, 0.12);
 }
 
-.ca-icon-btn--on-accent:hover {
-    background: rgba(255, 255, 255, 0.24);
-}
-
-.ca-chevron {
-    display: flex;
-    color: var(--ca-faint);
-    transition: transform 120ms ease;
-}
-
-.ca-chevron--open {
-    transform: rotate(90deg);
+.ca-icon-btn--on-accent:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.22);
 }

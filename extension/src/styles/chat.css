@@ -1,144 +1,170 @@
-/* The chat view: message bubbles, the typing indicator, starter chips and the composer. */
+/* The chat: empty state, messages, the live status line, and the composer. */
 
 .ca-thread {
+    gap: 16px;
+    padding-top: 18px;
+}
+
+.ca-msg {
+    display: flex;
     gap: 10px;
+    animation: ca-enter 220ms var(--ca-ease);
+}
+
+.ca-msg--user {
+    justify-content: flex-end;
 }
 
 .ca-bubble {
     max-width: 82%;
-    padding: 10px 14px;
-    font-size: 14px;
-    line-height: 1.45;
+    padding: 9px 14px;
+    color: var(--ca-on-accent);
+    background: var(--ca-accent);
+    border-radius: 18px 18px 4px 18px;
     white-space: pre-wrap;
     overflow-wrap: anywhere;
 }
 
-.ca-bubble--bot {
-    align-self: flex-start;
-    max-width: 94%;
-    background: var(--ca-surface);
-    border: 1px solid var(--ca-line);
-    border-radius: 4px 14px 14px 14px;
-}
-
-.ca-bubble--user {
-    align-self: flex-end;
-    background: var(--ca-accent);
-    color: var(--ca-on-accent);
-    border-radius: 14px 4px 14px 14px;
-}
-
-.ca-typing {
-    display: flex;
-    gap: 4px;
-    padding: 14px;
-}
-
-.ca-typing span {
-    width: 6px;
-    height: 6px;
-    border-radius: 999px;
-    background: var(--ca-faint);
-    animation: ca-blink 1s infinite ease-in-out;
-}
-
-.ca-typing span:nth-child(2) {
-    animation-delay: 0.15s;
-}
-
-.ca-typing span:nth-child(3) {
-    animation-delay: 0.3s;
-}
-
-@keyframes ca-blink {
-    0%,
-    80%,
-    100% {
-        opacity: 0.3;
-    }
-    40% {
-        opacity: 1;
-    }
-}
-
-.ca-suggestions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    margin-top: 4px;
-}
-
-.ca-chip {
-    padding: 8px 12px;
-    min-height: 36px;
-    font-size: 13px;
-    color: var(--ca-accent);
-    background: var(--ca-surface);
-    border: 1px solid var(--ca-line-2);
-    border-radius: 999px;
-}
-
-.ca-chip:hover {
-    background: var(--ca-accent-soft);
-}
-
-.ca-composer {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 12px;
-    border-top: 1px solid var(--ca-line);
-    background: var(--ca-surface);
-}
-
-.ca-input {
-    flex: 1;
-    height: 44px;
-    padding: 0 16px;
-    font-size: 14px;
-    border: 1px solid var(--ca-line-2);
-    border-radius: 999px;
-    background: var(--ca-surface);
-}
-
-.ca-input:focus {
-    outline: 2px solid var(--ca-accent);
-    outline-offset: -1px;
-}
-
-.ca-send {
+.ca-avatar {
     flex-shrink: 0;
-    width: 44px;
-    height: 44px;
-    padding: 0;
-    border: none;
+    width: 26px;
+    height: 26px;
+    margin-top: 1px;
     border-radius: 999px;
-    background: var(--ca-accent);
-    color: var(--ca-on-accent);
     display: flex;
     align-items: center;
     justify-content: center;
+    color: var(--ca-on-accent);
+    background: linear-gradient(145deg, var(--ca-accent), var(--ca-accent-strong));
 }
 
-.ca-send:disabled {
-    opacity: 0.45;
-    cursor: default;
+.ca-avatar--lg {
+    width: 44px;
+    height: 44px;
 }
 
-.ca-bubble--error {
-    align-self: flex-start;
-    color: var(--ca-warn-ink);
-    background: var(--ca-warn-bg);
-    border-radius: 4px 14px 14px 14px;
+.ca-avatar--busy {
+    animation: ca-breathe 1.6s ease-in-out infinite;
 }
 
-.ca-pending {
+@keyframes ca-breathe {
+    50% {
+        transform: scale(0.88);
+        opacity: 0.75;
+    }
+}
+
+.ca-answer {
+    min-width: 0;
+    flex: 1;
+    padding-top: 3px;
+    color: var(--ca-ink-2);
+    line-height: 1.55;
+    overflow-wrap: anywhere;
+}
+
+.ca-status {
+    padding-top: 4px;
+}
+
+.ca-status-text {
+    font-size: 13px;
+    font-weight: 700;
+    color: transparent;
+    background: linear-gradient(90deg, var(--ca-faint) 0%, var(--ca-ink-2) 40%, var(--ca-faint) 80%) 0 0 / 200% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    animation: ca-shimmer 1.8s linear infinite;
+}
+
+@keyframes ca-shimmer {
+    to {
+        background-position: -200% 0;
+    }
+}
+
+.ca-msg--error {
+    align-items: flex-start;
+    gap: 8px;
+    padding: 10px 12px;
+    font-size: 13px;
+    color: var(--ca-alert-ink);
+    background: var(--ca-alert-bg);
+    border-radius: 12px;
+}
+
+.ca-empty-chat {
+    margin: auto 0;
+    padding: 8px 4px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.ca-empty-title {
+    margin: 14px 0 4px;
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+}
+
+.ca-empty-sub {
+    max-width: 300px;
+    margin: 0 0 18px;
+    font-size: 13px;
+    color: var(--ca-muted);
+}
+
+.ca-starters {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.ca-starter {
     display: flex;
     align-items: center;
     gap: 10px;
+    width: 100%;
+    padding: 11px 12px;
+    text-align: left;
+    color: var(--ca-ink-2);
+    background: var(--ca-surface);
+    border: 1px solid var(--ca-line);
+    border-radius: 12px;
+    transition:
+        border-color 140ms,
+        background 140ms;
 }
 
-.ca-activity {
-    font-size: 12px;
-    color: var(--ca-muted);
+.ca-starter > :first-child {
+    color: var(--ca-accent);
+}
+
+.ca-starter > span:not(.ca-starter-go) {
+    flex: 1;
+}
+
+.ca-starter-go {
+    display: flex;
+    color: var(--ca-faint);
+    transition: transform 160ms var(--ca-ease);
+}
+
+.ca-starter:hover {
+    border-color: var(--ca-line-2);
+    background: var(--ca-accent-tint);
+}
+
+.ca-starter:hover .ca-starter-go {
+    transform: translateX(3px);
+    color: var(--ca-accent);
+}
+
+/* Expanded, keep the thread at a readable measure instead of stretching lines across the screen. */
+.ca-panel--expanded .ca-thread,
+.ca-panel--expanded .ca-chat-foot {
+    padding-inline: max(16px, calc((100% - 700px) / 2));
 }

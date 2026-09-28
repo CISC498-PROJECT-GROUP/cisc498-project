@@ -8,30 +8,37 @@
 
 .ca-root {
     --ca-accent: var(--ic-brand-primary, #2b59c3);
-    --ca-accent-soft: color-mix(in srgb, var(--ca-accent) 12%, white);
+    --ca-accent-strong: color-mix(in srgb, var(--ca-accent) 72%, #0b0d12);
+    --ca-accent-soft: color-mix(in srgb, var(--ca-accent) 11%, white);
+    --ca-accent-tint: color-mix(in srgb, var(--ca-accent) 5%, white);
     --ca-on-accent: #ffffff;
-    --ca-ink: #1c1f23;
-    --ca-muted: #5b6168;
-    --ca-faint: #8a8f95;
-    --ca-line: #e4e2dc;
-    --ca-line-2: #d5d2ca;
-    --ca-divider: #eeece6;
+
+    --ca-ink: #15171c;
+    --ca-ink-2: #383d46;
+    --ca-muted: #646a74;
+    --ca-faint: #9298a1;
+    --ca-line: #e8e6e1;
+    --ca-line-2: #dad7cf;
+    --ca-divider: #f0eee9;
     --ca-surface: #ffffff;
-    --ca-ground: #fafaf7;
-    --ca-tile-bg: #f4f3ef;
-    --ca-online: #7ee0a8;
-    --ca-warn-ink: #8a3b12;
-    --ca-warn-bg: #fce9dc;
-    --ca-done-ink: #1f6a45;
-    --ca-done-bg: #e3f3ea;
-    --ca-shadow-panel: 0 24px 60px rgba(20, 24, 30, 0.22), 0 2px 8px rgba(20, 24, 30, 0.08);
-    --ca-shadow-launcher: 0 10px 24px rgba(20, 24, 30, 0.25);
+    --ca-ground: #f9f8f6;
+    --ca-sunken: #f2f1ed;
+
+    --ca-alert-ink: #a23a17;
+    --ca-alert-bg: #fdeee6;
+    --ca-done-ink: #1c6b45;
+    --ca-done-bg: #e5f4eb;
+
+    --ca-shadow-panel: 0 0 0 1px rgba(15, 18, 24, 0.06), 0 10px 24px -8px rgba(15, 18, 24, 0.16), 0 28px 60px -16px rgba(15, 18, 24, 0.28);
+    --ca-shadow-card: 0 1px 2px rgba(15, 18, 24, 0.04);
+    --ca-shadow-lift: 0 6px 16px -6px rgba(15, 18, 24, 0.16);
+    --ca-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
     --ca-font: 'Lato Extended', Lato, 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    --ca-radius: 12px;
+    --ca-radius: 14px;
 
     font-family: var(--ca-font);
     font-size: 14px;
-    line-height: 1.4;
+    line-height: 1.45;
     color: var(--ca-ink);
     -webkit-font-smoothing: antialiased;
 }
@@ -45,13 +52,17 @@
     box-sizing: border-box;
 }
 
-:where(.ca-root) :is(button, input) {
+:where(.ca-root) :is(button, input, textarea) {
     font: inherit;
     color: inherit;
 }
 
 :where(.ca-root) button {
     cursor: pointer;
+}
+
+:where(.ca-root) button:disabled {
+    cursor: default;
 }
 
 .ca-root :focus-visible {
@@ -66,4 +77,21 @@
     overflow: hidden;
     clip: rect(0 0 0 0);
     white-space: nowrap;
+}
+
+.ca-muted {
+    color: var(--ca-muted);
+}
+
+.ca-small {
+    font-size: 12px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ca-root *,
+    .ca-root *::before,
+    .ca-root *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+    }
 }

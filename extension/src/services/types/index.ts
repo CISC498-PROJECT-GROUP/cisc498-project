@@ -59,4 +59,6 @@ export interface Loadable<T> {
     data: T;
     loading: boolean;
     error: string | null;
+    /** Run the loader again — offered on the error state. */
+    retry: () => void;
 }
