@@ -1,0 +1,4 @@
+# Bun runtime + test config for the backend.
+[test]
+# Tests never talk to live infra — svc-* boundaries are mocked in tests/.
+timeout = 15000
