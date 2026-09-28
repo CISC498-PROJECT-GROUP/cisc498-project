@@ -15,6 +15,7 @@
 
 .ca-bubble--bot {
     align-self: flex-start;
+    max-width: 94%;
     background: var(--ca-surface);
     border: 1px solid var(--ca-line);
     border-radius: 4px 14px 14px 14px;
@@ -125,19 +126,19 @@
 }
 
 .ca-bubble--error {
-  align-self: flex-start;
-  color: var(--ca-warn-ink);
-  background: var(--ca-warn-bg);
-  border-radius: 4px 14px 14px 14px;
+    align-self: flex-start;
+    color: var(--ca-warn-ink);
+    background: var(--ca-warn-bg);
+    border-radius: 4px 14px 14px 14px;
 }
 
 .ca-pending {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
 .ca-activity {
-  font-size: 12px;
-  color: var(--ca-muted);
+    font-size: 12px;
+    color: var(--ca-muted);
 }

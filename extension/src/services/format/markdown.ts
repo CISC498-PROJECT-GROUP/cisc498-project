@@ -3,7 +3,7 @@
 // It produces a token tree, never HTML, so rendering it cannot inject markup; links are allowed
 // only to http(s) URLs and site-relative paths.
 
-export type Inline = { kind: 'text' | 'bold' | 'italic' | 'code'; text: string } | { kind: 'link'; text: string; href: string };
+export type Inline = { kind: 'text'; text: string } | { kind: 'code'; text: string } | { kind: 'bold'; children: Inline[] } | { kind: 'italic'; children: Inline[] } | { kind: 'link'; text: string; href: string };
 
 export type Block = { kind: 'p'; lines: Inline[][] } | { kind: 'ul' | 'ol'; items: Inline[][] };
 
@@ -25,13 +25,13 @@ export function parseInline(line: string, origin: string): Inline[] {
         const token = match[0];
         if (match.index! > last) out.push({ kind: 'text', text: line.slice(last, match.index) });
         last = match.index! + token.length;
-        if (token.startsWith('**') || token.startsWith('__')) out.push({ kind: 'bold', text: token.slice(2, -2) });
+        if (token.startsWith('**') || token.startsWith('__')) out.push({ kind: 'bold', children: parseInline(token.slice(2, -2), origin) });
         else if (token.startsWith('`')) out.push({ kind: 'code', text: token.slice(1, -1) });
         else if (token.startsWith('[')) {
             const [, text, href] = /^\[([^\]]+)\]\(([^)\s]+)\)$/.exec(token)!;
             const safe = safeHref(href!, origin);
             out.push(safe ? { kind: 'link', text: text!, href: safe } : { kind: 'text', text: text! });
-        } else out.push({ kind: 'italic', text: token.slice(1, -1) });
+        } else out.push({ kind: 'italic', children: parseInline(token.slice(1, -1), origin) });
     }
     if (last < line.length) out.push({ kind: 'text', text: line.slice(last) });
     return out;

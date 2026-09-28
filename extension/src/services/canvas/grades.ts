@@ -6,8 +6,7 @@ import type { RawAssignment, RawAssignmentGroup } from '@/services/canvas/canvas
 import type { GradeGroup } from '@/services/types';
 
 /** Counts toward the current score: graded, not excused, not omitted, worth points. */
-export const counts = (a: RawAssignment): boolean =>
-    !a.omit_from_final_grade && (a.points_possible ?? 0) > 0 && a.submission?.excused !== true && typeof a.submission?.score === 'number';
+export const counts = (a: RawAssignment): boolean => !a.omit_from_final_grade && (a.points_possible ?? 0) > 0 && a.submission?.excused !== true && typeof a.submission?.score === 'number';
 
 export function summariseGroups(groups: RawAssignmentGroup[], weighted: boolean): GradeGroup[] {
     return groups.map((group) => {
@@ -26,5 +25,4 @@ export function summariseGroups(groups: RawAssignmentGroup[], weighted: boolean)
     });
 }
 
-export const fetchAssignmentGroups = (courseId: string): Promise<RawAssignmentGroup[]> =>
-    canvasGetAll<RawAssignmentGroup>(`/courses/${courseId}/assignment_groups`, { 'include[]': ['assignments', 'submission'] });
+export const fetchAssignmentGroups = (courseId: string): Promise<RawAssignmentGroup[]> => canvasGetAll<RawAssignmentGroup>(`/courses/${courseId}/assignment_groups`, { 'include[]': ['assignments', 'submission'] });

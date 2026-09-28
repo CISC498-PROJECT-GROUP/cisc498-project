@@ -17,10 +17,7 @@ export function DeadlineRow({ deadline, course, now }: DeadlineRowProps) {
     const Tag = deadline.url ? 'a' : 'div';
 
     return (
-        <Tag
-            class={`ca-card ca-deadline ${deadline.submitted ? 'ca-deadline--done' : ''}`}
-            style={{ '--ca-course': course?.color ?? 'var(--ca-faint)' }}
-            {...(deadline.url ? { href: deadline.url, target: '_blank', rel: 'noopener noreferrer' } : {})}>
+        <Tag class={`ca-card ca-deadline ${deadline.submitted ? 'ca-deadline--done' : ''}`} style={{ '--ca-course': course?.color ?? 'var(--ca-faint)' }} {...(deadline.url ? { href: deadline.url, target: '_blank', rel: 'noopener noreferrer' } : {})}>
             <div class="ca-date-tile" aria-hidden="true">
                 <span class="ca-date-month">{tile.month}</span>
                 <span class="ca-date-day">{tile.day}</span>

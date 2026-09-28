@@ -28,10 +28,7 @@ export const mapPlannerItem = (item: RawPlannerItem): Deadline | null => {
 /** Planner items dated between `daysBack` days ago and `daysAhead` days from now, soonest first. */
 export async function fetchPlanner(daysAhead: number, daysBack = 0): Promise<Deadline[]> {
     const now = Date.now();
-    const items = await canvasGetAll<RawPlannerItem>('/planner/items', {
-        start_date: new Date(now - daysBack * DAY_MS).toISOString(),
-        end_date: new Date(now + daysAhead * DAY_MS).toISOString(),
-    });
+    const items = await canvasGetAll<RawPlannerItem>('/planner/items', { start_date: new Date(now - daysBack * DAY_MS).toISOString(), end_date: new Date(now + daysAhead * DAY_MS).toISOString() });
     return items
         .map(mapPlannerItem)
         .filter((d): d is Deadline => d !== null)

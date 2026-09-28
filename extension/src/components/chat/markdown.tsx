@@ -8,8 +8,14 @@ function InlineRun({ tokens }: { tokens: Inline[] }) {
     return (
         <>
             {tokens.map((t, i) => {
-                if (t.kind === 'bold') return <strong key={i}>{t.text}</strong>;
-                if (t.kind === 'italic') return <em key={i}>{t.text}</em>;
+                if (t.kind === 'bold' || t.kind === 'italic') {
+                    const Tag = t.kind === 'bold' ? 'strong' : 'em';
+                    return (
+                        <Tag key={i}>
+                            <InlineRun tokens={t.children} />
+                        </Tag>
+                    );
+                }
                 if (t.kind === 'code') return <code key={i}>{t.text}</code>;
                 if (t.kind === 'link')
                     return (

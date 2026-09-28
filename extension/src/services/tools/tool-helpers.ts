@@ -33,5 +33,4 @@ export const MAX_TEXT = 40_000;
 export const clip = (text: string, max = MAX_TEXT): string => (text.length <= max ? text : `${text.slice(0, max)}\n\n[Truncated: ${text.length - max} more characters not shown.]`);
 
 /** Compact JSON with nulls and empty strings dropped — fewer tokens, same facts. */
-export const toJson = (value: unknown): string =>
-    clip(JSON.stringify(value, (_key, v: unknown) => (v === null || v === '' || (Array.isArray(v) && v.length === 0) ? undefined : v)));
+export const toJson = (value: unknown): string => clip(JSON.stringify(value, (_key, v: unknown) => (v === null || v === '' || (Array.isArray(v) && v.length === 0) ? undefined : v)));

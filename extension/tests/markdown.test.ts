@@ -9,14 +9,18 @@ const ORIGIN = 'https://canvas.example.edu';
 describe('markdown', () => {
     it('parses bold, code, italic and links', () => {
         expect(parseInline('**Due** `Fri` at *noon*, see [HW](/courses/1/assignments/2)', ORIGIN)).toEqual([
-            { kind: 'bold', text: 'Due' },
+            { kind: 'bold', children: [{ kind: 'text', text: 'Due' }] },
             { kind: 'text', text: ' ' },
             { kind: 'code', text: 'Fri' },
             { kind: 'text', text: ' at ' },
-            { kind: 'italic', text: 'noon' },
+            { kind: 'italic', children: [{ kind: 'text', text: 'noon' }] },
             { kind: 'text', text: ', see ' },
             { kind: 'link', text: 'HW', href: 'https://canvas.example.edu/courses/1/assignments/2' },
         ]);
+    });
+
+    it('parses a link inside bold', () => {
+        expect(parseInline('**[HW 6](/courses/1/assignments/2)**', ORIGIN)).toEqual([{ kind: 'bold', children: [{ kind: 'link', text: 'HW 6', href: 'https://canvas.example.edu/courses/1/assignments/2' }] }]);
     });
 
     it('refuses javascript: and data: links, keeping their text', () => {
@@ -32,6 +36,6 @@ describe('markdown', () => {
     });
 
     it('turns a heading into a bold line rather than markup', () => {
-        expect(parseMarkdown('## Late policy', ORIGIN)).toEqual([{ kind: 'p', lines: [[{ kind: 'bold', text: 'Late policy' }]] }]);
+        expect(parseMarkdown('## Late policy', ORIGIN)).toEqual([{ kind: 'p', lines: [[{ kind: 'bold', children: [{ kind: 'text', text: 'Late policy' }] }]] }]);
     });
 });

@@ -33,13 +33,8 @@ export const mapCourse = (raw: RawCourse, color: string): Course => {
 };
 
 async function fetchCourses(): Promise<Course[]> {
-    const [raw, colors] = await Promise.all([
-        canvasGetAll<RawCourse>('/courses', COURSE_PARAMS),
-        canvasGet<{ custom_colors?: Record<string, string> }>('/users/self/colors').catch(() => ({ custom_colors: {} as Record<string, string> })),
-    ]);
-    return raw
-        .filter((c) => !c.access_restricted_by_date && c.name)
-        .map((c, i) => mapCourse(c, colors.custom_colors?.[`course_${c.id}`] ?? PALETTE[i % PALETTE.length]!));
+    const [raw, colors] = await Promise.all([canvasGetAll<RawCourse>('/courses', COURSE_PARAMS), canvasGet<{ custom_colors?: Record<string, string> }>('/users/self/colors').catch(() => ({ custom_colors: {} as Record<string, string> }))]);
+    return raw.filter((c) => !c.access_restricted_by_date && c.name).map((c, i) => mapCourse(c, colors.custom_colors?.[`course_${c.id}`] ?? PALETTE[i % PALETTE.length]!));
 }
 
 let courses: Promise<Course[]> | null = null;

@@ -6,7 +6,10 @@ import type { GradeGroup, Loadable } from '@/services/types';
 
 async function load(courseId: string): Promise<GradeGroup[]> {
     const groups = await fetchAssignmentGroups(courseId);
-    return summariseGroups(groups, groups.some((g) => (g.group_weight ?? 0) > 0));
+    return summariseGroups(
+        groups,
+        groups.some((g) => (g.group_weight ?? 0) > 0),
+    );
 }
 
 export const useGradeGroups = (courseId: string): Loadable<GradeGroup[]> => useLoad(() => load(courseId), [], courseId);

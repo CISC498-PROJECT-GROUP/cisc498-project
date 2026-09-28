@@ -4,18 +4,6 @@
     "version": "0.1.0",
     "description": "Ask about your Canvas courses — due dates, grades and syllabus details — right from the dashboard.",
     "background": { "service_worker": "background.js" },
-    "content_scripts": [
-        {
-            "matches": ["https://*.instructure.com/*", "https://canvas.udel.edu/*"],
-            "js": ["content.js"],
-            "run_at": "document_idle"
-        }
-    ],
-    "host_permissions": [
-        "https://*.instructure.com/*",
-        "https://canvas.udel.edu/*",
-        "https://*.inscloudgate.net/*",
-        "https://*.instructure-uploads.com/*",
-        "https://*.canvas-user-content.com/*"
-    ]
+    "content_scripts": [{ "matches": ["https://*.instructure.com/*", "https://canvas.udel.edu/*"], "js": ["content.js"], "run_at": "document_idle" }],
+    "host_permissions": ["https://*.instructure.com/*", "https://canvas.udel.edu/*", "https://*.inscloudgate.net/*", "https://*.instructure-uploads.com/*", "https://*.canvas-user-content.com/*"]
 }
