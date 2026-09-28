@@ -1,0 +1,143 @@
+/* The chat view: message bubbles, the typing indicator, starter chips and the composer. */
+
+.ca-thread {
+    gap: 10px;
+}
+
+.ca-bubble {
+    max-width: 82%;
+    padding: 10px 14px;
+    font-size: 14px;
+    line-height: 1.45;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.ca-bubble--bot {
+    align-self: flex-start;
+    background: var(--ca-surface);
+    border: 1px solid var(--ca-line);
+    border-radius: 4px 14px 14px 14px;
+}
+
+.ca-bubble--user {
+    align-self: flex-end;
+    background: var(--ca-accent);
+    color: var(--ca-on-accent);
+    border-radius: 14px 4px 14px 14px;
+}
+
+.ca-typing {
+    display: flex;
+    gap: 4px;
+    padding: 14px;
+}
+
+.ca-typing span {
+    width: 6px;
+    height: 6px;
+    border-radius: 999px;
+    background: var(--ca-faint);
+    animation: ca-blink 1s infinite ease-in-out;
+}
+
+.ca-typing span:nth-child(2) {
+    animation-delay: 0.15s;
+}
+
+.ca-typing span:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+@keyframes ca-blink {
+    0%,
+    80%,
+    100% {
+        opacity: 0.3;
+    }
+    40% {
+        opacity: 1;
+    }
+}
+
+.ca-suggestions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 4px;
+}
+
+.ca-chip {
+    padding: 8px 12px;
+    min-height: 36px;
+    font-size: 13px;
+    color: var(--ca-accent);
+    background: var(--ca-surface);
+    border: 1px solid var(--ca-line-2);
+    border-radius: 999px;
+}
+
+.ca-chip:hover {
+    background: var(--ca-accent-soft);
+}
+
+.ca-composer {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px;
+    border-top: 1px solid var(--ca-line);
+    background: var(--ca-surface);
+}
+
+.ca-input {
+    flex: 1;
+    height: 44px;
+    padding: 0 16px;
+    font-size: 14px;
+    border: 1px solid var(--ca-line-2);
+    border-radius: 999px;
+    background: var(--ca-surface);
+}
+
+.ca-input:focus {
+    outline: 2px solid var(--ca-accent);
+    outline-offset: -1px;
+}
+
+.ca-send {
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: none;
+    border-radius: 999px;
+    background: var(--ca-accent);
+    color: var(--ca-on-accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ca-send:disabled {
+    opacity: 0.45;
+    cursor: default;
+}
+
+.ca-bubble--error {
+  align-self: flex-start;
+  color: var(--ca-warn-ink);
+  background: var(--ca-warn-bg);
+  border-radius: 4px 14px 14px 14px;
+}
+
+.ca-pending {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ca-activity {
+  font-size: 12px;
+  color: var(--ca-muted);
+}

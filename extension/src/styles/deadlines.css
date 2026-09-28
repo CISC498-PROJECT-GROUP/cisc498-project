@@ -1,0 +1,125 @@
+/* Deadlines and support rows. */
+
+.ca-deadline,
+.ca-link-row,
+.ca-teacher {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+}
+
+.ca-date-tile {
+    flex-shrink: 0;
+    width: 48px;
+    padding: 6px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-radius: 8px;
+    background: var(--ca-tile-bg);
+}
+
+.ca-date-month {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--ca-muted);
+}
+
+.ca-date-day {
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.1;
+}
+
+.ca-deadline-text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.ca-course-tag {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--ca-muted);
+}
+
+.ca-course-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: var(--ca-course);
+}
+
+.ca-soon {
+    padding: 4px 10px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--ca-warn-ink);
+    background: var(--ca-warn-bg);
+    border-radius: 999px;
+    white-space: nowrap;
+}
+
+.ca-link-row {
+    min-height: 56px;
+    padding: 10px 14px;
+    text-decoration: none;
+    color: var(--ca-ink);
+}
+
+.ca-teacher {
+    padding: 10px 14px;
+}
+
+a.ca-deadline {
+    text-decoration: none;
+    color: var(--ca-ink);
+}
+
+a.ca-deadline:hover {
+    border-color: var(--ca-line-2);
+}
+
+.ca-deadline--done {
+    opacity: 0.7;
+}
+
+.ca-status {
+    padding: 4px 10px;
+    font-size: 12px;
+    font-weight: 700;
+    border-radius: 999px;
+    white-space: nowrap;
+}
+
+.ca-status--done {
+    color: var(--ca-done-ink);
+    background: var(--ca-done-bg);
+}
+
+.ca-status--missing {
+    color: var(--ca-warn-ink);
+    background: var(--ca-warn-bg);
+}
+
+.ca-teacher-name {
+    color: var(--ca-ink);
+    text-decoration: none;
+}
+
+.ca-teacher-name:hover {
+    text-decoration: underline;
+}
+
+.ca-chip--sm {
+    flex-shrink: 0;
+    min-height: 32px;
+    padding: 6px 10px;
+    font-size: 12px;
+}

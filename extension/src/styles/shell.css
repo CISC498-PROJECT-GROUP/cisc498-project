@@ -1,0 +1,131 @@
+/* The launcher, the floating panel, and the headers and icon buttons shared by every view. */
+
+.ca-launcher {
+    position: fixed;
+    right: 28px;
+    bottom: 28px;
+    z-index: 2147483000;
+    width: 60px;
+    height: 60px;
+    padding: 0;
+    border: none;
+    border-radius: 999px;
+    background: var(--ca-accent);
+    color: var(--ca-on-accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--ca-shadow-launcher);
+    transition: transform 120ms ease;
+}
+
+.ca-launcher:hover {
+    transform: scale(1.05);
+}
+
+.ca-panel {
+    position: fixed;
+    right: 28px;
+    bottom: 104px;
+    z-index: 2147483000;
+    width: 384px;
+    height: 620px;
+    max-width: calc(100vw - 32px);
+    max-height: calc(100vh - 128px);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--ca-surface);
+    border: 1px solid var(--ca-line);
+    border-radius: 18px;
+    box-shadow: var(--ca-shadow-panel);
+    animation: ca-rise 160ms ease-out;
+}
+
+@keyframes ca-rise {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ca-panel {
+        animation: none;
+    }
+    .ca-launcher {
+        transition: none;
+    }
+}
+
+.ca-body {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: var(--ca-ground);
+}
+
+/* A scrolling flex column squashes its children to fit instead of scrolling — keep them whole. */
+.ca-body > * {
+    flex-shrink: 0;
+}
+
+.ca-subheader {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 12px 12px 12px 8px;
+    border-bottom: 1px solid var(--ca-line);
+}
+
+.ca-subheader-title {
+    flex: 1;
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.ca-icon-btn {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: none;
+    border-radius: 10px;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ca-icon-btn:hover {
+    background: var(--ca-tile-bg);
+}
+
+.ca-icon-btn--muted {
+    color: var(--ca-muted);
+}
+
+.ca-icon-btn--on-accent {
+    width: 36px;
+    height: 36px;
+    background: rgba(255, 255, 255, 0.14);
+    color: var(--ca-on-accent);
+}
+
+.ca-icon-btn--on-accent:hover {
+    background: rgba(255, 255, 255, 0.24);
+}
+
+.ca-chevron {
+    display: flex;
+    color: var(--ca-faint);
+    transition: transform 120ms ease;
+}
+
+.ca-chevron--open {
+    transform: rotate(90deg);
+}

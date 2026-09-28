@@ -1,0 +1,135 @@
+/* The home view: the accent greeting header, the menu rows and the ask pseudo-input. */
+
+.ca-hero {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 20px 20px 22px;
+    background: var(--ca-accent);
+    color: var(--ca-on-accent);
+}
+
+.ca-hero-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.ca-hero-name {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    opacity: 0.92;
+}
+
+.ca-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: var(--ca-online);
+}
+
+.ca-hero-title {
+    margin: 0;
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 1.15;
+}
+
+.ca-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+    min-height: 68px;
+    padding: 12px 14px;
+    text-align: left;
+    background: var(--ca-surface);
+    border: 1px solid var(--ca-line);
+    border-radius: var(--ca-radius);
+}
+
+.ca-menu-item:hover,
+.ca-link-row:hover {
+    border-color: var(--ca-line-2);
+    box-shadow: 0 1px 3px rgba(20, 24, 30, 0.08);
+}
+
+.ca-tile {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: var(--ca-accent-soft);
+    color: var(--ca-accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ca-tile--sm {
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+}
+
+.ca-menu-text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.ca-menu-label {
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.ca-menu-desc {
+    font-size: 13px;
+    color: var(--ca-muted);
+    line-height: 1.35;
+}
+
+.ca-spacer {
+    flex: 1;
+}
+
+.ca-ask {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    height: 48px;
+    padding: 0 8px 0 16px;
+    text-align: left;
+    color: var(--ca-muted);
+    background: var(--ca-surface);
+    border: 1px solid var(--ca-line-2);
+    border-radius: 999px;
+}
+
+.ca-ask-text {
+    flex: 1;
+}
+
+.ca-ask-go {
+    width: 34px;
+    height: 34px;
+    border-radius: 999px;
+    background: var(--ca-accent);
+    color: var(--ca-on-accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ca-footnote {
+    margin: 0;
+    font-size: 12px;
+    color: var(--ca-muted);
+    text-align: center;
+}
