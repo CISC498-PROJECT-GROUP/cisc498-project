@@ -177,7 +177,9 @@ onto Canvas. Path alias `@/*` → `extension/src`.
   trip back to the menu). Keyboard events are stopped at this root — Canvas binds global shortcuts
   on `document`, and typing in the chat box would otherwise trigger them.
 - `components/<feature>/` — `shell/` is the launcher and panel chrome; `home/`, `chat/`,
-  `grades/`, `deadlines/`, `support/` are the views; `common/` holds the icon set and load states.
+  `grades/`, `deadlines/`, `support/` are the views; `common/` holds the icon set, the segmented
+  toggle and `LoadState` (skeletons while loading, an error card with retry — every `Loadable` has
+  `retry()`). `chat/composer.tsx` is shared by the chat and the home screen.
 - `background.ts` — the service worker. It relays backend calls (avoiding the page's CORS and
   Chrome's local-network prompt) and file downloads (Canvas file URLs redirect cross-origin).
 - `services/hooks/use-*.ts` — every data source. `services/canvas/` — the REST client and the

@@ -23,9 +23,21 @@
     margin-top: 3px;
 }
 
+.ca-md strong {
+    color: var(--ca-ink);
+}
+
 .ca-md a {
     color: var(--ca-accent);
+    font-weight: 700;
     text-decoration: underline;
+    text-decoration-color: color-mix(in srgb, var(--ca-accent) 30%, transparent);
+    text-underline-offset: 3px;
+    transition: text-decoration-color 120ms;
+}
+
+.ca-md a:hover {
+    text-decoration-color: currentColor;
 }
 
 .ca-md code {

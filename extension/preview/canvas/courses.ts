@@ -18,7 +18,7 @@ export const SYLLABI: Record<number, string> = {
 <p><strong>Office hours:</strong> Tuesdays and Thursdays 2:00–3:30 PM, Smith Hall 204, or by appointment.</p>
 <h3>Grading</h3><table><tr><td>Homework</td><td>40%</td></tr><tr><td>Quizzes</td><td>20%</td></tr><tr><td>Midterm</td><td>15%</td></tr><tr><td>Final Project</td><td>25%</td></tr></table>
 <h3>Late work</h3><p>Homework loses 10% per day late, up to 3 days; after that it receives a zero. You get two free "grace days" per semester — email the TA to use one.</p>
-<p>The midterm is on <strong>October 20</strong> in class. The final project is due <strong>December 10</strong>.</p>`,
+<p>The midterm was held in class the week of <strong>September 21</strong>. The final project is due <strong>December 10</strong>.</p>`,
     102: '',
     103: '',
     104: `<h2>PHYS 207 — Physics I</h2><p>Office hours: Wednesdays 3:00–4:30 PM, Sharp Lab 118.</p>

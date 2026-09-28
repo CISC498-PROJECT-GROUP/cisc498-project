@@ -12,14 +12,14 @@ import { runTurn, type ToolCall } from '@/services/chat/run-turn';
 import { TOOL_ACTIVITY } from '@/services/tools';
 import type { ChatMessage } from '@/services/types';
 
-export const GREETING = 'Hi! Ask me about your courses — due dates, grades, or anything in a syllabus.';
-
 export interface ChatState {
     messages: ChatMessage[];
     pending: boolean;
     /** e.g. "Reading the syllabus" while a tool runs; null otherwise. */
     activity: string | null;
     send: (text: string) => void;
+    /** Start a fresh conversation. Ignored while a reply is pending. */
+    reset: () => void;
 }
 
 let next_id = 0;
@@ -31,7 +31,7 @@ const describe = (calls: ToolCall[]): string => {
 };
 
 export function useChat(): ChatState {
-    const [messages, setMessages] = useState<ChatMessage[]>(() => [message('assistant', GREETING)]);
+    const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [pending, setPending] = useState(false);
     const [activity, setActivity] = useState<string | null>(null);
     const history = useRef<ChatMessageParam[]>([]);
@@ -61,5 +61,11 @@ export function useChat(): ChatState {
         })();
     }, []);
 
-    return { messages, pending, activity, send };
+    const reset = useCallback(() => {
+        if (busy.current) return;
+        history.current = [];
+        setMessages([]);
+    }, []);
+
+    return { messages, pending, activity, send, reset };
 }

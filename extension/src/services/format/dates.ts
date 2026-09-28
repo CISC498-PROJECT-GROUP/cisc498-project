@@ -45,3 +45,16 @@ export const localStamp = (iso: string | null | undefined): string | null => {
 };
 
 export const timeZone = (): string => Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+/** "Good morning" until noon, "Good afternoon" until 5 PM, then "Good evening". */
+export const greeting = (now: Date): string => (now.getHours() < 12 ? 'Good morning' : now.getHours() < 17 ? 'Good afternoon' : 'Good evening');
+
+/** A day heading for grouped lists: "Today", "Tomorrow", "Yesterday", else "Thu, Oct 1". */
+export const dayLabel = (date: Date, now: Date): string => {
+    const days = calendarDaysUntil(date, now);
+    if (days === 0) return 'Today';
+    if (days === 1) return 'Tomorrow';
+    if (days === -1) return 'Yesterday';
+    const tile = dateTile(date);
+    return `${tile.weekday}, ${tile.month} ${tile.day}`;
+};

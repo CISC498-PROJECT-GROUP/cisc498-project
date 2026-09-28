@@ -1,0 +1,136 @@
+/* Grade cards, and the chips, links and prompts the list views share. */
+
+.ca-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.ca-grade {
+    overflow: hidden;
+    background: var(--ca-surface);
+    border: 1px solid var(--ca-line);
+    border-radius: var(--ca-radius);
+    box-shadow: var(--ca-shadow-card);
+    transition: box-shadow 160ms var(--ca-ease);
+}
+
+.ca-grade--open {
+    box-shadow: var(--ca-shadow-lift);
+}
+
+.ca-grade-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 13px 12px 10px 16px;
+    text-align: left;
+    background: transparent;
+    border: none;
+}
+
+.ca-grade-name {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.ca-grade-code {
+    font-weight: 700;
+}
+
+.ca-grade-title {
+    font-size: 12px;
+    color: var(--ca-muted);
+}
+
+.ca-grade-score {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+}
+
+.ca-grade-pct {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    font-variant-numeric: tabular-nums;
+}
+
+.ca-grade-letter {
+    min-width: 28px;
+    padding: 2px 7px;
+    font-size: 12px;
+    font-weight: 700;
+    text-align: center;
+    color: var(--ca-accent);
+    background: var(--ca-accent-soft);
+    border-radius: 7px;
+}
+
+.ca-meter,
+.ca-bar {
+    height: 4px;
+    margin: 0 16px 14px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: var(--ca-divider);
+}
+
+.ca-meter-fill,
+.ca-bar-fill {
+    display: block;
+    height: 100%;
+    border-radius: 999px;
+    background: var(--ca-course);
+    transition: width 500ms var(--ca-ease);
+}
+
+.ca-grade-body {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 12px 16px 14px;
+    background: var(--ca-ground);
+    border-top: 1px solid var(--ca-divider);
+    animation: ca-enter 200ms var(--ca-ease);
+}
+
+.ca-cat-head {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 6px;
+    font-size: 13px;
+}
+
+.ca-cat-name {
+    font-weight: 700;
+}
+
+.ca-cat-weight {
+    margin-left: 6px;
+    font-weight: 400;
+    color: var(--ca-faint);
+}
+
+.ca-cat-score {
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+.ca-cat .ca-bar {
+    margin: 0;
+}
+
+.ca-chevron {
+    display: flex;
+    color: var(--ca-faint);
+    transition: transform 200ms var(--ca-ease);
+}
+
+.ca-chevron--open {
+    transform: rotate(90deg);
+}

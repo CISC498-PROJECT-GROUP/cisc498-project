@@ -1,24 +1,29 @@
-// The home menu: the four destinations, and a pseudo-input that opens the chat.
+// The home screen body: four shortcuts, what's up next, and a composer. Typing a question here goes straight to the
+// chat — no need to open it first.
 
-import { Icon } from '@/components/common/icon';
-import { MenuItem } from '@/components/home/menu-item';
+import { Composer } from '@/components/chat/composer';
+import { NavTile } from '@/components/home/nav-tile';
+import { UpNext } from '@/components/home/up-next';
 import type { View } from '@/services/types';
 
-export function HomeView({ onNavigate }: { onNavigate: (view: View) => void }) {
+interface HomeViewProps {
+    onNavigate: (view: View) => void;
+    onAsk: (question: string) => void;
+}
+
+export function HomeView({ onNavigate, onAsk }: HomeViewProps) {
     return (
-        <div class="ca-body ca-home">
-            <MenuItem icon="chat" label="Chat with Assistant" description="Ask about any course, assignment, or policy" onSelect={() => onNavigate('chat')} />
-            <MenuItem icon="grades" label="View Grade Breakdown" description="Current grades across all your courses" onSelect={() => onNavigate('grades')} />
-            <MenuItem icon="calendar" label="Upcoming Deadlines" description="What's due in every course, next two weeks" onSelect={() => onNavigate('deadlines')} />
-            <MenuItem icon="help" label="Canvas Support" description="Help links and your instructors" onSelect={() => onNavigate('support')} />
-            <div class="ca-spacer" />
-            <button type="button" class="ca-ask" onClick={() => onNavigate('chat')}>
-                <span class="ca-ask-text">Ask anything about your courses…</span>
-                <span class="ca-ask-go">
-                    <Icon name="arrow" size={16} />
-                </span>
-            </button>
-            <p class="ca-footnote">Answers come from the courses you're enrolled in.</p>
+        <div class="ca-home">
+            <div class="ca-tiles">
+                <NavTile icon="chat" label="Ask" hint="Syllabi, policies…" onSelect={() => onNavigate('chat')} />
+                <NavTile icon="calendar" label="Deadlines" hint="Next two weeks" onSelect={() => onNavigate('deadlines')} />
+                <NavTile icon="grades" label="Grades" hint="By category" onSelect={() => onNavigate('grades')} />
+                <NavTile icon="help" label="Help" hint="Instructors, Canvas" onSelect={() => onNavigate('support')} />
+            </div>
+            <UpNext onSeeAll={() => onNavigate('deadlines')} />
+            <div class="ca-home-ask">
+                <Composer onSend={onAsk} placeholder="Ask anything about your courses…" autoFocus={false} />
+            </div>
         </div>
     );
 }

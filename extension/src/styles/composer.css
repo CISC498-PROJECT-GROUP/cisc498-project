@@ -1,0 +1,79 @@
+/* The composer, shared by the chat and the home screen, and the chat's footer. */
+
+.ca-chat-foot {
+    padding: 10px 12px 10px;
+    background: var(--ca-ground);
+    border-top: 1px solid var(--ca-line);
+}
+
+.ca-composer {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    padding: 6px 6px 6px 14px;
+    background: var(--ca-surface);
+    border: 1px solid var(--ca-line-2);
+    border-radius: 16px;
+    box-shadow: var(--ca-shadow-card);
+    transition:
+        border-color 140ms,
+        box-shadow 140ms;
+}
+
+.ca-composer:focus-within {
+    border-color: var(--ca-accent);
+    box-shadow: 0 0 0 3px var(--ca-accent-soft);
+}
+
+.ca-input {
+    flex: 1;
+    min-height: 34px;
+    max-height: 132px;
+    padding: 7px 0;
+    border: none;
+    outline: none;
+    resize: none;
+    background: transparent;
+    font-size: 14px;
+    line-height: 1.45;
+}
+
+.ca-input::placeholder {
+    color: var(--ca-faint);
+}
+
+.ca-root .ca-input:focus-visible {
+    outline: none;
+}
+
+.ca-send {
+    flex-shrink: 0;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    border: none;
+    border-radius: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ca-on-accent);
+    background: var(--ca-accent);
+    transition:
+        opacity 140ms,
+        transform 140ms var(--ca-ease);
+}
+
+.ca-send:hover:not(:disabled) {
+    transform: translateY(-1px);
+}
+
+.ca-send:disabled {
+    opacity: 0.3;
+}
+
+.ca-disclaimer {
+    margin: 7px 0 0;
+    font-size: 11px;
+    text-align: center;
+    color: var(--ca-faint);
+}
