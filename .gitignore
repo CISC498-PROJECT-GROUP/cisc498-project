@@ -1,0 +1,25 @@
+# IDE
+.idea/
+.vscode/
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Dependencies
+node_modules/
+
+# Env — local env lives outside the repo, never here
+.env
+.env.local
+.env.*.local
+
+# Build output — the unpacked extension Chrome loads is built, never committed
+dist/
+backend/dist/
+extension/dist/
+*.zip
+
+# Test / tool caches
+coverage/
+*.tsbuildinfo
