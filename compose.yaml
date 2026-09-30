@@ -1,0 +1,18 @@
+# Runs the backend API on a server: `docker compose up -d --build` from the repo root.
+# The key and chat settings come from backend/.env (copy backend/.env.example); HOST and PORT are
+# fixed by the Dockerfile, so those two lines in .env are ignored here.
+services:
+    api:
+        build: .
+        env_file: backend/.env
+        environment:
+            HOST: 0.0.0.0
+            PORT: 3010
+        # This API spends the Anthropic key for anyone who can reach it and has no auth. Published on
+        # the host's loopback only — put Tailscale or a reverse proxy in front rather than opening it
+        # to the LAN. Change to "3010:3010" only on a network you trust.
+        ports:
+            - 127.0.0.1:3010:3010
+        # Bun as PID 1 ignores SIGTERM; a tiny init forwards it so `docker compose down` is instant.
+        init: true
+        restart: unless-stopped
