@@ -25,6 +25,19 @@ add it to `extension/static/manifest.json`.
 **No Canvas login handy?** `bun run --cwd extension preview` serves a stand-in dashboard at
 http://localhost:5174 with a fake Canvas API behind it. Chat still goes to the real assistant server.
 
+## Run the server on a home server
+
+Only the assistant server needs hosting — the extension still loads from `extension/dist/` on each
+machine. On the server, with Docker (or Podman) and `backend/.env` filled in:
+
+```sh
+docker compose up -d --build             # the API on the server's 127.0.0.1:3010
+```
+
+It has no auth and spends your API key for whoever reaches it, so it is published on the server's
+loopback only. Reach it over Tailscale or a reverse proxy, then build the extension against that
+address: `CANVAS_ASSISTANT_API=https://assistant.example.ts.net bun run build`.
+
 ## How it works
 
 The extension reads Canvas through its REST API using your existing login: no token, read-only,
