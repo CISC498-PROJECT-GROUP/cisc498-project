@@ -41,8 +41,12 @@ request:
 2. Commit regularly as you go — one logical step per commit, not one commit at the end.
 3. Push the branch and open a PR with `gh pr create` — a summary of what and why, and how it was
    tested.
-4. Merge it once the work is done and the checks (`bun run lint && bun run test`) pass —
-   `gh pr merge --squash --delete-branch` — then start the next piece of work on a fresh branch.
+4. Rebase it onto an up-to-date `main` (`git fetch && git rebase origin/main`), then merge it once
+   the work is done and the checks (`bun run lint && bun run test`) pass — `gh pr merge --rebase` —
+   then start the next piece of work on a fresh branch.
+
+**NEVER delete a branch after it is merged** — not locally, not on the remote. No `--delete-branch`
+on `gh pr merge`, no `git branch -d`, no `git push --delete`. Merged branches stay as history.
 
 Keep branches small and short-lived: a PR per feature or fix, not per session.
 
@@ -124,6 +128,8 @@ From the repo root: `bun install` (once, for the whole workspace), then:
   **127.0.0.1:3010** (needs `ANTHROPIC_API_KEY` in `backend/.env` for chat).
 - `bun run build` — one-off extension build into `extension/dist/`.
 - `bun run lint` — typecheck both. `bun run test` — both suites.
+- `docker compose up -d --build` — the backend alone in a container (root `Dockerfile` +
+  `compose.yaml`, env from `backend/.env`), for a server. Published on loopback only.
 
 **Loading the extension:** `chrome://extensions` → Developer mode → *Load unpacked* →
 `extension/dist/`. After a rebuild, press the extension's reload arrow, then refresh the Canvas tab —
