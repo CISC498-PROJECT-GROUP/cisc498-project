@@ -26,6 +26,7 @@
             <li><a href="#l4"><span class="n">04</span> Environment</a></li>
             <li><a href="#l5"><span class="n">05</span> Logging &amp; student data</a></li>
             <li><a href="#l6"><span class="n">06</span> Tests</a></li>
+            <li><a href="#l7"><span class="n">07</span> Deployment</a></li>
         </ol>
     </nav>
 
@@ -110,6 +111,21 @@
                 Tests never talk to live infra — stub <code>fetch</code> or the <code>svc-*</code> boundary.
                 <code>tests/architecture/</code> holds the structural tests (layering, the 200-line limit across the
                 whole repo); they run with everything else.</p>
+        </div>
+    </section>
+    <section class="rule" id="l7">
+        <div class="rule-head"><span class="num">07</span>
+            <h3>Deployment</h3>
+        </div>
+        <div class="rule-body">
+            <p>The root <code>Dockerfile</code> packages the backend alone; <code>compose.yaml</code> runs it with
+                <code>backend/.env</code>. Bun runs the TypeScript directly — no build step — so the image carries
+                <code>backend/src</code>, <code>packages/shared</code> and the root lockfile and tsconfig. A new file
+                the backend needs at runtime outside <code>backend/src</code> must be added to the Dockerfile's
+                <code>COPY</code> lines.</p>
+            <div class="note warn">The container listens on <code>0.0.0.0</code>, so the port mapping is the only
+                thing keeping it off the network. It stays <code>127.0.0.1:3010:3010</code>: this API has no auth and
+                spends the key for anyone who reaches it.</div>
         </div>
     </section>
 </div>
