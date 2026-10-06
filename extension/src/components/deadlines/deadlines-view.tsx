@@ -1,5 +1,5 @@
 // Everything due in the next two weeks, grouped by day, overdue work first. "To do" hides what is
-// already turned in; "All" shows it.
+// already turned in; "All" shows it. An open assignment's Submit button hands it to the submit view.
 
 import { useState } from 'preact/hooks';
 import { Icon } from '@/components/common/icon';
@@ -9,13 +9,19 @@ import { DeadlineRow } from '@/components/deadlines/deadline-row';
 import { groupDeadlines, type DeadlineFilter } from '@/services/format/group-deadlines';
 import { useCourses } from '@/services/hooks/use-courses';
 import { useDeadlines } from '@/services/hooks/use-deadlines';
+import type { Deadline } from '@/services/types';
 
 const FILTERS: { value: DeadlineFilter; label: string }[] = [
     { value: 'todo', label: 'To do' },
     { value: 'all', label: 'All' },
 ];
 
-export function DeadlinesView({ onAsk }: { onAsk: (question: string) => void }) {
+interface DeadlinesViewProps {
+    onAsk: (question: string) => void;
+    onSubmit: (deadline: Deadline) => void;
+}
+
+export function DeadlinesView({ onAsk, onSubmit }: DeadlinesViewProps) {
     const deadlines = useDeadlines();
     const courses = useCourses();
     const [filter, setFilter] = useState<DeadlineFilter>('todo');
@@ -46,7 +52,7 @@ export function DeadlinesView({ onAsk }: { onAsk: (question: string) => void }) 
                     </h3>
                     <div class="ca-list-card">
                         {group.items.map((d) => (
-                            <DeadlineRow key={d.id} deadline={d} course={courses.data.find((c) => c.id === d.courseId)} overdue={group.overdue} />
+                            <DeadlineRow key={d.id} deadline={d} course={courses.data.find((c) => c.id === d.courseId)} overdue={group.overdue} onSubmit={onSubmit} />
                         ))}
                     </div>
                 </section>

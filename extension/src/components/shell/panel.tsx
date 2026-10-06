@@ -8,11 +8,12 @@ import { GradesView } from '@/components/grades/grades-view';
 import { HomeHero } from '@/components/home/home-hero';
 import { HomeView } from '@/components/home/home-view';
 import { PanelHeader } from '@/components/shell/panel-header';
+import { SubmitView } from '@/components/submit/submit-view';
 import { SupportView } from '@/components/support/support-view';
 import type { ChatState } from '@/services/hooks/use-chat';
-import type { View } from '@/services/types';
+import type { Deadline, View } from '@/services/types';
 
-const TITLES: Record<Exclude<View, 'home'>, string> = { chat: 'Assistant', grades: 'Grades', deadlines: 'Deadlines', support: 'Help & instructors' };
+const TITLES: Record<Exclude<View, 'home'>, string> = { chat: 'Assistant', grades: 'Grades', deadlines: 'Deadlines', support: 'Help & instructors', submit: 'Submit' };
 
 interface PanelProps {
     view: View;
@@ -22,9 +23,12 @@ interface PanelProps {
     onClose: () => void;
     chat: ChatState;
     onAsk: (question: string) => void;
+    /** The assignment the submit view is turning in. */
+    submitting: Deadline | null;
+    onSubmit: (deadline: Deadline) => void;
 }
 
-export function Panel({ view, expanded, onExpand, onNavigate, onClose, chat, onAsk }: PanelProps) {
+export function Panel({ view, expanded, onExpand, onNavigate, onClose, chat, onAsk, submitting, onSubmit }: PanelProps) {
     const newChat =
         view === 'chat' && chat.messages.length > 0 ? (
             <button type="button" class="ca-icon-btn ca-icon-btn--muted" onClick={chat.reset} disabled={chat.pending} aria-label="New chat" title="New chat">
@@ -34,12 +38,17 @@ export function Panel({ view, expanded, onExpand, onNavigate, onClose, chat, onA
 
     return (
         <section class={`ca-panel ${expanded ? 'ca-panel--expanded' : ''}`} role="dialog" aria-label="Canvas Assistant">
-            {view === 'home' ? <HomeHero onNavigate={onNavigate} onClose={onClose} /> : <PanelHeader title={TITLES[view]} expanded={expanded} onBack={() => onNavigate('home')} onExpand={onExpand} onClose={onClose} actions={newChat} />}
+            {view === 'home' ? (
+                <HomeHero onNavigate={onNavigate} onClose={onClose} />
+            ) : (
+                <PanelHeader title={TITLES[view]} expanded={expanded} onBack={() => onNavigate(view === 'submit' ? 'deadlines' : 'home')} onExpand={onExpand} onClose={onClose} actions={newChat} />
+            )}
             <div key={view} class="ca-view">
                 {view === 'home' && <HomeView onNavigate={onNavigate} onAsk={onAsk} />}
                 {view === 'chat' && <ChatView chat={chat} />}
                 {view === 'grades' && <GradesView onAsk={onAsk} />}
-                {view === 'deadlines' && <DeadlinesView onAsk={onAsk} />}
+                {view === 'deadlines' && <DeadlinesView onAsk={onAsk} onSubmit={onSubmit} />}
+                {view === 'submit' && submitting?.courseId && submitting.assignmentId && <SubmitView deadline={{ ...submitting, courseId: submitting.courseId, assignmentId: submitting.assignmentId }} onDone={() => onNavigate('deadlines')} />}
                 {view === 'support' && <SupportView onAsk={onAsk} />}
             </div>
         </section>

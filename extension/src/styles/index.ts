@@ -9,6 +9,7 @@ import home from './home.css' with { type: 'text' };
 import lists from './lists.css' with { type: 'text' };
 import markdown from './markdown.css' with { type: 'text' };
 import shell from './shell.css' with { type: 'text' };
+import submit from './submit.css' with { type: 'text' };
 import tokens from './tokens.css' with { type: 'text' };
 
-export const WIDGET_CSS = [tokens, shell, home, chat, composer, markdown, lists, grades, feedback].join('\n');
+export const WIDGET_CSS = [tokens, shell, home, chat, composer, markdown, lists, grades, submit, feedback].join('\n');

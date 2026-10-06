@@ -29,6 +29,7 @@ const PATHS = {
     shrink: <path d="M4 14h6v6M20 10h-6V4M14 10l7-7M3 21l7-7" />,
     check: <path d="M5 12.5l4.5 4.5L19 7.5" />,
     send: <path d="M12 19V5M5 12l7-7 7 7" />,
+    upload: <path d="M12 15V4M7 9l5-5 5 5M4 15v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4" />,
     alert: (
         <>
             <circle cx="12" cy="12" r="9" />

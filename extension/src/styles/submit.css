@@ -1,0 +1,181 @@
+/* The submit view: the assignment header, the form fields, the confirm step and the receipt. */
+
+.ca-submit-head {
+    display: flex;
+    gap: 12px;
+    padding: 12px 14px;
+    background: var(--ca-surface);
+    border: 1px solid var(--ca-line);
+    border-radius: var(--ca-radius);
+    box-shadow: var(--ca-shadow-card);
+}
+
+.ca-submit-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.ca-field-label {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--ca-ink-2);
+}
+
+.ca-field {
+    width: 100%;
+    min-height: 38px;
+    padding: 8px 12px;
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--ca-ink);
+    background: var(--ca-surface);
+    border: 1px solid var(--ca-line-2);
+    border-radius: 10px;
+    outline: none;
+    transition:
+        border-color 140ms,
+        box-shadow 140ms;
+}
+
+.ca-field:focus {
+    border-color: var(--ca-accent);
+    box-shadow: 0 0 0 3px var(--ca-accent-soft);
+}
+
+.ca-field--area {
+    min-height: 140px;
+    resize: vertical;
+    line-height: 1.45;
+}
+
+.ca-field--file {
+    padding: 7px 10px;
+    font-size: 13px;
+}
+
+.ca-file-list {
+    margin: 0;
+    padding: 0 2px;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 13px;
+}
+
+.ca-submit-error {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin: 0;
+    padding: 10px 12px;
+    font-size: 13px;
+    color: var(--ca-alert-ink);
+    background: var(--ca-alert-bg);
+    border-radius: 10px;
+}
+
+.ca-notice {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    margin: 0;
+    padding: 12px 14px;
+    font-size: 13px;
+    color: var(--ca-ink-2);
+    background: var(--ca-sunken);
+    border-radius: var(--ca-radius);
+}
+
+.ca-notice p {
+    margin: 0;
+}
+
+.ca-confirm {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 12px 14px;
+    background: var(--ca-accent-tint);
+    border: 1px solid var(--ca-accent-soft);
+    border-radius: var(--ca-radius);
+}
+
+.ca-confirm-text {
+    margin: 0;
+    font-size: 13px;
+}
+
+.ca-confirm-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.ca-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 36px;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 700;
+    border: none;
+    border-radius: 999px;
+    transition:
+        filter 140ms,
+        opacity 140ms;
+}
+
+.ca-btn:disabled {
+    opacity: 0.55;
+}
+
+.ca-btn--primary {
+    color: var(--ca-on-accent);
+    background: var(--ca-accent);
+}
+
+.ca-btn--primary:hover:not(:disabled) {
+    filter: brightness(1.08);
+}
+
+.ca-btn--quiet {
+    color: var(--ca-ink-2);
+    background: var(--ca-sunken);
+}
+
+.ca-btn--wide {
+    align-self: stretch;
+}
+
+.ca-receipt {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 28px 16px;
+    text-align: center;
+}
+
+.ca-receipt p {
+    margin: 0;
+}
+
+.ca-receipt-title {
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.ca-receipt .ca-confirm-actions {
+    justify-content: center;
+    margin-top: 8px;
+}
