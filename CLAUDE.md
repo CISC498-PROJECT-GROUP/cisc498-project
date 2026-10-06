@@ -16,7 +16,7 @@ The build is a **working prototype**:
 - **Canvas data** — every view reads the student's real courses, grades and planner. The content
   script runs on the Canvas origin, so a same-origin `fetch('/api/v1/…')` carries the student's own
   session: no token, no OAuth, and it sees exactly what the student can see. Read-only.
-- **AI chat** — questions go to `backend/`, which calls Claude (`claude-opus-5`) with twelve Canvas
+- **AI chat** — questions go to `backend/`, which calls Claude (`claude-sonnet-5-5`) with twelve Canvas
   tools (courses, planner, assignments, grade breakdown, announcements, syllabus, pages, modules,
   files, reading a PDF). The **extension runs the tools** — it holds the Canvas session — and loops;
   the backend owns the key, the frozen system prompt and the tool definitions, and stores nothing.
@@ -167,7 +167,7 @@ routers) → `src/services/<module>/` (business logic). A repositories layer arr
   live here (a module's `common.ts`), never in services.
 - `src/services/<module>/` — business logic. `tests/{routes,services}/` mirror the same shape.
 - `src/services/common/svc-*.ts` — cross-cutting clients (env, response, log, the Anthropic SDK).
-- `src/services/chat/` — `POST /chat/turn`: one model call per step. Opus 5, adaptive thinking at
+- `src/services/chat/` — `POST /chat/turn`: one model call per step. Sonnet 5.5, adaptive thinking at
   `CHAT_EFFORT` (default medium), `fallbacks: "default"` for classifier refusals, prompt caching on
   tools + system + conversation. The system prompt in `chat-prompt.ts` is frozen — nothing
   per-request goes in it.

@@ -9,7 +9,7 @@ export type EnvKey = 'NODE_ENV' | 'PORT' | 'HOST' | 'ANTHROPIC_API_KEY' | 'CHAT_
 
 export type Effort = 'low' | 'medium' | 'high' | 'xhigh' | 'max';
 
-export const DEFAULT_CHAT_MODEL = 'claude-opus-5';
+export const DEFAULT_CHAT_MODEL = 'claude-sonnet-5-5';
 
 /** Medium, not the API's default high: this is interactive chat over tool results, where the wait
     is felt on every question and most answers are look-ups rather than hard reasoning. */

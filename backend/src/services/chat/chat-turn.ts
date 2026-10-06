@@ -2,7 +2,7 @@
 // conversation, gets back either an answer (end_turn) or tool calls (tool_use), runs the tools
 // against Canvas, and sends the results in the next request.
 //
-// Model: claude-opus-5 with adaptive thinking at CHAT_EFFORT. `fallbacks: "default"` re-runs a
+// Model: claude-sonnet-5-5 with adaptive thinking at CHAT_EFFORT. `fallbacks: "default"` re-runs a
 // request that the model's safety classifiers decline on Anthropic's recommended fallback model,
 // so a false positive on an ordinary course question becomes an answer rather than a dead end.
 //
