@@ -7,7 +7,7 @@
 import { afterEach, beforeEach, describe, expect, it } from 'bun:test';
 import { Hono } from 'hono';
 import { router_chat } from '@/routes/chat/chat';
-import { app_env, DEFAULT_CHAT_MODEL } from '@/services/common/svc-env';
+import { app_env, DEFAULT_CHAT_EFFORT, DEFAULT_CHAT_MODEL } from '@/services/common/svc-env';
 
 const real_fetch = globalThis.fetch;
 const real_key = app_env.anthropic_api_key;
@@ -62,13 +62,15 @@ describe('POST /chat/turn', () => {
         expect(sent?.thinking).toEqual({ type: 'adaptive' });
     });
 
-    it('defaults to Sonnet 5.5 and scopes the assistant to Canvas', async () => {
+    it('defaults to Sonnet 5.5 at low effort, scoped to Canvas with no homework help', async () => {
         await post(QUESTION);
         expect(DEFAULT_CHAT_MODEL).toBe('claude-sonnet-5-5');
+        expect(DEFAULT_CHAT_EFFORT).toBe('low');
         expect(sent?.model).toBe(app_env.chat_model);
+        expect(sent?.output_config).toEqual({ effort: app_env.chat_effort });
         const system = (sent?.system as { text: string }[])[0]?.text ?? '';
-        expect(system).toContain('Out of scope');
-        expect(system).toContain('Academic integrity');
+        expect(system).toContain('Everything else is out of scope');
+        expect(system).toContain('No homework help');
     });
 
     it('passes tool calls through so the extension can run them', async () => {
@@ -88,7 +90,16 @@ describe('POST /chat/turn', () => {
         expect((await post('not json')).status).toBe(435);
         expect((await post({ messages: [] })).status).toBe(435);
         expect((await post({ messages: [{ role: 'assistant', content: 'hi' }] })).status).toBe(435);
-        expect((await post({ messages: [{ role: 'user', content: 'q' }, { role: 'assistant', content: 'a' }] })).status).toBe(435);
+        expect(
+            (
+                await post({
+                    messages: [
+                        { role: 'user', content: 'q' },
+                        { role: 'assistant', content: 'a' },
+                    ],
+                })
+            ).status,
+        ).toBe(435);
     });
 
     it('answers 503 without a key, and for a rejected key', async () => {

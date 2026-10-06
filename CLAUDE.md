@@ -168,7 +168,7 @@ routers) → `src/services/<module>/` (business logic). A repositories layer arr
 - `src/services/<module>/` — business logic. `tests/{routes,services}/` mirror the same shape.
 - `src/services/common/svc-*.ts` — cross-cutting clients (env, response, log, the Anthropic SDK).
 - `src/services/chat/` — `POST /chat/turn`: one model call per step. Sonnet 5.5, adaptive thinking at
-  `CHAT_EFFORT` (default medium), `fallbacks: "default"` for classifier refusals, prompt caching on
+  `CHAT_EFFORT` (default low), `fallbacks: "default"` for classifier refusals, prompt caching on
   tools + system + conversation. The system prompt in `chat-prompt.ts` is frozen — nothing
   per-request goes in it.
 

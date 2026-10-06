@@ -11,9 +11,11 @@ export type Effort = 'low' | 'medium' | 'high' | 'xhigh' | 'max';
 
 export const DEFAULT_CHAT_MODEL = 'claude-sonnet-5-5';
 
-/** Medium, not the API's default high: this is interactive chat over tool results, where the wait
-    is felt on every question and most answers are look-ups rather than hard reasoning. */
-export const DEFAULT_CHAT_EFFORT: Effort = 'medium';
+/** Low, not the API's default high: this is interactive chat over tool results, where the wait is
+    felt on every question and most answers are look-ups rather than hard reasoning. On Sonnet 5.5,
+    low skips thinking on simple questions and still thinks when a lookup needs it; set
+    CHAT_EFFORT=medium if answers that need several lookups come back thin. */
+export const DEFAULT_CHAT_EFFORT: Effort = 'low';
 
 const EFFORTS: readonly Effort[] = ['low', 'medium', 'high', 'xhigh', 'max'];
 
