@@ -12,10 +12,12 @@ upcoming deadlines across every course, and where to get help.
 The build is a **working prototype**:
 
 - **The widget** — the extension injects the assistant on the dashboard (only there), in a shadow
-  root, with home, chat, grades, deadlines and support views.
+  root, with home, chat, grades, deadlines, submit and support views.
 - **Canvas data** — every view reads the student's real courses, grades and planner. The content
   script runs on the Canvas origin, so a same-origin `fetch('/api/v1/…')` carries the student's own
-  session: no token, no OAuth, and it sees exactly what the student can see. Read-only.
+  session: no token, no OAuth, and it sees exactly what the student can see. Read-only, except
+  that a student can submit their own assignment from the deadlines list after confirming it
+  (`services/canvas/canvas-write.ts`). The assistant never writes.
 - **AI chat** — questions go to `backend/`, which calls Claude (`claude-sonnet-5-5`) with twelve Canvas
   tools (courses, planner, assignments, grade breakdown, announcements, syllabus, pages, modules,
   files, reading a PDF). The **extension runs the tools** — it holds the Canvas session — and loops;
@@ -183,7 +185,7 @@ onto Canvas. Path alias `@/*` → `extension/src`.
   trip back to the menu). Keyboard events are stopped at this root — Canvas binds global shortcuts
   on `document`, and typing in the chat box would otherwise trigger them.
 - `components/<feature>/` — `shell/` is the launcher and panel chrome; `home/`, `chat/`,
-  `grades/`, `deadlines/`, `support/` are the views; `common/` holds the icon set, the segmented
+  `grades/`, `deadlines/`, `submit/`, `support/` are the views; `common/` holds the icon set, the segmented
   toggle and `LoadState` (skeletons while loading, an error card with retry — every `Loadable` has
   `retry()`). `chat/composer.tsx` is shared by the chat and the home screen.
 - `background.ts` — the service worker. It relays backend calls (avoiding the page's CORS and

@@ -71,8 +71,11 @@
                 data exists only as the preview harness's fixtures in <code>extension/preview/</code>, which the
                 build never bundles. The assistant is told to state only what a tool returned, and tool results
                 carry times already in the student's zone (<code>localStamp</code>).</p>
-            <div class="note warn">Canvas access is <strong>read-only</strong>: <code>canvas-api.ts</code> only issues
-                GET. Anything that writes to Canvas (submitting, messaging) is a product decision, not a refactor.</div>
+            <div class="note warn">Canvas access is <strong>read-only, with one exception</strong>: the student
+                submitting their own assignment. <code>canvas-api.ts</code> only issues GET; the submission write lives
+                in <code>canvas-write.ts</code> (POST with Canvas's <code>X-CSRF-Token</code>), runs only after the
+                student confirms in the submit view, and is never reachable from a chat tool — the assistant reads,
+                it never writes. Any other write (messaging, editing) is a product decision, not a refactor.</div>
         </div>
     </section>
 
