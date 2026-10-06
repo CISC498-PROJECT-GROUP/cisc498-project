@@ -1,7 +1,9 @@
-// A fake Canvas REST API over the preview fixtures, answering the endpoints the extension calls.
+// A fake Canvas REST API over the preview fixtures, answering the endpoints the extension reads.
+// Writes (submitting) are in submissions.ts.
 
 import { COLORS, COURSES, SYLLABI, USER } from './courses';
 import { FILES, HIDDEN_PAGES, MODULES, PAGES } from './content';
+import { SUBMITTED, submissionTypes } from './submissions';
 import { ANNOUNCEMENTS, assignmentsOf, GROUPS, planner } from './work';
 
 const json = (body: unknown, status = 200) => Response.json(body, { status });
@@ -24,7 +26,9 @@ export function canvasRoute(url: URL): Response {
     if ((m = /^\/courses\/(\d+)\/assignments$/.exec(p))) return json(assignmentsOf(Number(m[1])).map(({ description: _d, ...rest }) => rest));
     if ((m = /^\/courses\/(\d+)\/assignments\/(\d+)$/.exec(p))) {
         const found = assignmentsOf(Number(m[1])).find((x) => x.id === Number(m![2]));
-        return found ? json({ ...found, submission_types: ['online_upload'], allowed_attempts: -1 }) : json({}, 404);
+        if (!found) return json({}, 404);
+        const submittedAt = SUBMITTED.get(found.id) ?? found.submission.submitted_at ?? null;
+        return json({ ...found, ...submissionTypes(found.id), allowed_attempts: -1, submission: { ...found.submission, submitted_at: submittedAt, attempt: submittedAt ? 1 : 0 } });
     }
     if ((m = /^\/courses\/(\d+)\/pages$/.exec(p))) {
         if (HIDDEN_PAGES.has(Number(m[1]))) return json({ message: 'That page has been disabled for this course' }, 403);

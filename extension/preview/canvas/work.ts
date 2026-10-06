@@ -1,5 +1,7 @@
 // Preview fixtures: assignments, grades, planner and announcements, with dates relative to today.
 
+import { SUBMITTED } from './submissions';
+
 const at = (days: number, h = 23, m = 59) => {
     const d = new Date();
     d.setDate(d.getDate() + days);
@@ -57,7 +59,7 @@ export function planner(start: Date, end: Date) {
                 plannable_type: 'assignment',
                 html_url: x.html_url,
                 plannable: { title: x.name, due_at: x.due_at, points_possible: x.points_possible },
-                submissions: { submitted: x.submission.submitted_at != null, missing: x.submission.missing === true, graded: x.submission.score != null },
+                submissions: { submitted: x.submission.submitted_at != null || SUBMITTED.has(x.id), missing: x.submission.missing === true, graded: x.submission.score != null },
             })),
     );
 }
