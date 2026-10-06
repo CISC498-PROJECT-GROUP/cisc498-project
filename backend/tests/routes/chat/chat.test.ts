@@ -7,7 +7,7 @@
 import { afterEach, beforeEach, describe, expect, it } from 'bun:test';
 import { Hono } from 'hono';
 import { router_chat } from '@/routes/chat/chat';
-import { app_env } from '@/services/common/svc-env';
+import { app_env, DEFAULT_CHAT_MODEL } from '@/services/common/svc-env';
 
 const real_fetch = globalThis.fetch;
 const real_key = app_env.anthropic_api_key;
@@ -19,7 +19,7 @@ const message = (content: unknown[], stop_reason = 'end_turn') => ({
     id: 'msg_test',
     type: 'message',
     role: 'assistant',
-    model: 'claude-opus-5',
+    model: 'claude-sonnet-5-5',
     content,
     stop_reason,
     stop_sequence: null,
@@ -60,6 +60,15 @@ describe('POST /chat/turn', () => {
         expect((sent?.tools as { name: string }[]).map((t) => t.name)).toContain('get_upcoming_work');
         expect(sent?.fallbacks).toBe('default');
         expect(sent?.thinking).toEqual({ type: 'adaptive' });
+    });
+
+    it('defaults to Sonnet 5.5 and scopes the assistant to Canvas', async () => {
+        await post(QUESTION);
+        expect(DEFAULT_CHAT_MODEL).toBe('claude-sonnet-5-5');
+        expect(sent?.model).toBe(app_env.chat_model);
+        const system = (sent?.system as { text: string }[])[0]?.text ?? '';
+        expect(system).toContain('Out of scope');
+        expect(system).toContain('Academic integrity');
     });
 
     it('passes tool calls through so the extension can run them', async () => {
