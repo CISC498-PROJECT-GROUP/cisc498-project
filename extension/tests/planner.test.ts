@@ -17,7 +17,7 @@ describe('mapPlannerItem', () => {
             plannable: { title: 'HW 6', due_at: '2026-09-30T03:59:00Z', points_possible: 20 },
             submissions: { submitted: false, missing: true },
         });
-        expect(d).toMatchObject({ id: 'assignment-42', courseId: '7', title: 'HW 6', points: 20, submitted: false, missing: true, url: 'https://canvas.example.edu/courses/7/assignments/42' });
+        expect(d).toMatchObject({ id: 'assignment-42', courseId: '7', assignmentId: '42', title: 'HW 6', points: 20, submitted: false, missing: true, url: 'https://canvas.example.edu/courses/7/assignments/42' });
         expect(d?.dueAt.toISOString()).toBe('2026-09-30T03:59:00.000Z');
     });
 
@@ -25,6 +25,7 @@ describe('mapPlannerItem', () => {
         const d = mapPlannerItem({ plannable_id: 1, plannable_type: 'planner_note', plannable_date: '2026-10-01T12:00:00Z', plannable: { title: 'Study' }, submissions: { excused: true } });
         expect(d?.submitted).toBe(true);
         expect(d?.courseId).toBeNull();
+        expect(d?.assignmentId).toBeNull();
         expect(d?.dueAt.toISOString()).toBe('2026-10-01T12:00:00.000Z');
     });
 

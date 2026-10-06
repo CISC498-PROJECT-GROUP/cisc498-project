@@ -22,4 +22,9 @@ function loadDeadlines(): Promise<Deadline[]> {
     return promise;
 }
 
+/** Drop the shared result so the next view to ask reloads it — after a submission changes it. */
+export const forgetDeadlines = (): void => {
+    cached = null;
+};
+
 export const useDeadlines = (): Loadable<Deadline[]> => useLoad(loadDeadlines, []);

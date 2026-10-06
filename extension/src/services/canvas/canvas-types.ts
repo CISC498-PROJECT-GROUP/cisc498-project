@@ -41,7 +41,10 @@ export interface RawAssignment {
     points_possible?: number | null;
     omit_from_final_grade?: boolean;
     submission_types?: string[];
+    allowed_extensions?: string[];
     allowed_attempts?: number;
+    locked_for_user?: boolean;
+    lock_explanation?: string;
     assignment_group_id?: number | string;
     html_url?: string;
     rubric?: { description?: string; points?: number; ratings?: { description?: string; points?: number }[] }[];

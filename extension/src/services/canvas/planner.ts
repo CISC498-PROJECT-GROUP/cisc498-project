@@ -20,6 +20,7 @@ export const mapPlannerItem = (item: RawPlannerItem): Deadline | null => {
         points: item.plannable?.points_possible ?? null,
         url: absoluteUrl(item.html_url),
         kind: item.plannable_type ?? 'item',
+        assignmentId: item.plannable_type === 'assignment' ? String(item.plannable_id) : null,
         submitted: status?.submitted === true || status?.excused === true,
         missing: status?.missing === true,
     };

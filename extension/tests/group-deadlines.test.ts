@@ -11,6 +11,7 @@ const NOW = new Date(2026, 8, 28, 13, 0); // Mon Sep 28, 1 PM
 const item = (id: string, day: number, hour: number, submitted = false): Deadline => ({
     id,
     courseId: 'c',
+    assignmentId: null,
     courseName: 'Course',
     title: id,
     dueAt: new Date(2026, 8, day, hour, 0),
