@@ -1,6 +1,6 @@
 // read_file: fetch a course file's bytes and hand them to the model in a form it can read.
 // PDFs go back as a `document` block — the model reads the PDF itself, layout and tables included.
-// Text-like files go back as text. Office formats would need a converter; the model is told so.
+// Text-like files and DOCX files go back as text. Other Office formats are left as links.
 //
 // The download itself runs in the background worker (see background.ts): a Canvas file URL
 // redirects to a storage host on another origin, which the page cannot read but the worker can.
@@ -10,6 +10,7 @@ import type { FileReply } from '@/services/api/messages';
 import { canvasGet } from '@/services/canvas/canvas-api';
 import { htmlToText } from '@/services/canvas/html-text';
 import { inExtension } from '@/services/config';
+import { parseDocx } from '@/services/tools/docx';
 import { clip, need, type ToolInput, type ToolOutput } from '@/services/tools/tool-helpers';
 
 /** The Messages API takes 32 MB per request and base64 adds a third; stay well inside it. */
@@ -37,7 +38,8 @@ export async function readFile(input: ToolInput): Promise<ToolOutput> {
 
     const type = meta['content-type'] ?? '';
     const isPdf = type === 'application/pdf' || name.toLowerCase().endsWith('.pdf');
-    if (!isPdf && !TEXT_TYPES.test(type)) return `"${name}" is a ${type || 'binary'} file, which can't be read here. Link the student to it instead.`;
+    const isDocx = type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' || name.toLowerCase().endsWith('.docx');
+    if (!isPdf && !isDocx && !TEXT_TYPES.test(type)) return `"${name}" is a ${type || 'binary'} file, which can't be read here. Link the student to it instead.`;
 
     const file = await download(meta.url);
     if (!file.ok) return `Couldn't download "${name}": ${file.error ?? `HTTP ${file.status}`}.`;
@@ -45,6 +47,13 @@ export async function readFile(input: ToolInput): Promise<ToolOutput> {
     if (isPdf) {
         const block: ContentBlock = { type: 'document', title: name, source: { type: 'base64', media_type: 'application/pdf', data: file.base64 } };
         return [{ type: 'text', text: `Contents of "${name}":` }, block];
+    }
+    if (isDocx) {
+        try {
+            return clip(`Contents of "${name}":\n\n${parseDocx(decode(file.base64))}`);
+        } catch {
+            return `"${name}" could not be read as a Word document. Link the student to it instead.`;
+        }
     }
     const text = decode(file.base64);
     return clip(`Contents of "${name}":\n\n${type === 'text/html' ? htmlToText(text) : text}`);
