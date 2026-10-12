@@ -12,6 +12,8 @@
     },
     "dependencies": {
         "@canvas-assistant/shared": "workspace:*",
+        "fflate": "^0.8.2",
+        "@xmldom/xmldom": "^0.8.11",
         "preact": "^10.29.0"
     },
     "devDependencies": {

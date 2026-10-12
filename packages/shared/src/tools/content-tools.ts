@@ -47,7 +47,7 @@ export const CONTENT_TOOLS = [
     },
     {
         name: 'read_file',
-        description: 'Read one file by id. PDFs are returned as the document itself; text, HTML, CSV and Markdown as text. Word and PowerPoint files cannot be read — say so and link the file instead.',
+        description: 'Read one file by id. PDFs are returned as the document itself; text, HTML, CSV, Markdown and Google Docs-exported Word files as text. PowerPoint files cannot be read — say so and link the file instead.',
         input_schema: { type: 'object', properties: { file_id: { type: 'string', description: 'File id from list_files or a module item.' } }, required: ['file_id'], additionalProperties: false },
     },
 ] as const;
