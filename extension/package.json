@@ -8,6 +8,7 @@
         "preview": "bun run scripts/build.ts && bun run scripts/preview.ts",
         "lint": "tsc --noEmit -p .",
         "format": "prettier --config .prettierrc --write \"**/*.{ts,tsx,json,css}\"",
+        "format:check": "prettier --config .prettierrc --check \"**/*.{ts,tsx,json,css}\"",
         "test": "bun test ./tests"
     },
     "dependencies": {
