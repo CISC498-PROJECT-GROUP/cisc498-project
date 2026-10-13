@@ -29,7 +29,5 @@ function readParagraph(paragraph: Element): string {
         }
     };
     visit(paragraph);
-    return text
-        .replace(/\s+/g, ' ')
-        .trim();
+    return text.replace(/\s+/g, ' ').trim();
 }
