@@ -1,0 +1,45 @@
+# Pushing a tag `vX.Y.Z` builds the extension and attaches it to a GitHub Release as a zip, so a
+# tester can unzip and Load unpacked without installing Bun. The tag must match the manifest version.
+#
+# The zip talks to http://localhost:3010 unless the repo variable CANVAS_ASSISTANT_API is set
+# (Settings → Secrets and variables → Actions → Variables).
+name: Release
+
+on:
+    push:
+        tags: ['v*']
+
+permissions:
+    contents: write
+
+jobs:
+    release:
+        runs-on: ubuntu-latest
+        timeout-minutes: 10
+        steps:
+            - uses: actions/checkout@v4
+            - uses: oven-sh/setup-bun@v2
+              with:
+                  bun-version: 1.3.14
+            - run: bun install --frozen-lockfile
+            - run: bun run lint && bun run test
+            - name: Check tag matches manifest version
+              run: |
+                  manifest=$(bun -e "console.log(require('./extension/static/manifest.json').version)")
+                  if [ "v$manifest" != "$GITHUB_REF_NAME" ]; then
+                      echo "::error::tag $GITHUB_REF_NAME does not match manifest version $manifest"
+                      exit 1
+                  fi
+            - name: Build extension
+              env:
+                  API: ${{ vars.CANVAS_ASSISTANT_API }}
+              run: |
+                  if [ -n "$API" ]; then export CANVAS_ASSISTANT_API="$API"; fi
+                  bun run build
+            - name: Zip and publish
+              env:
+                  GH_TOKEN: ${{ github.token }}
+              run: |
+                  zip_name="canvas-assistant-$GITHUB_REF_NAME.zip"
+                  (cd extension/dist && zip -r "../../$zip_name" .)
+                  gh release create "$GITHUB_REF_NAME" "$zip_name" --title "$GITHUB_REF_NAME" --generate-notes
