@@ -22,6 +22,12 @@ After a rebuild, press the extension's reload arrow and refresh the Canvas tab.
 The extension runs on `*.instructure.com` and `canvas.udel.edu`. For another school's Canvas domain,
 add it to `extension/static/manifest.json`.
 
+**Just want to try it?** Each [GitHub Release](../../releases) has the built extension as a zip:
+unzip it and **Load unpacked** the folder. It still needs the assistant server running locally.
+
+Before opening a PR, run what CI runs: `bun run lint && bun run test && bun run format:check`
+(`bun run format` fixes formatting).
+
 **No Canvas login handy?** `bun run --cwd extension preview` serves a stand-in dashboard at
 http://localhost:5174 with a fake Canvas API behind it. Chat still goes to the real assistant server.
 
