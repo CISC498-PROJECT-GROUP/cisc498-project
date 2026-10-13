@@ -44,7 +44,8 @@ request:
 3. Push the branch and open a PR with `gh pr create` — a summary of what and why, and how it was
    tested.
 4. Rebase it onto an up-to-date `main` (`git fetch && git rebase origin/main`), then merge it once
-   the work is done and the checks (`bun run lint && bun run test`) pass — `gh pr merge --rebase` —
+   the work is done and the checks (`bun run lint && bun run test && bun run format:check`) pass —
+   CI runs the same on the PR — `gh pr merge --rebase` —
    then start the next piece of work on a fresh branch.
 
 **NEVER delete a branch after it is merged** — not locally, not on the remote. No `--delete-branch`
@@ -129,7 +130,11 @@ From the repo root: `bun install` (once, for the whole workspace), then:
 - `bun run dev` — build the extension in watch mode. `bun run dev:api` — the API on
   **127.0.0.1:3010** (needs `ANTHROPIC_API_KEY` in `backend/.env` for chat).
 - `bun run build` — one-off extension build into `extension/dist/`.
-- `bun run lint` — typecheck both. `bun run test` — both suites.
+- `bun run lint` — typecheck both. `bun run test` — both suites. `bun run format` /
+  `bun run format:check` — Prettier over both.
+- CI (`.github/workflows/ci.yml`) runs lint, test, format check and the extension build on every PR
+  and push to `main`. Pushing a tag `vX.Y.Z` matching the manifest version publishes the built
+  extension as a zip on a GitHub Release (`release.yml`).
 - `docker compose up -d --build` — the backend alone in a container (root `Dockerfile` +
   `compose.yaml`, env from `backend/.env`), for a server. Published on loopback only.
 
