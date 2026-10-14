@@ -1,44 +1,56 @@
-/* Design tokens. Components never hardcode a colour — they use these. The accent follows the
-   school's Canvas theme: --ic-brand-primary is defined by Canvas on the page's :root and custom
-   properties inherit into the shadow root. The hex is the fallback when a page lacks it. */
+/* Design tokens. Components never hardcode a colour — they use these. The palette is the widget's
+   own (the "Brilliant-inspired" redesign in the Canvas Assistant Figma file): warm paper ground,
+   near-black ink outlines and one bright green for the action that matters. It no longer follows
+   the school's --ic-brand-primary — the green is the product's identity, and a school blue would
+   fight the course colours that carry meaning on every screen.
+
+   Fonts: Poppins for display type and Inter for text, when the student's machine has them; a
+   shadow root cannot register its own @font-face, and the widget never adds to Canvas's DOM, so it
+   falls back to the system UI face. */
 
 :host {
     all: initial;
 }
 
 .ca-root {
-    --ca-accent: var(--ic-brand-primary, #2b59c3);
-    --ca-accent-strong: color-mix(in srgb, var(--ca-accent) 72%, #0b0d12);
-    --ca-accent-soft: color-mix(in srgb, var(--ca-accent) 11%, white);
-    --ca-accent-tint: color-mix(in srgb, var(--ca-accent) 5%, white);
-    --ca-on-accent: #ffffff;
+    --ca-accent: #27d655;
+    --ca-accent-ink: #116d2c;
+    --ca-accent-soft: #e9f9e8;
+    --ca-accent-tint: #f4fcf3;
+    --ca-on-accent: #171b18;
 
-    --ca-ink: #15171c;
-    --ca-ink-2: #383d46;
-    --ca-muted: #646a74;
-    --ca-faint: #9298a1;
-    --ca-line: #e8e6e1;
-    --ca-line-2: #dad7cf;
-    --ca-divider: #f0eee9;
+    --ca-ink: #171b18;
+    --ca-ink-2: #2f3530;
+    --ca-muted: #646b65;
+    --ca-faint: #8e958e;
+    --ca-line: #d6dbd3;
+    --ca-line-2: #c2c9bf;
+    --ca-divider: #e7ede4;
     --ca-surface: #ffffff;
-    --ca-ground: #f9f8f6;
-    --ca-sunken: #f2f1ed;
+    --ca-ground: #fafaf5;
+    --ca-sunken: #e7ede4;
 
-    --ca-alert-ink: #a23a17;
-    --ca-alert-bg: #fdeee6;
-    --ca-done-ink: #1c6b45;
-    --ca-done-bg: #e5f4eb;
+    --ca-alert-ink: #b74426;
+    --ca-alert-line: #b5542d;
+    --ca-alert-bg: #fff0e9;
+    --ca-done-ink: #116d2c;
+    --ca-done-bg: #e9f9e8;
 
-    --ca-shadow-panel: 0 0 0 1px rgba(15, 18, 24, 0.06), 0 10px 24px -8px rgba(15, 18, 24, 0.16), 0 28px 60px -16px rgba(15, 18, 24, 0.28);
-    --ca-shadow-card: 0 1px 2px rgba(15, 18, 24, 0.04);
-    --ca-shadow-lift: 0 6px 16px -6px rgba(15, 18, 24, 0.16);
+    /* The pressable look: an ink outline and a hard drop in the darker green, like a key. */
+    --ca-press: 0 2px 0 var(--ca-accent-ink);
+    --ca-press-lg: 0 3px 0 var(--ca-accent-ink);
+    --ca-shadow-card: none;
+    --ca-shadow-lift: 0 6px 16px -8px rgba(23, 27, 24, 0.18);
+    --ca-shadow-panel: 0 10px 24px -8px rgba(23, 27, 24, 0.16), 0 28px 60px -16px rgba(23, 27, 24, 0.26);
     --ca-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
-    --ca-font: 'Lato Extended', Lato, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    --ca-font: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    --ca-font-display: Poppins, Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     --ca-radius: 14px;
+    --ca-radius-sm: 10px;
 
     font-family: var(--ca-font);
-    font-size: 14px;
-    line-height: 1.45;
+    font-size: 13px;
+    line-height: 1.4;
     color: var(--ca-ink);
     -webkit-font-smoothing: antialiased;
 }
@@ -66,7 +78,7 @@
 }
 
 .ca-root :focus-visible {
-    outline: 2px solid var(--ca-accent);
+    outline: 2px solid var(--ca-accent-ink);
     outline-offset: 2px;
 }
 
@@ -77,6 +89,12 @@
     overflow: hidden;
     clip: rect(0 0 0 0);
     white-space: nowrap;
+}
+
+.ca-display {
+    font-family: var(--ca-font-display);
+    font-weight: 700;
+    letter-spacing: -0.01em;
 }
 
 .ca-muted {

@@ -1,24 +1,20 @@
-// One of the four shortcuts on the home screen.
+// One of the four shortcuts along the bottom of the home screen: an icon over a one-word label.
+// `primary` marks Ask, the shortcut the home screen most wants tapped.
 
 import { Icon, type IconName } from '@/components/common/icon';
 
 interface NavTileProps {
     icon: IconName;
     label: string;
-    hint: string;
+    primary?: boolean;
     onSelect: () => void;
 }
 
-export function NavTile({ icon, label, hint, onSelect }: NavTileProps) {
+export function NavTile({ icon, label, primary = false, onSelect }: NavTileProps) {
     return (
-        <button type="button" class="ca-tile-btn" onClick={onSelect}>
-            <span class="ca-tile-icon">
-                <Icon name={icon} size={19} />
-            </span>
-            <span class="ca-tile-text">
-                <span class="ca-tile-label">{label}</span>
-                <span class="ca-tile-hint">{hint}</span>
-            </span>
+        <button type="button" class={`ca-shortcut ${primary ? 'ca-shortcut--primary' : ''}`} onClick={onSelect}>
+            <Icon name={icon} size={16} />
+            <span>{label}</span>
         </button>
     );
 }

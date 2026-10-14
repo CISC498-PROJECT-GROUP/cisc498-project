@@ -11,17 +11,15 @@ interface HelpLinkProps {
 
 export function HelpLink({ href, icon, label, description }: HelpLinkProps) {
     return (
-        <a class="ca-row ca-row--link" href={href} target="_blank" rel="noopener noreferrer">
-            <span class="ca-row-icon">
-                <Icon name={icon} size={17} />
+        <a class="ca-help-link" href={href} target="_blank" rel="noopener noreferrer">
+            <span class="ca-help-icon">
+                <Icon name={icon} size={19} />
             </span>
-            <span class="ca-row-main">
-                <span class="ca-row-title">{label}</span>
-                <span class="ca-row-meta">{description}</span>
+            <span class="ca-help-text">
+                <span class="ca-help-title">{label}</span>
+                <span class="ca-help-desc">{description}</span>
             </span>
-            <span class="ca-row-end">
-                <Icon name="external" size={15} />
-            </span>
+            <Icon name="external" size={14} />
         </a>
     );
 }

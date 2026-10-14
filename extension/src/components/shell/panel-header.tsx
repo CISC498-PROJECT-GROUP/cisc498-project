@@ -17,15 +17,15 @@ export function PanelHeader({ title, expanded, onBack, onExpand, onClose, action
     return (
         <header class="ca-subheader">
             <button type="button" class="ca-icon-btn" onClick={onBack} aria-label="Back to menu">
-                <Icon name="back" />
+                <Icon name="back" size={19} />
             </button>
             <h2 class="ca-subheader-title">{title}</h2>
             {actions}
-            <button type="button" class="ca-icon-btn ca-icon-btn--muted" onClick={onExpand} aria-label={expanded ? 'Shrink panel' : 'Expand panel'} title={expanded ? 'Shrink' : 'Expand'}>
-                <Icon name={expanded ? 'shrink' : 'expand'} size={17} />
+            <button type="button" class="ca-icon-btn" onClick={onExpand} aria-label={expanded ? 'Shrink panel' : 'Expand panel'} title={expanded ? 'Shrink' : 'Expand'}>
+                <Icon name={expanded ? 'shrink' : 'expand'} size={15} />
             </button>
-            <button type="button" class="ca-icon-btn ca-icon-btn--muted" onClick={onClose} aria-label="Close assistant" title="Close (Esc)">
-                <Icon name="close" size={18} />
+            <button type="button" class="ca-icon-btn" onClick={onClose} aria-label="Close assistant" title="Close (Esc)">
+                <Icon name="close" size={19} />
             </button>
         </header>
     );

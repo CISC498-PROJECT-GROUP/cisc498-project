@@ -23,7 +23,7 @@ export function GradesView({ onAsk }: { onAsk: (question: string) => void }) {
                 ))}
             </div>
             {ready && courses.data.length > 0 && (
-                <button type="button" class="ca-ask-row" onClick={() => onAsk('What do I need on my remaining work and finals to keep or raise my current grades?')}>
+                <button type="button" class="ca-cta" onClick={() => onAsk('What do I need on my remaining work and finals to keep or raise my current grades?')}>
                     What do I need on my finals? →
                 </button>
             )}

@@ -58,3 +58,19 @@ export const dayLabel = (date: Date, now: Date): string => {
     const tile = dateTile(date);
     return `${tile.weekday}, ${tile.month} ${tile.day}`;
 };
+
+/** When something upcoming is due, as the home timeline says it: "In 5h" inside a day, otherwise
+    "Thu · 11:59 PM". */
+export const relativeDue = (due: Date, now: Date): string => {
+    const hours = (due.getTime() - now.getTime()) / (60 * 60 * 1000);
+    if (hours < 1) return 'Within the hour';
+    if (hours < 24) return `In ${Math.round(hours)}h`;
+    return `${WEEKDAYS[due.getDay()]} · ${formatTime(due)}`;
+};
+
+/** The span a list covers, "Sep 28 – Oct 11", counting today as the first of `days`. */
+export const rangeLabel = (now: Date, days: number): string => {
+    const end = new Date(now.getFullYear(), now.getMonth(), now.getDate() + days - 1);
+    const short = (d: Date) => `${MONTHS[d.getMonth()]} ${d.getDate()}`;
+    return `${short(now)} – ${short(end)}`;
+};

@@ -203,7 +203,7 @@ onto Canvas. Path alias `@/*` → `extension/src`.
   stamped with the time asked, so the backend's system prompt never changes and stays cached.
 - Styling: `src/styles/*.css`, imported as text and joined into one `<style>` in the shadow root by
   `styles/index.ts`. Colours come from the tokens in `tokens.css` — never hardcoded in a component.
-  The accent is the school's own Canvas brand colour (`--ic-brand-primary`, which inherits into the
-  shadow root), falling back to a fixed blue.
+  The palette is the widget's own (the Figma file's "Brilliant-inspired" redesign): ink outlines on a
+  paper ground, and one green (`--ca-accent`, text in `--ca-accent-ink`) for the main action.
 - The manifest is `extension/static/manifest.json`, copied into `dist/` by the build. It matches
   `*.instructure.com` and `canvas.udel.edu`; add a school's self-hosted domain there.

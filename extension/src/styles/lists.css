@@ -1,48 +1,61 @@
-/* The list views — toolbar, grouped list cards and rows, pills and chips — shared by deadlines,
-   support and grades. */
+/* The list views — toolbar, day groups, deadline cards, pills — shared by deadlines and grades.
+   The support view's instructor and help cards are in support.css. */
 
 .ca-toolbar {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 8px;
-    padding: 0 2px;
+}
+
+.ca-toolbar-heading {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
 }
 
 .ca-toolbar-title {
-    font-size: 13px;
+    font-family: var(--ca-font-display);
+    font-size: 20px;
     font-weight: 700;
+    line-height: 1.35;
+    letter-spacing: -0.01em;
 }
 
 .ca-toolbar-hint {
-    font-size: 12px;
-    color: var(--ca-faint);
+    font-size: 10px;
+    color: var(--ca-muted);
+}
+
+.ca-toolbar > .ca-toolbar-hint {
+    font-size: 9px;
 }
 
 .ca-segmented {
     display: inline-flex;
-    padding: 2px;
-    background: var(--ca-sunken);
-    border-radius: 9px;
+    height: 34px;
+    padding: 3px;
+    background: var(--ca-surface);
+    border: 1px solid var(--ca-ink);
+    border-radius: 999px;
 }
 
 .ca-seg {
-    padding: 4px 11px;
-    font-size: 12px;
-    font-weight: 700;
+    padding: 0 12px;
+    font-size: 11px;
     color: var(--ca-muted);
     background: transparent;
     border: none;
-    border-radius: 7px;
+    border-radius: 999px;
     transition:
         background 140ms,
         color 140ms;
 }
 
 .ca-seg--on {
-    color: var(--ca-ink);
-    background: var(--ca-surface);
-    box-shadow: 0 1px 2px rgba(15, 18, 24, 0.1);
+    font-weight: 700;
+    color: var(--ca-on-accent);
+    background: var(--ca-accent);
 }
 
 .ca-group {
@@ -54,11 +67,12 @@
 .ca-group-label {
     display: flex;
     align-items: center;
-    gap: 6px;
-    margin: 6px 2px 0;
-    font-size: 11px;
+    gap: 8px;
+    margin: 0;
+    font-size: 10px;
     font-weight: 700;
-    letter-spacing: 0.07em;
+    line-height: 1.35;
+    letter-spacing: 0.02em;
     text-transform: uppercase;
     color: var(--ca-muted);
 }
@@ -68,38 +82,45 @@
 }
 
 .ca-group-count {
-    padding: 0 6px;
-    font-size: 10px;
-    line-height: 16px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
     border-radius: 999px;
     background: var(--ca-sunken);
 }
 
-.ca-list-card {
-    overflow: hidden;
-    background: var(--ca-surface);
-    border: 1px solid var(--ca-line);
-    border-radius: var(--ca-radius);
-    box-shadow: var(--ca-shadow-card);
+.ca-group-label--alert .ca-group-count {
+    background: var(--ca-alert-bg);
+}
+
+.ca-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
 .ca-row {
     display: flex;
     align-items: center;
-    gap: 12px;
-    min-height: 56px;
-    padding: 10px 14px;
+    gap: 9px;
+    min-height: 54px;
+    padding: 8px 12px;
     color: var(--ca-ink);
     text-decoration: none;
-    transition: background 120ms;
 }
 
-.ca-row + .ca-row {
-    border-top: 1px solid var(--ca-divider);
+.ca-row--card {
+    background: var(--ca-surface);
+    border: 1px solid var(--ca-line);
+    border-radius: var(--ca-radius);
 }
 
-a.ca-row:hover {
-    background: var(--ca-accent-tint);
+.ca-row--late {
+    border-color: var(--ca-alert-ink);
 }
 
 .ca-row--done .ca-row-title {
@@ -109,10 +130,11 @@ a.ca-row:hover {
 }
 
 .ca-row-bar {
-    align-self: stretch;
-    width: 3px;
+    align-self: center;
+    width: 4px;
+    height: 34px;
     flex-shrink: 0;
-    border-radius: 999px;
+    border-radius: 3px;
     background: var(--ca-course);
 }
 
@@ -121,13 +143,15 @@ a.ca-row:hover {
     min-width: 0;
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 4px;
+    line-height: 1.35;
 }
 
 .ca-row-title {
-    font-weight: 700;
+    font-size: 12px;
     color: var(--ca-ink);
     text-decoration: none;
+    overflow-wrap: anywhere;
 }
 
 a.ca-row-link:hover {
@@ -135,42 +159,17 @@ a.ca-row-link:hover {
 }
 
 .ca-row-meta {
-    font-size: 12px;
+    font-size: 9px;
     color: var(--ca-muted);
     font-variant-numeric: tabular-nums;
 }
 
-.ca-row-icon,
-.ca-initials {
-    flex-shrink: 0;
-    width: 34px;
-    height: 34px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--ca-accent);
-    background: var(--ca-accent-soft);
-}
-
-.ca-initials {
-    border-radius: 999px;
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--ca-on-accent);
-    background: var(--ca-course);
-}
-
-.ca-row-end {
-    display: flex;
-    color: var(--ca-faint);
-}
-
 .ca-pill {
     flex-shrink: 0;
-    padding: 3px 9px;
-    font-size: 11px;
+    padding: 4px 7px;
+    font-size: 9px;
     font-weight: 700;
+    line-height: 1.35;
     border-radius: 999px;
 }
 

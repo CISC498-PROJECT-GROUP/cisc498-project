@@ -1,8 +1,9 @@
-/* The chat: empty state, messages, the live status line, and the composer. */
+/* The chat: messages and the live status line. The empty state is in chat-empty.css, the
+   composer in composer.css. */
 
 .ca-thread {
     gap: 16px;
-    padding-top: 18px;
+    padding-top: 20px;
 }
 
 .ca-msg {
@@ -17,10 +18,11 @@
 
 .ca-bubble {
     max-width: 82%;
-    padding: 9px 14px;
-    color: var(--ca-on-accent);
-    background: var(--ca-accent);
-    border-radius: 18px 18px 4px 18px;
+    padding: 9px 13px;
+    color: var(--ca-ink);
+    background: var(--ca-accent-soft);
+    border: 1px solid var(--ca-accent-ink);
+    border-radius: 14px 14px 4px 14px;
     white-space: pre-wrap;
     overflow-wrap: anywhere;
 }
@@ -35,12 +37,15 @@
     align-items: center;
     justify-content: center;
     color: var(--ca-on-accent);
-    background: linear-gradient(145deg, var(--ca-accent), var(--ca-accent-strong));
+    background: var(--ca-accent);
+    border: 1.2px solid var(--ca-ink);
 }
 
 .ca-avatar--lg {
-    width: 44px;
-    height: 44px;
+    width: 64px;
+    height: 64px;
+    margin: 0;
+    border-width: 2px;
 }
 
 .ca-avatar--busy {
@@ -87,84 +92,15 @@
     align-items: flex-start;
     gap: 8px;
     padding: 10px 12px;
-    font-size: 13px;
+    font-size: 12px;
     color: var(--ca-alert-ink);
     background: var(--ca-alert-bg);
+    border: 1px solid var(--ca-alert-line);
     border-radius: 12px;
-}
-
-.ca-empty-chat {
-    margin: auto 0;
-    padding: 8px 4px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-}
-
-.ca-empty-title {
-    margin: 14px 0 4px;
-    font-size: 17px;
-    font-weight: 700;
-    letter-spacing: -0.01em;
-}
-
-.ca-empty-sub {
-    max-width: 300px;
-    margin: 0 0 18px;
-    font-size: 13px;
-    color: var(--ca-muted);
-}
-
-.ca-starters {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-}
-
-.ca-starter {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    width: 100%;
-    padding: 11px 12px;
-    text-align: left;
-    color: var(--ca-ink-2);
-    background: var(--ca-surface);
-    border: 1px solid var(--ca-line);
-    border-radius: 12px;
-    transition:
-        border-color 140ms,
-        background 140ms;
-}
-
-.ca-starter > :first-child {
-    color: var(--ca-accent);
-}
-
-.ca-starter > span:not(.ca-starter-go) {
-    flex: 1;
-}
-
-.ca-starter-go {
-    display: flex;
-    color: var(--ca-faint);
-    transition: transform 160ms var(--ca-ease);
-}
-
-.ca-starter:hover {
-    border-color: var(--ca-line-2);
-    background: var(--ca-accent-tint);
-}
-
-.ca-starter:hover .ca-starter-go {
-    transform: translateX(3px);
-    color: var(--ca-accent);
 }
 
 /* Expanded, keep the thread at a readable measure instead of stretching lines across the screen. */
 .ca-panel--expanded .ca-thread,
 .ca-panel--expanded .ca-chat-foot {
-    padding-inline: max(16px, calc((100% - 700px) / 2));
+    padding-inline: max(20px, calc((100% - 700px) / 2));
 }

@@ -1,8 +1,19 @@
-/* The composer, shared by the chat and the home screen, and the chat's footer. */
+/* The composer, shared by the chat and the home screen, and the white footer each sits in. */
 
 .ca-chat-foot {
-    padding: 10px 12px 10px;
-    background: var(--ca-ground);
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px 20px 14px;
+    background: var(--ca-surface);
+    border-top: 1px solid var(--ca-line);
+}
+
+.ca-composer-area {
+    flex-shrink: 0;
+    padding: 12px 20px 14px;
+    background: var(--ca-surface);
     border-top: 1px solid var(--ca-line);
 }
 
@@ -10,18 +21,15 @@
     display: flex;
     align-items: flex-end;
     gap: 8px;
-    padding: 6px 6px 6px 14px;
+    min-height: 46px;
+    padding: 5px 5px 5px 12px;
     background: var(--ca-surface);
-    border: 1px solid var(--ca-line-2);
-    border-radius: 16px;
-    box-shadow: var(--ca-shadow-card);
-    transition:
-        border-color 140ms,
-        box-shadow 140ms;
+    border: 1.5px solid var(--ca-ink);
+    border-radius: 12px;
+    transition: box-shadow 140ms;
 }
 
 .ca-composer:focus-within {
-    border-color: var(--ca-accent);
     box-shadow: 0 0 0 3px var(--ca-accent-soft);
 }
 
@@ -29,17 +37,17 @@
     flex: 1;
     min-height: 34px;
     max-height: 132px;
-    padding: 7px 0;
+    padding: 8px 0;
     border: none;
     outline: none;
     resize: none;
     background: transparent;
-    font-size: 14px;
+    font-size: 12px;
     line-height: 1.45;
 }
 
 .ca-input::placeholder {
-    color: var(--ca-faint);
+    color: var(--ca-muted);
 }
 
 .ca-root .ca-input:focus-visible {
@@ -51,8 +59,8 @@
     width: 34px;
     height: 34px;
     padding: 0;
-    border: none;
-    border-radius: 11px;
+    border: 1px solid var(--ca-accent-ink);
+    border-radius: 9px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -68,12 +76,13 @@
 }
 
 .ca-send:disabled {
-    opacity: 0.3;
+    opacity: 0.45;
 }
 
 .ca-disclaimer {
-    margin: 7px 0 0;
-    font-size: 11px;
+    margin: 0;
+    font-size: 9px;
+    line-height: 1.35;
     text-align: center;
-    color: var(--ca-faint);
+    color: var(--ca-muted);
 }

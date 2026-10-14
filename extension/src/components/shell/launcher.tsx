@@ -22,7 +22,7 @@ export function Launcher({ open, busy, onToggle, buttonRef }: LauncherProps) {
             aria-expanded={open}
             aria-label={open ? 'Close Canvas Assistant' : 'Open Canvas Assistant'}>
             <span class="ca-launcher-icon ca-launcher-icon--closed">
-                <Icon name="sparkle" size={24} />
+                <Icon name="sparkle" size={26} />
             </span>
             <span class="ca-launcher-icon ca-launcher-icon--open">
                 <Icon name="close" size={22} />
