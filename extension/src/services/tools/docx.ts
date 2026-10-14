@@ -8,8 +8,18 @@ export function parseDocx(bytes: string): string {
     const document = files[WORD_DOCUMENT];
     if (!document) throw new Error('DOCX is missing word/document.xml');
 
-    const xml = new DOMParser().parseFromString(strFromU8(document), 'application/xml');
-    if (xml.getElementsByTagName('parsererror').length > 0) throw new Error('DOCX contains invalid document XML');
+    let parseError = false;
+    const xml = new DOMParser({
+        errorHandler: {
+            error: () => {
+                parseError = true;
+            },
+            fatalError: () => {
+                parseError = true;
+            },
+        },
+    }).parseFromString(strFromU8(document), 'application/xml');
+    if (parseError || xml.getElementsByTagName('parsererror').length > 0) throw new Error('DOCX contains invalid document XML');
 
     return Array.from(xml.getElementsByTagNameNS('*', 'p'))
         .map((paragraph) => readParagraph(paragraph))

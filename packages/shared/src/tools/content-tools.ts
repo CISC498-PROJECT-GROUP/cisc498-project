@@ -7,12 +7,12 @@ export const CONTENT_TOOLS = [
     {
         name: 'get_syllabus',
         description:
-            "The course's Syllabus page as text. Often empty or just a link — many instructors put the syllabus in a file (usually a PDF), a page, or a module instead; if so, look there with list_files / list_pages / list_modules.",
+            "The course's Syllabus page as text. Often empty or just a link — many instructors put the syllabus in a file (usually a PDF), a page, or a module instead; if empty or incomplete, continue with list_files / list_pages / list_modules and inspect linked items.",
         input_schema: { type: 'object', properties: { course_id: courseId }, required: ['course_id'], additionalProperties: false },
     },
     {
         name: 'list_pages',
-        description: 'The wiki pages in a course (title, url slug, last updated). Optionally filter by a search term matched against titles.',
+        description: 'The wiki pages in a course (title, url slug, last updated). Optionally filter by a search term matched against titles. If a filtered search is empty, retry with a broader synonym or list all pages.',
         input_schema: {
             type: 'object',
             properties: { course_id: courseId, search: { type: 'string', description: 'Only pages whose title contains this, e.g. "syllabus".' } },
@@ -37,7 +37,7 @@ export const CONTENT_TOOLS = [
     },
     {
         name: 'list_files',
-        description: 'Files uploaded to a course (id, name, type, size, updated). Optionally filter by a search term, e.g. "syllabus" or "schedule". Some courses hide the Files list from students; module items still link files.',
+        description: 'Files uploaded to a course (id, name, type, size, updated). Optionally filter by a search term, e.g. "syllabus" or "schedule". If a filtered search is empty, retry with a broader synonym or list all files. Some courses hide the Files list from students; module items still link files.',
         input_schema: {
             type: 'object',
             properties: { course_id: courseId, search: { type: 'string', description: 'Only files whose name contains this (2+ characters).' } },

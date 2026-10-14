@@ -71,6 +71,9 @@ describe('POST /chat/turn', () => {
         const system = (sent?.system as { text: string }[])[0]?.text ?? '';
         expect(system).toContain('Everything else is out of scope');
         expect(system).toContain('No homework help');
+        expect(system).toContain('Choose the best starting source and tools from the question');
+        expect(system).toContain('Never say "I\'m not sure"');
+        expect(system).toContain('state exactly which relevant sources and searches you checked');
     });
 
     it('passes tool calls through so the extension can run them', async () => {

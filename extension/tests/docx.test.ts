@@ -12,4 +12,32 @@ describe('parseDocx', () => {
 
         expect(parseDocx(asBinary(bytes))).toBe('Google Docs\nSecond paragraph');
     });
+
+    it('normalizes tabs, line breaks and surrounding whitespace', () => {
+        const bytes = zipSync({
+            'word/document.xml': strToU8(
+                documentXml('<w:p><w:r><w:t>  Before </w:t><w:tab/><w:t> after </w:t><w:br/><w:t> next </w:t></w:r></w:p>'),
+            ),
+        });
+
+        expect(parseDocx(asBinary(bytes))).toBe('Before after next');
+    });
+
+    it('ignores empty paragraphs', () => {
+        const bytes = zipSync({ 'word/document.xml': strToU8(documentXml('<w:p/><w:p><w:r><w:t>Visible</w:t></w:r></w:p><w:p><w:r/></w:p>')) });
+
+        expect(parseDocx(asBinary(bytes))).toBe('Visible');
+    });
+
+    it('rejects archives without the Word document entry', () => {
+        const bytes = zipSync({ 'word/styles.xml': strToU8('<w:styles/>') });
+
+        expect(() => parseDocx(asBinary(bytes))).toThrow('DOCX is missing word/document.xml');
+    });
+
+    it('rejects invalid document XML', () => {
+        const bytes = zipSync({ 'word/document.xml': strToU8('<w:document><w:body>') });
+
+        expect(() => parseDocx(asBinary(bytes))).toThrow('DOCX contains invalid document XML');
+    });
 });
