@@ -33,8 +33,21 @@ export function groupDeadlines(deadlines: Deadline[], now: Date, filter: Deadlin
     return overdue.length > 0 ? [{ label: 'Overdue', overdue: true, items: overdue }, ...groups] : groups;
 }
 
-/** The home screen's at-a-glance numbers. */
-export function glance(deadlines: Deadline[], now: Date): { dueSoon: number; overdue: number } {
-    const soon = now.getTime() + 48 * 60 * 60 * 1000;
-    return { dueSoon: deadlines.filter((d) => !d.submitted && d.dueAt.getTime() >= now.getTime() && d.dueAt.getTime() <= soon).length, overdue: deadlines.filter((d) => !d.submitted && d.dueAt.getTime() < now.getTime()).length };
+/** What the home screen leads with. `focus` is the one item to act on now — the oldest overdue
+    work, or failing that the next thing due — and `soon` is the rest of what is due in 48 hours. */
+export interface NextMove {
+    overdue: Deadline[];
+    focus: Deadline | null;
+    soon: Deadline[];
+}
+
+export const SOON_HOURS = 48;
+
+export function nextMove(deadlines: Deadline[], now: Date): NextMove {
+    const open = deadlines.filter((d) => !d.submitted);
+    const overdue = open.filter((d) => d.dueAt.getTime() < now.getTime());
+    const upcoming = open.filter((d) => d.dueAt.getTime() >= now.getTime());
+    const focus = overdue[0] ?? upcoming[0] ?? null;
+    const cutoff = now.getTime() + SOON_HOURS * 60 * 60 * 1000;
+    return { overdue, focus, soon: upcoming.filter((d) => d !== focus && d.dueAt.getTime() <= cutoff) };
 }

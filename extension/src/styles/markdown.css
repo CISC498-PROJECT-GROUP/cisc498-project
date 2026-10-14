@@ -28,10 +28,10 @@
 }
 
 .ca-md a {
-    color: var(--ca-accent);
+    color: var(--ca-accent-ink);
     font-weight: 700;
     text-decoration: underline;
-    text-decoration-color: color-mix(in srgb, var(--ca-accent) 30%, transparent);
+    text-decoration-color: color-mix(in srgb, var(--ca-accent-ink) 35%, transparent);
     text-underline-offset: 3px;
     transition: text-decoration-color 120ms;
 }

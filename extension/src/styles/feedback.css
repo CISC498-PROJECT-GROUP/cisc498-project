@@ -1,4 +1,5 @@
-/* Loading skeletons, error and empty states, and the small action controls. */
+/* Loading skeletons, error and empty states, and the action controls every view shares: the green
+   call-to-action, text links and chips. */
 
 .ca-skeleton {
     display: flex;
@@ -30,7 +31,7 @@
     display: block;
     height: 11px;
     border-radius: 6px;
-    background: linear-gradient(90deg, var(--ca-sunken) 25%, var(--ca-divider) 50%, var(--ca-sunken) 75%) 0 0 / 200% 100%;
+    background: linear-gradient(90deg, var(--ca-sunken) 25%, var(--ca-ground) 50%, var(--ca-sunken) 75%) 0 0 / 200% 100%;
     animation: ca-shimmer 1.4s linear infinite;
 }
 
@@ -53,20 +54,21 @@
     padding: 12px 14px;
     color: var(--ca-alert-ink);
     background: var(--ca-alert-bg);
+    border: 1px solid var(--ca-alert-line);
     border-radius: var(--ca-radius);
 }
 
 .ca-error-text {
     flex: 1;
     min-width: 180px;
-    font-size: 13px;
+    font-size: 12px;
 }
 
 .ca-empty-state {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
     padding: 36px 16px;
     text-align: center;
     color: var(--ca-muted);
@@ -83,8 +85,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--ca-done-ink);
-    background: var(--ca-done-bg);
+    color: var(--ca-on-accent);
+    background: var(--ca-accent);
+    border: 1.5px solid var(--ca-ink);
 }
 
 .ca-text-btn,
@@ -92,10 +95,10 @@
 .ca-chip {
     display: inline-flex;
     align-items: center;
-    gap: 5px;
-    font-size: 12px;
+    gap: 6px;
+    font-size: 11px;
     font-weight: 700;
-    color: var(--ca-accent);
+    color: var(--ca-accent-ink);
     text-decoration: none;
     background: none;
     border: none;
@@ -113,29 +116,60 @@
 
 .ca-chip {
     flex-shrink: 0;
-    padding: 6px 10px;
-    border: 1px solid var(--ca-line-2);
+    gap: 5px;
+    padding: 5px 8px;
+    font-size: 9px;
+    background: var(--ca-accent-soft);
+    border: 1px solid var(--ca-accent-ink);
     border-radius: 999px;
     transition: background 140ms;
 }
 
 .ca-chip:hover {
-    background: var(--ca-accent-soft);
+    background: var(--ca-surface);
 }
 
-.ca-ask-row {
-    align-self: center;
-    margin-top: 4px;
-    padding: 8px 14px;
-    font-size: 13px;
+/* The one green button a view ends on — "Help me plan my week →". */
+.ca-cta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    height: 44px;
+    margin-top: auto;
+    padding: 0 14px;
+    font-size: 12px;
     font-weight: 700;
-    color: var(--ca-accent);
-    background: var(--ca-accent-soft);
-    border: none;
-    border-radius: 999px;
-    transition: filter 140ms;
+    color: var(--ca-on-accent);
+    background: var(--ca-accent);
+    border: 1.5px solid var(--ca-accent-ink);
+    border-radius: 12px;
+    box-shadow: var(--ca-press-lg);
+    transition:
+        transform 120ms var(--ca-ease),
+        box-shadow 120ms var(--ca-ease);
 }
 
-.ca-ask-row:hover {
-    filter: brightness(0.96);
+.ca-cta:hover {
+    filter: brightness(1.04);
+}
+
+.ca-cta:active {
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 var(--ca-accent-ink);
+}
+
+.ca-cta--sm {
+    height: 36px;
+    margin-top: 0;
+    padding: 0 12px;
+    border-width: 1.2px;
+    border-radius: var(--ca-radius-sm);
+    box-shadow: var(--ca-press);
+}
+
+.ca-cta-label {
+    flex: 1;
+    text-align: left;
 }

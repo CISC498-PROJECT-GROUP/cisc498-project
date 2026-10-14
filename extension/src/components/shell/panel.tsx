@@ -5,7 +5,7 @@ import { ChatView } from '@/components/chat/chat-view';
 import { Icon } from '@/components/common/icon';
 import { DeadlinesView } from '@/components/deadlines/deadlines-view';
 import { GradesView } from '@/components/grades/grades-view';
-import { HomeHero } from '@/components/home/home-hero';
+import { HomeHeader } from '@/components/home/home-header';
 import { HomeView } from '@/components/home/home-view';
 import { PanelHeader } from '@/components/shell/panel-header';
 import { SubmitView } from '@/components/submit/submit-view';
@@ -31,25 +31,21 @@ interface PanelProps {
 export function Panel({ view, expanded, onExpand, onNavigate, onClose, chat, onAsk, submitting, onSubmit }: PanelProps) {
     const newChat =
         view === 'chat' && chat.messages.length > 0 ? (
-            <button type="button" class="ca-icon-btn ca-icon-btn--muted" onClick={chat.reset} disabled={chat.pending} aria-label="New chat" title="New chat">
+            <button type="button" class="ca-icon-btn" onClick={chat.reset} disabled={chat.pending} aria-label="New chat" title="New chat">
                 <Icon name="compose" size={17} />
             </button>
         ) : null;
 
     return (
         <section class={`ca-panel ${expanded ? 'ca-panel--expanded' : ''}`} role="dialog" aria-label="Canvas Assistant">
-            {view === 'home' ? (
-                <HomeHero onNavigate={onNavigate} onClose={onClose} />
-            ) : (
-                <PanelHeader title={TITLES[view]} expanded={expanded} onBack={() => onNavigate(view === 'submit' ? 'deadlines' : 'home')} onExpand={onExpand} onClose={onClose} actions={newChat} />
-            )}
+            {view === 'home' ? <HomeHeader onClose={onClose} /> : <PanelHeader title={TITLES[view]} expanded={expanded} onBack={() => onNavigate(view === 'submit' ? 'deadlines' : 'home')} onExpand={onExpand} onClose={onClose} actions={newChat} />}
             <div key={view} class="ca-view">
                 {view === 'home' && <HomeView onNavigate={onNavigate} onAsk={onAsk} />}
                 {view === 'chat' && <ChatView chat={chat} />}
                 {view === 'grades' && <GradesView onAsk={onAsk} />}
                 {view === 'deadlines' && <DeadlinesView onAsk={onAsk} onSubmit={onSubmit} />}
                 {view === 'submit' && submitting?.courseId && submitting.assignmentId && <SubmitView deadline={{ ...submitting, courseId: submitting.courseId, assignmentId: submitting.assignmentId }} onDone={() => onNavigate('deadlines')} />}
-                {view === 'support' && <SupportView onAsk={onAsk} />}
+                {view === 'support' && <SupportView onAsk={onAsk} onOpenChat={() => onNavigate('chat')} />}
             </div>
         </section>
     );

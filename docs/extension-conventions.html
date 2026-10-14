@@ -110,7 +110,11 @@
                     Every class is prefixed <code>ca-</code>.</li>
                 <li>Colours come from the tokens in <code>tokens.css</code> — never a hex in a component. A per-course
                     colour is passed as the <code>--ca-course</code> custom property.</li>
-                <li>The accent is <code>var(--ic-brand-primary)</code>, the school's Canvas theme colour.</li>
+                <li>The palette is the widget's own, from the Canvas Assistant Figma file: paper ground, ink
+                    outlines, and one green (<code>--ca-accent</code>) for the action that matters. Green text and
+                    icons use <code>--ca-accent-ink</code>; the bright fill is never text on white. Display type is
+                    Poppins, body text Inter, each falling back to the system face — a shadow root cannot register
+                    fonts, and the widget never adds to Canvas's DOM.</li>
                 <li>Resets use <code>:where()</code> so they carry zero specificity and never beat a component class.</li>
             </ul>
         </div>

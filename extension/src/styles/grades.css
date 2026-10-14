@@ -1,9 +1,9 @@
-/* Grade cards, and the chips, links and prompts the list views share. */
+/* Grade cards: course and score, a progress meter, and the opened breakdown by assignment group. */
 
 .ca-stack {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 9px;
 }
 
 .ca-grade {
@@ -11,23 +11,30 @@
     background: var(--ca-surface);
     border: 1px solid var(--ca-line);
     border-radius: var(--ca-radius);
-    box-shadow: var(--ca-shadow-card);
-    transition: box-shadow 160ms var(--ca-ease);
+    transition: border-color 160ms;
 }
 
-.ca-grade--open {
-    box-shadow: var(--ca-shadow-lift);
+.ca-grade--open,
+.ca-grade:hover {
+    border-color: var(--ca-ink);
 }
 
 .ca-grade-head {
     display: flex;
-    align-items: center;
-    gap: 12px;
+    flex-direction: column;
+    gap: 8px;
     width: 100%;
-    padding: 13px 12px 10px 16px;
+    padding: 10px 12px;
     text-align: left;
     background: transparent;
     border: none;
+}
+
+.ca-grade-top {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
 }
 
 .ca-grade-name {
@@ -35,99 +42,116 @@
     min-width: 0;
     display: flex;
     flex-direction: column;
-    gap: 1px;
+    gap: 2px;
+    line-height: 1.35;
 }
 
 .ca-grade-code {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 9px;
     font-weight: 700;
+    color: var(--ca-course);
+}
+
+.ca-grade-code::before {
+    content: '';
+    width: 5px;
+    height: 5px;
+    border-radius: 999px;
+    background: currentColor;
 }
 
 .ca-grade-title {
-    font-size: 12px;
-    color: var(--ca-muted);
-}
-
-.ca-grade-score {
-    display: flex;
-    align-items: baseline;
-    gap: 8px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--ca-ink);
 }
 
 .ca-grade-pct {
-    font-size: 18px;
+    font-family: var(--ca-font-display);
+    font-size: 19px;
     font-weight: 700;
+    line-height: 1.35;
     letter-spacing: -0.01em;
     font-variant-numeric: tabular-nums;
 }
 
 .ca-grade-letter {
-    min-width: 28px;
-    padding: 2px 7px;
-    font-size: 12px;
+    min-width: 30px;
+    height: 28px;
+    padding: 0 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
     font-weight: 700;
-    text-align: center;
-    color: var(--ca-accent);
+    color: var(--ca-accent-ink);
     background: var(--ca-accent-soft);
-    border-radius: 7px;
+    border: 1px solid var(--ca-accent-ink);
+    border-radius: 8px;
 }
 
-.ca-meter,
-.ca-bar {
-    height: 4px;
-    margin: 0 16px 14px;
+.ca-meter {
+    display: block;
+    width: 100%;
+    height: 6px;
     overflow: hidden;
     border-radius: 999px;
-    background: var(--ca-divider);
+    background: var(--ca-sunken);
 }
 
-.ca-meter-fill,
-.ca-bar-fill {
+.ca-meter-fill {
     display: block;
     height: 100%;
     border-radius: 999px;
-    background: var(--ca-course);
+    background: var(--ca-accent);
     transition: width 500ms var(--ca-ease);
 }
 
 .ca-grade-body {
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    padding: 12px 16px 14px;
-    background: var(--ca-ground);
-    border-top: 1px solid var(--ca-divider);
+    gap: 6px;
+    padding: 9px 12px 10px;
+    background: var(--ca-accent-soft);
+    border-top: 1px solid var(--ca-line);
     animation: ca-enter 200ms var(--ca-ease);
 }
 
-.ca-cat-head {
+.ca-cat {
     display: flex;
+    align-items: center;
     justify-content: space-between;
-    margin-bottom: 6px;
-    font-size: 13px;
+    min-height: 18px;
+    font-size: 11px;
+    line-height: 1.35;
 }
 
 .ca-cat-name {
-    font-weight: 700;
+    font-weight: 600;
 }
 
 .ca-cat-weight {
     margin-left: 6px;
+    font-size: 10px;
     font-weight: 400;
-    color: var(--ca-faint);
+    color: var(--ca-muted);
 }
 
 .ca-cat-score {
-    font-weight: 700;
+    font-weight: 600;
     font-variant-numeric: tabular-nums;
 }
 
-.ca-cat .ca-bar {
-    margin: 0;
+.ca-grade-body .ca-link {
+    margin-top: 2px;
 }
 
 .ca-chevron {
     display: flex;
-    color: var(--ca-faint);
+    color: var(--ca-ink);
     transition: transform 200ms var(--ca-ease);
 }
 

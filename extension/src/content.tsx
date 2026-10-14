@@ -3,8 +3,7 @@
 //
 // The widget renders inside a SHADOW ROOT on a host element of its own. That is the isolation
 // boundary in both directions: Canvas's global CSS cannot restyle the widget, and the widget's CSS
-// cannot leak onto Canvas. CSS custom properties DO cross it, which is how the widget inherits the
-// school's brand colour (--ic-brand-primary) without reading the page's scripts.
+// cannot leak onto Canvas. (CSS custom properties do cross it; the widget sets its own on .ca-root.)
 
 import { render } from 'preact';
 import { App } from '@/app';

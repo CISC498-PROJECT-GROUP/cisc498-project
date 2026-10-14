@@ -23,7 +23,7 @@ export function Message({ message }: { message: ChatMessage }) {
     return (
         <div class="ca-msg ca-msg--bot">
             <span class="ca-avatar" aria-hidden="true">
-                <Icon name="sparkle" size={14} />
+                <Icon name="sparkle" size={15} />
             </span>
             <div class="ca-answer">
                 <Markdown text={message.text} />

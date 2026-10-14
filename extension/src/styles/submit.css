@@ -42,7 +42,7 @@
 }
 
 .ca-field:focus {
-    border-color: var(--ca-accent);
+    border-color: var(--ca-ink);
     box-shadow: 0 0 0 3px var(--ca-accent-soft);
 }
 
@@ -101,8 +101,8 @@
     flex-direction: column;
     gap: 10px;
     padding: 12px 14px;
-    background: var(--ca-accent-tint);
-    border: 1px solid var(--ca-accent-soft);
+    background: var(--ca-accent-soft);
+    border: 1px solid var(--ca-accent-ink);
     border-radius: var(--ca-radius);
 }
 
@@ -142,6 +142,8 @@
 .ca-btn--primary {
     color: var(--ca-on-accent);
     background: var(--ca-accent);
+    border: 1.2px solid var(--ca-accent-ink);
+    box-shadow: var(--ca-press);
 }
 
 .ca-btn--primary:hover:not(:disabled) {
@@ -149,8 +151,9 @@
 }
 
 .ca-btn--quiet {
-    color: var(--ca-ink-2);
-    background: var(--ca-sunken);
+    color: var(--ca-ink);
+    background: var(--ca-surface);
+    border: 1px solid var(--ca-ink);
 }
 
 .ca-btn--wide {

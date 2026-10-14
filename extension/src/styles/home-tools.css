@@ -1,0 +1,195 @@
+/* The lower half of the home screen: the priority card's outline button, the 48-hour timeline,
+   the ask-the-assistant button and the shortcut row. */
+
+.ca-btn-outline {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 36px;
+    padding: 0 12px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--ca-ink);
+    text-decoration: none;
+    background: var(--ca-surface);
+    border: 1.2px solid var(--ca-ink);
+    border-radius: var(--ca-radius-sm);
+    transition: background 120ms;
+}
+
+.ca-btn-outline:hover {
+    background: var(--ca-ground);
+}
+
+.ca-home-main--busy .ca-btn-outline {
+    height: 32px;
+}
+
+.ca-section-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 22px;
+}
+
+.ca-section-title {
+    margin: 0;
+    font-family: var(--ca-font-display);
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+.ca-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.ca-timeline-list {
+    --ca-row: 44px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.ca-home-main--busy .ca-timeline-list {
+    --ca-row: 36px;
+}
+
+/* The connector runs from the first point to the last. */
+.ca-timeline-list::before {
+    content: '';
+    position: absolute;
+    left: 7px;
+    top: calc(var(--ca-row) / 2);
+    bottom: calc(var(--ca-row) / 2);
+    width: 2px;
+    background: var(--ca-line);
+}
+
+.ca-timeline-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: var(--ca-row);
+}
+
+.ca-timeline-point {
+    width: 16px;
+    flex-shrink: 0;
+    display: flex;
+    justify-content: center;
+}
+
+.ca-timeline-point::before {
+    content: '';
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+    background: var(--ca-ground);
+    border: 2.5px solid var(--ca-course);
+}
+
+.ca-timeline-main {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    line-height: 1.3;
+    color: var(--ca-ink);
+    text-decoration: none;
+}
+
+.ca-home-main--busy .ca-timeline-main {
+    gap: 3px;
+}
+
+.ca-timeline-meta {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: 10px;
+}
+
+.ca-timeline-when {
+    color: var(--ca-muted);
+    white-space: nowrap;
+}
+
+.ca-timeline-title {
+    font-size: 13px;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+
+a.ca-timeline-main:hover .ca-timeline-title {
+    text-decoration: underline;
+}
+
+.ca-timeline-more {
+    min-height: 22px;
+    padding-left: 28px;
+    font-weight: 600;
+}
+
+.ca-assist {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.ca-assist-alt {
+    align-self: center;
+    min-height: 22px;
+    font-weight: 600;
+}
+
+.ca-shortcuts {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+    padding: 4px 20px 14px;
+}
+
+.ca-shortcut {
+    flex: 1;
+    min-width: 0;
+    height: 48px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 0;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--ca-ink);
+    background: var(--ca-surface);
+    border: 1px solid var(--ca-ink);
+    border-radius: var(--ca-radius-sm);
+    transition:
+        transform 120ms var(--ca-ease),
+        background 120ms;
+}
+
+.ca-shortcut svg {
+    color: var(--ca-accent-ink);
+}
+
+.ca-shortcut:hover {
+    transform: translateY(-1px);
+    background: var(--ca-accent-tint);
+}
+
+.ca-shortcut--primary,
+.ca-shortcut--primary:hover {
+    background: var(--ca-accent-soft);
+}

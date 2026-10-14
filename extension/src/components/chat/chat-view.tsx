@@ -22,7 +22,7 @@ export function ChatView({ chat }: { chat: ChatState }) {
                 {chat.pending && (
                     <div class="ca-msg ca-msg--bot">
                         <span class="ca-avatar ca-avatar--busy" aria-hidden="true">
-                            <Icon name="sparkle" size={14} />
+                            <Icon name="sparkle" size={15} />
                         </span>
                         <span class="ca-status">
                             <span class="ca-status-text">{chat.activity ? `${chat.activity}…` : 'Thinking…'}</span>
@@ -31,8 +31,8 @@ export function ChatView({ chat }: { chat: ChatState }) {
                 )}
             </div>
             <div class="ca-chat-foot">
-                <Composer onSend={chat.send} disabled={chat.pending} placeholder={chat.messages.length === 0 ? 'Ask about your courses…' : 'Ask a follow-up…'} />
-                <p class="ca-disclaimer">Answers use your Canvas data — double-check what matters.</p>
+                <Composer onSend={chat.send} disabled={chat.pending} placeholder={chat.messages.length === 0 ? 'Ask anything…' : 'Ask a follow-up…'} />
+                <p class="ca-disclaimer">Answers may be inaccurate. Check Canvas for official information.</p>
             </div>
         </>
     );

@@ -26,7 +26,7 @@ export function DeadlineRow({ deadline, course, overdue, onSubmit }: DeadlineRow
     const submittable = !deadline.submitted && deadline.assignmentId !== null && deadline.courseId !== null;
 
     return (
-        <div class={`ca-row ${deadline.submitted ? 'ca-row--done' : ''}`} style={{ '--ca-course': course?.color ?? 'var(--ca-faint)' }}>
+        <div class={`ca-row ca-row--card ${overdue ? 'ca-row--late' : ''} ${deadline.submitted ? 'ca-row--done' : ''}`} style={{ '--ca-course': course?.color ?? 'var(--ca-faint)' }}>
             <span class="ca-row-bar" aria-hidden="true" />
             <span class="ca-row-main">
                 {deadline.url ? (

@@ -6,9 +6,10 @@ import { Icon } from '@/components/common/icon';
 import { LoadState } from '@/components/common/load-state';
 import { Segmented } from '@/components/common/segmented';
 import { DeadlineRow } from '@/components/deadlines/deadline-row';
+import { rangeLabel } from '@/services/format/dates';
 import { groupDeadlines, type DeadlineFilter } from '@/services/format/group-deadlines';
 import { useCourses } from '@/services/hooks/use-courses';
-import { useDeadlines } from '@/services/hooks/use-deadlines';
+import { useDeadlines, WINDOW_DAYS } from '@/services/hooks/use-deadlines';
 import type { Deadline } from '@/services/types';
 
 const FILTERS: { value: DeadlineFilter; label: string }[] = [
@@ -32,7 +33,10 @@ export function DeadlinesView({ onAsk, onSubmit }: DeadlinesViewProps) {
     return (
         <div class="ca-body">
             <div class="ca-toolbar">
-                <span class="ca-toolbar-title">Next 14 days</span>
+                <span class="ca-toolbar-heading">
+                    <span class="ca-toolbar-title">Next {WINDOW_DAYS} days</span>
+                    <span class="ca-toolbar-hint">{rangeLabel(now, WINDOW_DAYS)}</span>
+                </span>
                 <Segmented label="Show" value={filter} options={FILTERS} onChange={setFilter} />
             </div>
             <LoadState state={deadlines} rows={4} />
@@ -50,7 +54,7 @@ export function DeadlinesView({ onAsk, onSubmit }: DeadlinesViewProps) {
                         {group.label}
                         <span class="ca-group-count">{group.items.length}</span>
                     </h3>
-                    <div class="ca-list-card">
+                    <div class="ca-cards">
                         {group.items.map((d) => (
                             <DeadlineRow key={d.id} deadline={d} course={courses.data.find((c) => c.id === d.courseId)} overdue={group.overdue} onSubmit={onSubmit} />
                         ))}
@@ -58,7 +62,7 @@ export function DeadlinesView({ onAsk, onSubmit }: DeadlinesViewProps) {
                 </section>
             ))}
             {ready && groups.length > 0 && (
-                <button type="button" class="ca-ask-row" onClick={() => onAsk('Help me plan my week: what should I work on first, given what is due and how much each is worth?')}>
+                <button type="button" class="ca-cta" onClick={() => onAsk('Help me plan my week: what should I work on first, given what is due and how much each is worth?')}>
                     Help me plan my week →
                 </button>
             )}
