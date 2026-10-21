@@ -8,6 +8,13 @@
 
 FROM docker.io/oven/bun:1.3-slim
 
+# Chromium prints study PDFs (svc-browser.ts); Latin Modern Math sets their formulas, and DejaVu
+# covers the symbols the embedded fonts don't.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends chromium fonts-lmodern fonts-dejavu-core \
+    && rm -rf /var/lib/apt/lists/*
+ENV CHROME_PATH=/usr/bin/chromium
+
 WORKDIR /app
 
 # Every workspace member's package.json must be present for the frozen lockfile to match, even the

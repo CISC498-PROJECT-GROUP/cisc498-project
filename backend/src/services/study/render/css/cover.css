@@ -1,0 +1,128 @@
+/* The cover: gradient hero, unit cards, and the key to the guide's boxes. A study guide's cover is
+   exactly one page tall, its three parts spread over it; a topics PDF's cover just flows. */
+
+.g-cover {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 9.7in;
+    break-after: page;
+}
+
+.g-cover--flow {
+    height: auto;
+    gap: 22pt;
+    break-after: auto;
+}
+
+.g-hero {
+    padding: 30pt 30pt 32pt;
+    border-radius: 13pt;
+    color: #fff;
+    background: linear-gradient(118deg, #1e2a5a 0%, #2f47b0 38%, #3b5bdb 58%, #6247e6 82%, #7048e8 100%);
+}
+
+.g-eyebrow {
+    font-size: 8.5pt;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    opacity: 0.85;
+}
+
+.g-title {
+    margin: 9pt 0 12pt;
+    font-size: 40pt;
+    font-weight: 800;
+    line-height: 1.04;
+    letter-spacing: -0.02em;
+}
+
+.g-hero-sub {
+    max-width: 78%;
+    margin: 0 0 14pt;
+    font-size: 12pt;
+    line-height: 1.5;
+    opacity: 0.92;
+}
+
+.g-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7pt;
+}
+
+.g-pill {
+    padding: 3.5pt 10pt;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.16);
+    font-size: 9pt;
+}
+
+.g-ucards {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10pt;
+}
+
+.g-ucards--1 {
+    grid-template-columns: 1fr;
+}
+
+.g-ucards--2 {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.g-ucards--3 {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.g-ucard {
+    padding: 12pt 12pt 14pt;
+    border-radius: 9pt;
+    background: var(--u);
+    color: #fff;
+    break-inside: avoid;
+}
+
+.g-ucard-n {
+    font-size: 22pt;
+    font-weight: 800;
+    line-height: 1.1;
+}
+
+.g-ucard-t {
+    margin-top: 6pt;
+    font-size: 11pt;
+    font-weight: 700;
+}
+
+.g-ucard-s {
+    margin-top: 3pt;
+    font-size: 8.3pt;
+    line-height: 1.35;
+    opacity: 0.9;
+}
+
+.g-legend-h {
+    margin: 0 0 6pt;
+    font-size: 11pt;
+    font-weight: 700;
+}
+
+.g-legend-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8pt;
+}
+
+.g-box--key {
+    margin: 0;
+    font-size: 9.5pt;
+}
+
+.g-walk.g-box--key {
+    margin: 0;
+    padding: 8pt 12pt;
+    border-width: 1px;
+}

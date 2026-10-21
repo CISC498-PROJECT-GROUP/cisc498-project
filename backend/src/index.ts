@@ -8,6 +8,8 @@ import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { router_chat } from '@/routes/chat/chat';
 import { router_health } from '@/routes/health/health';
+import { router_study } from '@/routes/study/study';
+import { chromePath } from '@/services/common/svc-browser';
 import { app_env, getEnvStatus } from '@/services/common/svc-env';
 
 const env_status = getEnvStatus();
@@ -24,6 +26,7 @@ app.use('*', cors({ origin: (origin) => origin ?? '*', allowMethods: ['GET', 'PO
 // ── Feature routers ─────────────────────────────────────────────────────────
 app.route('/health', router_health);
 app.route('/chat', router_chat);
+app.route('/study', router_study);
 
 // Every unhandled throw lands here. Respond through the shared envelope shape, never a bare body.
 app.onError((error, c) => {
@@ -31,6 +34,8 @@ app.onError((error, c) => {
     return c.json({ data: null, statusCode: 500, message: 'Internal server error' }, 500);
 });
 
-console.log(`[api] listening on ${app_env.host}:${app_env.port} — chat model ${app_env.chat_model}, effort ${app_env.chat_effort}`);
+console.log(
+    `[api] listening on ${app_env.host}:${app_env.port} — chat model ${app_env.chat_model}, effort ${app_env.chat_effort}; study model ${app_env.study_model}, PDF printing ${chromePath() === null ? 'unavailable (no Chrome found)' : 'ready'}`,
+);
 
 export default { port: app_env.port, hostname: app_env.host, fetch: app.fetch };

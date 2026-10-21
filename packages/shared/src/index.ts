@@ -6,6 +6,30 @@
 
 export type { Envelope, HealthStatus } from './types/api';
 export type { ChatMessageParam, ChatTurnRequest, ChatTurnResponse, ContentBlock } from './types/chat';
+export type {
+    CheatSheet,
+    CourseRef,
+    DigestRequest,
+    ExamInfo,
+    LectureDigest,
+    LectureQuote,
+    LectureRef,
+    LinksRequest,
+    LinksResponse,
+    Overview,
+    PlanRequest,
+    PlanSection,
+    PlanUnit,
+    QuoteKind,
+    RenderResponse,
+    SaidQuote,
+    SectionRequest,
+    StudyDocument,
+    StudyKind,
+    StudyLink,
+    StudyPlan,
+} from './types/study';
+export type { CalloutBlock, CardsBlock, ColumnsBlock, DiagramBlock, FormulaBlock, LeafBlock, ListBlock, SaidBlock, StudyBlock, StudySection, TableBlock, TableData, TextBlock, WalkthroughBlock } from './types/study-blocks';
 
 /* The Canvas tools. Declared once: the backend sends these definitions to the model, the extension
    implements one executor per name, and the type below makes a missing executor a compile error. */

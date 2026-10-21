@@ -1,0 +1,128 @@
+/* Callouts, quotes and walkthroughs. Unit-coloured parts read --u (main), --ut (tint) and --us
+   (soft) from the unit they sit in. */
+
+.g-box {
+    margin: 8pt 0;
+    padding: 8pt 12pt;
+    border-left: 3.5pt solid var(--u);
+    border-radius: 7pt;
+    background: var(--ut);
+    break-inside: avoid;
+}
+
+.g-label {
+    margin-bottom: 3pt;
+    font-size: 7.5pt;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--u);
+}
+
+.g-label .g-i {
+    margin-right: 4pt;
+    vertical-align: -0.12em;
+}
+
+.g-box-p {
+    margin: 0 0 4pt;
+}
+
+.g-box > :last-child,
+.g-box .g-list:last-child {
+    margin-bottom: 0;
+}
+
+.g-box--trap {
+    border-color: var(--red);
+    background: var(--red-tint);
+}
+
+.g-box--trap .g-label {
+    color: var(--red-ink);
+}
+
+.g-box--note {
+    border-color: var(--grey);
+    background: var(--grey-tint);
+}
+
+.g-box--note .g-label {
+    color: var(--grey-ink);
+}
+
+.g-box--said {
+    border-color: var(--gold);
+    background: var(--gold-tint);
+}
+
+.g-box--said .g-label {
+    color: var(--gold-ink);
+}
+
+.g-box--plan {
+    border-color: #1e2a5a;
+    background: #eef1f8;
+}
+
+.g-box--plan .g-label {
+    color: #1e2a5a;
+}
+
+.g-quote {
+    margin: 0;
+    font-size: 10.5pt;
+}
+
+.g-walk {
+    margin: 10pt 0;
+    padding: 10pt 13pt 11pt;
+    border: 1.3pt solid var(--u);
+    border-radius: 9pt;
+    background: #fff;
+    break-inside: avoid;
+}
+
+.g-walk-prompt {
+    margin-bottom: 6pt;
+    font-weight: 650;
+}
+
+.g-walk-split {
+    display: grid;
+    grid-template-columns: 1fr 1.05fr;
+    gap: 14pt;
+    align-items: start;
+}
+
+.g-steps {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.g-steps li {
+    display: flex;
+    gap: 7pt;
+    margin: 4pt 0;
+}
+
+.g-num {
+    flex: none;
+    width: 13pt;
+    height: 13pt;
+    margin-top: 1.5pt;
+    border-radius: 50%;
+    background: var(--u);
+    color: #fff;
+    font-size: 7.5pt;
+    font-weight: 700;
+    line-height: 13pt;
+    text-align: center;
+}
+
+.g-walk-note {
+    margin: 6pt 0 0;
+    font-size: 8.5pt;
+    color: var(--muted);
+}
