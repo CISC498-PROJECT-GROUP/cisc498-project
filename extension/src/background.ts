@@ -6,8 +6,11 @@
 //     plain extension requests to a host in host_permissions.
 //   - File downloads. A Canvas file URL redirects to a storage host on another origin that does not
 //     send CORS headers; host_permissions let this worker read the response anyway.
+//   - The course's Media Gallery, which is Kaltura's: launching it (the LTI form Canvas signs),
+//     reading its pages with the session that launch sets, and calling Kaltura's API for captions.
+//     Only Kaltura hosts are reachable this way — this worker is not a general-purpose proxy.
 
-import type { ApiReply, ApiRequest, FileReply, FileRequest, WorkerRequest } from '@/services/api/messages';
+import type { ApiReply, ApiRequest, FileReply, FileRequest, WebReply, WebRequest, WorkerRequest } from '@/services/api/messages';
 import { API_BASE } from '@/services/config';
 
 async function callApi(request: ApiRequest): Promise<ApiReply> {
@@ -43,9 +46,36 @@ async function fetchFile(request: FileRequest): Promise<FileReply> {
     }
 }
 
+/** A transcript runs to a few hundred kilobytes; a gallery page to about one megabyte. */
+const MAX_WEB_BYTES = 8 * 1024 * 1024;
+
+const isKaltura = (url: string): boolean => {
+    try {
+        const { protocol, hostname } = new URL(url);
+        return protocol === 'https:' && (hostname === 'kaltura.com' || hostname.endsWith('.kaltura.com'));
+    } catch {
+        return false;
+    }
+};
+
+async function fetchWeb(request: WebRequest): Promise<WebReply> {
+    if (!isKaltura(request.url)) return { ok: false, status: 0, url: request.url, text: '', error: 'only Kaltura hosts are allowed' };
+    try {
+        const body = request.form ? new URLSearchParams(request.form) : request.json !== undefined ? JSON.stringify(request.json) : undefined;
+        const headers = request.json !== undefined ? { 'content-type': 'application/json' } : undefined;
+        const response = await fetch(request.url, { method: request.method, body, headers, credentials: 'include', redirect: 'follow' });
+        const text = await response.text();
+        if (text.length > MAX_WEB_BYTES) return { ok: false, status: 413, url: response.url, text: '', error: 'response too large' };
+        return { ok: response.ok, status: response.status, url: response.url, text };
+    } catch (error) {
+        return { ok: false, status: 0, url: request.url, text: '', error: error instanceof Error ? error.message : String(error) };
+    }
+}
+
 chrome.runtime.onMessage.addListener((message: WorkerRequest, _sender, sendResponse) => {
     if (message?.type === 'api') void callApi(message).then(sendResponse);
     else if (message?.type === 'file') void fetchFile(message).then(sendResponse);
+    else if (message?.type === 'web') void fetchWeb(message).then(sendResponse);
     else return false;
     return true; // keep the channel open for the async reply
 });

@@ -46,6 +46,19 @@ export const localStamp = (iso: string | null | undefined): string | null => {
 
 export const timeZone = (): string => Intl.DateTimeFormat().resolvedOptions().timeZone;
 
+const pad = (n: number): string => String(n).padStart(2, '0');
+
+/** A Date as its local calendar day, YYYY-MM-DD — the form tools take and lecture dates use. */
+export const isoDay = (date: Date): string => `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+
+/** "2026-10-13" → "Tue, Oct 13, 2026"; anything else comes back as it was. */
+export const dayStamp = (day: string): string => {
+    const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(day);
+    if (!match) return day;
+    const date = new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
+    return `${WEEKDAYS[date.getDay()]}, ${MONTHS[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
+};
+
 /** "Good morning" until noon, "Good afternoon" until 5 PM, then "Good evening". */
 export const greeting = (now: Date): string => (now.getHours() < 12 ? 'Good morning' : now.getHours() < 17 ? 'Good afternoon' : 'Good evening');
 
