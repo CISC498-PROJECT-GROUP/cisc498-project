@@ -1,0 +1,157 @@
+/* Tables, formulas, diagrams, cards and the video chips. Unit-coloured parts read --u (main), --ut
+   (tint) and --us (soft) from the unit they sit in. */
+
+.g-tablewrap {
+    margin: 8pt 0;
+    break-inside: avoid;
+}
+
+.g-table {
+    width: 100%;
+    margin: 4pt 0;
+    border-collapse: collapse;
+    font-size: 9pt;
+    line-height: 1.38;
+}
+
+.g-table th {
+    padding: 4.5pt 7pt;
+    background: var(--u);
+    color: #fff;
+    font-weight: 650;
+    text-align: left;
+}
+
+.g-table td {
+    padding: 4.5pt 7pt;
+    border-bottom: 0.75pt solid var(--rule);
+    vertical-align: top;
+}
+
+.g-table tbody tr:nth-child(even) td {
+    background: var(--zebra);
+}
+
+.g-table tbody tr.g-hl td {
+    background: var(--ut);
+    font-weight: 600;
+}
+
+.g-table--walk {
+    margin: 0;
+    font-size: 8.5pt;
+}
+
+.g-table--walk td,
+.g-table--walk th {
+    text-align: center;
+}
+
+.g-formula {
+    margin: 8pt 0;
+    padding: 8pt 13pt;
+    border-radius: 7pt;
+    background: var(--formula);
+    break-inside: avoid;
+}
+
+.g-formula .g-label {
+    color: var(--muted);
+}
+
+.g-math {
+    margin: 4pt 0;
+    font-size: 13pt;
+}
+
+.g-formula-note {
+    margin: 4pt 0 0;
+    font-size: 8.5pt;
+    color: var(--muted);
+}
+
+.g-fig {
+    margin: 8pt 0;
+    break-inside: avoid;
+}
+
+.g-fig svg {
+    display: block;
+    width: 100%;
+    max-height: 3.3in;
+    font-family: Inter, sans-serif;
+}
+
+.g-fig figcaption {
+    margin-top: 4pt;
+    font-size: 8.3pt;
+    text-align: center;
+    color: var(--muted);
+}
+
+.g-cards {
+    display: grid;
+    gap: 9pt;
+    margin: 8pt 0;
+    break-inside: avoid;
+}
+
+.g-cards--2 {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.g-cards--3 {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.g-cards--4 {
+    grid-template-columns: repeat(4, 1fr);
+}
+
+.g-card {
+    padding: 8pt 11pt;
+    border-left: 3.5pt solid var(--u);
+    border-radius: 7pt;
+    background: var(--ut);
+    font-size: 9.5pt;
+}
+
+.g-card p {
+    margin: 0;
+}
+
+.g-watch {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 5pt;
+    margin: 6pt 0 10pt;
+}
+
+.g-watch-label {
+    margin-right: 3pt;
+    font-size: 7.5pt;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--muted);
+}
+
+.g-chip {
+    padding: 2.5pt 9pt 2.5pt 7pt;
+    border: 0.75pt solid #dee2e6;
+    border-radius: 999px;
+    font-size: 8.5pt;
+    color: var(--ink);
+    text-decoration: none;
+}
+
+.g-chip .g-i {
+    margin-right: 4pt;
+    color: var(--red);
+}
+
+.g-chip--gold {
+    border-color: #f0c64a;
+    background: var(--gold-tint);
+}

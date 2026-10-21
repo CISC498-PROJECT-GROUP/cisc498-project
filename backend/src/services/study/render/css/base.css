@@ -1,0 +1,138 @@
+/* The study guide's page: colours, type and the few rules every page shares. Printed by headless
+   Chrome on US Letter; the @page rule with the running footer is added by document.ts because it
+   carries the document's title. */
+
+:root {
+    --ink: #1f2937;
+    --muted: #6b7280;
+    --rule: #e5e7eb;
+    --zebra: #f8f9fb;
+    --red: #e03131;
+    --red-ink: #c92a2a;
+    --red-tint: #fdeeee;
+    --gold: #e8a400;
+    --gold-ink: #a86b00;
+    --gold-tint: #fff7e0;
+    --green: #2b8a3e;
+    --green-tint: #e3f6e8;
+    --grey: #868e96;
+    --grey-ink: #495057;
+    --grey-tint: #f1f3f5;
+    --formula: #f4f5f7;
+    /* A unit's colours; each unit section sets its own. */
+    --u: #3b5bdb;
+    --ut: #edf2ff;
+    --us: #d0dbff;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+}
+
+body {
+    margin: 0;
+    font-family: Inter, 'Segoe UI', system-ui, sans-serif;
+    font-size: 10.5pt;
+    line-height: 1.45;
+    color: var(--ink);
+    font-feature-settings: 'cv11', 'ss03';
+}
+
+p {
+    margin: 0 0 6pt;
+}
+
+strong {
+    font-weight: 650;
+}
+
+em {
+    font-style: italic;
+}
+
+a {
+    color: inherit;
+}
+
+code {
+    font-family: 'JetBrains Mono', Consolas, monospace;
+    font-size: 0.88em;
+    background: var(--grey-tint);
+    padding: 0 3px;
+    border-radius: 3px;
+}
+
+math {
+    font-family: 'Cambria Math', 'Latin Modern Math', 'STIX Two Math', math;
+    font-size: 1.06em;
+}
+
+.g-i {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    vertical-align: -0.14em;
+}
+
+.g-small {
+    margin: 6pt 0 0;
+    font-size: 8.5pt;
+    color: var(--muted);
+}
+
+.g-small .g-i {
+    color: var(--red);
+}
+
+.g-p {
+    margin: 0 0 7pt;
+}
+
+.g-ans {
+    background: var(--green-tint);
+    color: var(--green);
+    font-weight: 650;
+    padding: 0 4px;
+    border-radius: 4px;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+}
+
+.g-list {
+    margin: 2pt 0 7pt;
+    padding-left: 16pt;
+}
+
+.g-list li {
+    margin: 2pt 0;
+}
+
+.g-cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16pt;
+    align-items: start;
+    margin: 4pt 0;
+}
+
+.g-col > :first-child {
+    margin-top: 0;
+}
+
+.g-cap,
+.g-from {
+    margin: 3pt 0 8pt;
+    font-size: 8.5pt;
+    color: var(--muted);
+}
+
+.g-sources {
+    margin: 14pt 0 0;
+    font-size: 7.5pt;
+    color: var(--muted);
+}
