@@ -30,4 +30,25 @@ export interface FileReply {
     error?: string;
 }
 
-export type WorkerRequest = ApiRequest | FileRequest;
+/** A request to the course's Media Gallery (Kaltura) — its pages, carrying the session the gallery's
+    launch set, and its API. The worker only sends these to Kaltura hosts. */
+export interface WebRequest {
+    type: 'web';
+    url: string;
+    method: 'GET' | 'POST';
+    /** Sent as application/x-www-form-urlencoded — an LTI launch. */
+    form?: Record<string, string>;
+    /** Sent as JSON — a Kaltura API call. */
+    json?: unknown;
+}
+
+export interface WebReply {
+    ok: boolean;
+    status: number;
+    /** Where the request ended up after redirects. */
+    url: string;
+    text: string;
+    error?: string;
+}
+
+export type WorkerRequest = ApiRequest | FileRequest | WebRequest;
