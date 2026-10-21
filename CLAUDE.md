@@ -18,10 +18,17 @@ The build is a **working prototype**:
   session: no token, no OAuth, and it sees exactly what the student can see. Read-only, except
   that a student can submit their own assignment from the deadlines list after confirming it
   (`services/canvas/canvas-write.ts`). The assistant never writes.
-- **AI chat** — questions go to `backend/`, which calls Claude (`claude-sonnet-5-5`) with twelve Canvas
-  tools (courses, planner, assignments, grade breakdown, announcements, syllabus, pages, modules,
-  files, reading a PDF). The **extension runs the tools** — it holds the Canvas session — and loops;
-  the backend owns the key, the frozen system prompt and the tool definitions, and stores nothing.
+- **AI chat** — questions go to `backend/`, which calls Claude (`claude-sonnet-5-5`) with fifteen
+  tools: twelve Canvas ones (courses, planner, assignments, grade breakdown, announcements, syllabus,
+  pages, modules, files, reading a PDF) and three for recorded lectures. The **extension runs the
+  tools** — it holds the Canvas session — and loops; the backend owns the key, the frozen system
+  prompt and the tool definitions, and stores nothing.
+- **Recorded lectures and study PDFs** — the lecture tools read a course's **Media Gallery**
+  (Kaltura, launched through Canvas's own LTI launch) for its recordings and their captions. The
+  assistant summarizes lectures, and builds a PDF — a topics outline or a full study guide — for a
+  date range the student gives, or that it works out from Canvas for an exam (it asks when there is
+  neither). The backend's `study` module writes the guide in steps (`claude-opus-5-5`, structured
+  outputs, every quote and link checked against its source) and prints it with headless Chrome.
 
 No database.
 
@@ -30,8 +37,9 @@ Two rules follow from the subject matter and override convenience:
 1. **Never pass invented data off as the student's record.** A grade, date or policy the widget or
    the assistant shows must come from Canvas. Invented data exists only as the preview harness's
    fixtures in `extension/preview/`, which are never bundled into the extension.
-2. **A student's data goes nowhere it doesn't need to.** Canvas content is sent to the backend only
-   to answer the question asked, is never logged (see `svc-log.ts`), and is never stored.
+2. **A student's data goes nowhere it doesn't need to.** Canvas content — lecture transcripts
+   included — is sent to the backend only to answer the question asked, is never logged (see
+   `svc-log.ts`), and is never stored. A study PDF lives in a `blob:` URL in the student's page.
 
 ## Git workflow
 
@@ -128,7 +136,8 @@ Each app's `tsconfig.json` extends the root `tsconfig.base.json` and overrides o
 
 From the repo root: `bun install` (once, for the whole workspace), then:
 - `bun run dev` — build the extension in watch mode. `bun run dev:api` — the API on
-  **127.0.0.1:3010** (needs `ANTHROPIC_API_KEY` in `backend/.env` for chat).
+  **127.0.0.1:3010** (needs `ANTHROPIC_API_KEY` in `backend/.env` for chat, and an installed Chrome,
+  Edge or Chromium — or `CHROME_PATH` — to print study PDFs).
 - `bun run build` — one-off extension build into `extension/dist/`.
 - `bun run lint` — typecheck both. `bun run test` — both suites. `bun run format` /
   `bun run format:check` — Prettier over both.
@@ -145,7 +154,8 @@ Chrome does not pick up a rebuild on its own.
 **Without a Canvas login:** `bun run --cwd extension preview` serves a stand-in dashboard on
 **:5174** that runs the same `content.js` against a fake Canvas API (`extension/preview/canvas/`),
 with chat going to the real backend. Where the extension would use `chrome.runtime` (backend calls,
-file downloads) it falls back to a direct fetch — see `services/config.ts`.
+file downloads, the Media Gallery) it falls back to a direct fetch — see `services/config.ts`. Course
+101 has a stand-in Media Gallery (`preview/canvas/gallery.ts`) with invented lecture captions.
 
 Backend (inside `backend/`): `bun run dev` (watch), `bun run test`, `bun run lint`,
 `bun run format` (Prettier — 4-space, 250 width, single quotes; the extension uses the same config).
@@ -178,6 +188,11 @@ routers) → `src/services/<module>/` (business logic). A repositories layer arr
   `CHAT_EFFORT` (default low), `fallbacks: "default"` for classifier refusals, prompt caching on
   tools + system + conversation. The system prompt in `chat-prompt.ts` is frozen — nothing
   per-request goes in it.
+- `src/services/study/` — `POST /study/{digest,plan,section,links,render}`: the study-PDF pipeline,
+  one short step per request (types in `packages/shared/src/types/study.ts`). `STUDY_MODEL` (default
+  `claude-opus-5-5`) with structured outputs; quotes are checked against the transcript, links against
+  the search results; `render/` turns a document into HTML (the guide's design) and
+  `svc-browser.ts` prints it with puppeteer-core and an installed Chrome (`CHROME_PATH`).
 
 ## Extension architecture
 
@@ -194,7 +209,11 @@ onto Canvas. Path alias `@/*` → `extension/src`.
   toggle and `LoadState` (skeletons while loading, an error card with retry — every `Loadable` has
   `retry()`). `chat/composer.tsx` is shared by the chat and the home screen.
 - `background.ts` — the service worker. It relays backend calls (avoiding the page's CORS and
-  Chrome's local-network prompt) and file downloads (Canvas file URLs redirect cross-origin).
+  Chrome's local-network prompt), file downloads (Canvas file URLs redirect cross-origin), and
+  requests to the Media Gallery — Kaltura hosts only.
+- `services/media/` — a course's recorded lectures: the gallery's launch, its pages and Kaltura's
+  API, and captions as text. `services/study/` — digests and the study-PDF pipeline; a PDF comes back
+  as an attachment on the assistant's message.
 - `services/hooks/use-*.ts` — every data source. `services/canvas/` — the REST client and the
   loaders/mappers. `services/tools/` — one executor per shared tool name. `services/chat/` — the
   tool loop and the conversation context. `services/format/` — dates and the Markdown parser.
@@ -206,4 +225,5 @@ onto Canvas. Path alias `@/*` → `extension/src`.
   The palette is the widget's own (the Figma file's "Brilliant-inspired" redesign): ink outlines on a
   paper ground, and one green (`--ca-accent`, text in `--ca-accent-ink`) for the main action.
 - The manifest is `extension/static/manifest.json`, copied into `dist/` by the build. It matches
-  `*.instructure.com` and `canvas.udel.edu`; add a school's self-hosted domain there.
+  `*.instructure.com` and `canvas.udel.edu`; add a school's self-hosted domain there. Its
+  `https://*.kaltura.com/*` host permission is what lets the worker open the Media Gallery.

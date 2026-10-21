@@ -73,11 +73,23 @@ export interface SubmitTarget {
 
 export type SubmissionInput = { kind: 'online_text_entry'; text: string } | { kind: 'online_url'; url: string } | { kind: 'online_upload'; files: File[] };
 
+/** A file the assistant made — a study PDF — held in a blob: URL for the page's lifetime. */
+export interface Attachment {
+    kind: 'pdf';
+    title: string;
+    filename: string;
+    url: string;
+    pages: number;
+    bytes: number;
+}
+
 export interface ChatMessage {
     id: string;
     /** `error` is shown in the thread but is not part of the conversation sent to the model. */
     role: 'user' | 'assistant' | 'error';
     text: string;
+    /** Files attached to an assistant reply. */
+    attachments?: Attachment[];
 }
 
 /** What every data hook returns. */

@@ -1,0 +1,88 @@
+/* A file attached to an assistant reply — a study PDF: an outlined card with the file's name and
+   size, a green Download and a plain Open. */
+
+.ca-file {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+    padding: 10px 12px;
+    background: var(--ca-surface);
+    border: 1.2px solid var(--ca-ink);
+    border-radius: var(--ca-radius-sm);
+    box-shadow: 0 2px 0 var(--ca-ink);
+}
+
+.ca-file-icon {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    color: var(--ca-accent-ink);
+    background: var(--ca-accent-soft);
+    border-radius: 8px;
+}
+
+.ca-file-text {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.ca-file-name {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.3;
+    color: var(--ca-ink);
+    overflow: hidden;
+    overflow-wrap: anywhere;
+}
+
+.ca-file-meta {
+    font-size: 11px;
+    color: var(--ca-muted);
+}
+
+.ca-file-actions {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.ca-file-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    min-height: 32px;
+    padding: 0 10px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--ca-ink);
+    text-decoration: none;
+    border: 1.2px solid var(--ca-line-2);
+    border-radius: 8px;
+}
+
+.ca-file-btn:hover {
+    background: var(--ca-ground);
+}
+
+.ca-file-btn--main {
+    color: var(--ca-on-accent);
+    background: var(--ca-accent);
+    border-color: var(--ca-accent-ink);
+    box-shadow: var(--ca-press);
+}
+
+.ca-file-btn--main:hover {
+    background: var(--ca-accent);
+    filter: brightness(1.04);
+}
