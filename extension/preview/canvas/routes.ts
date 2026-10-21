@@ -3,6 +3,7 @@
 
 import { COLORS, COURSES, SYLLABI, USER } from './courses';
 import { FILES, HIDDEN_PAGES, MODULES, PAGES } from './content';
+import { galleryCanvasRoute } from './gallery';
 import { SUBMITTED, submissionTypes } from './submissions';
 import { ANNOUNCEMENTS, assignmentsOf, GROUPS, planner } from './work';
 
@@ -40,6 +41,8 @@ export function canvasRoute(url: URL): Response {
         return page ? json({ ...page, html_url: `/courses/${m[1]}/pages/${page.url}` }) : json({}, 404);
     }
     if ((m = /^\/courses\/(\d+)\/modules$/.exec(p))) return json(MODULES[Number(m[1])] ?? []);
+    const gallery = galleryCanvasRoute(p);
+    if (gallery) return gallery;
     if ((m = /^\/courses\/(\d+)\/files$/.exec(p))) {
         const term = (q.get('search_term') ?? '').toLowerCase();
         return json(

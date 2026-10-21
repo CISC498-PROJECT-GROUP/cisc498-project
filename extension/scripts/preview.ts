@@ -6,6 +6,7 @@
 // The fixtures live in preview/ and are never bundled into the extension.
 
 import { join } from 'node:path';
+import { galleryRoute } from '../preview/canvas/gallery';
 import { canvasRoute, fileDownload } from '../preview/canvas/routes';
 import { submissionRoute, uploadRoute } from '../preview/canvas/submissions';
 
@@ -14,13 +15,16 @@ const PORT = 5174;
 
 Bun.serve({
     port: PORT,
-    fetch(req) {
+    async fetch(req) {
         const url = new URL(req.url);
         if (url.pathname === '/content.js') return new Response(Bun.file(join(ROOT, 'dist', 'content.js')));
         // Canvas sets a readable CSRF cookie that writes must echo back; the stand-in does the same.
         if (url.pathname === '/') return new Response(Bun.file(join(ROOT, 'preview', 'index.html')), { headers: { 'set-cookie': '_csrf_token=preview-token; Path=/; SameSite=Lax' } });
         if (url.pathname === '/preview-upload' && req.method === 'POST') return uploadRoute(req);
         if (url.pathname.startsWith('/api/v1/')) return req.method === 'POST' ? submissionRoute(req, url) : canvasRoute(url);
+        // The stand-in Media Gallery: its launch page, the gallery itself, and Kaltura's API.
+        const gallery = await galleryRoute(req, url);
+        if (gallery) return gallery;
         return fileDownload(url) ?? new Response('Not found', { status: 404 });
     },
 });

@@ -30,7 +30,10 @@ export const MODULES: Record<number, unknown[]> = {
         },
         { name: 'Week 5', items: [{ title: 'Reading Response 3', type: 'Assignment', content_id: 3012 }] },
     ],
-    101: [{ name: 'Week 6: Trees', items: [{ title: 'Homework 6: Binary Trees', type: 'Assignment', content_id: 1003 }] }],
+    101: [
+        { name: 'Week 3: Big-O review', items: [{ title: 'Video: counting loops (posted by the instructor)', type: 'ExternalUrl', external_url: 'https://www.youtube.com/watch?v=preview0001' }] },
+        { name: 'Week 6: Trees', items: [{ title: 'Homework 6: Binary Trees', type: 'Assignment', content_id: 1003 }] },
+    ],
 };
 
 const SYLLABUS_PDF = textPdf([
