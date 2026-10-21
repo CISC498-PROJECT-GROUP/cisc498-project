@@ -15,7 +15,8 @@ import type { ChatMessage } from '@/services/types';
 export interface ChatState {
     messages: ChatMessage[];
     pending: boolean;
-    /** e.g. "Reading the syllabus" while a tool runs; null otherwise. */
+    /** e.g. "Reading the syllabus" while a tool runs — or a long tool's own progress ("Writing the
+        guide — 4 of 12 sections"); null otherwise. */
     activity: string | null;
     send: (text: string) => void;
     /** Start a fresh conversation. Ignored while a reply is pending. */
@@ -23,7 +24,7 @@ export interface ChatState {
 }
 
 let next_id = 0;
-const message = (role: ChatMessage['role'], text: string): ChatMessage => ({ id: `m${++next_id}`, role, text });
+const message = (role: ChatMessage['role'], text: string, attachments: ChatMessage['attachments'] = []): ChatMessage => ({ id: `m${++next_id}`, role, text, ...(attachments.length > 0 ? { attachments } : {}) });
 
 const describe = (calls: ToolCall[]): string => {
     const labels = [...new Set(calls.map((c) => TOOL_ACTIVITY[c.name as keyof typeof TOOL_ACTIVITY] ?? 'Looking that up'))];
@@ -48,9 +49,9 @@ export function useChat(): ChatState {
         void (async () => {
             try {
                 const content: ContentBlock[] = history.current.length === 0 ? [await contextBlock(), questionBlock(question)] : [questionBlock(question)];
-                const turn = await runTurn([...history.current, { role: 'user', content }], (calls) => setActivity(describe(calls)));
+                const turn = await runTurn([...history.current, { role: 'user', content }], (calls) => setActivity(describe(calls)), setActivity);
                 history.current = turn.messages;
-                setMessages((current) => [...current, message('assistant', turn.answer)]);
+                setMessages((current) => [...current, message('assistant', turn.answer, turn.attachments)]);
             } catch (error) {
                 setMessages((current) => [...current, message('error', error instanceof Error ? error.message : String(error))]);
             } finally {

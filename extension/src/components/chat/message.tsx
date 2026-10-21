@@ -1,7 +1,9 @@
 // One message in the thread. The student's own words sit in an accent bubble on the right; the
 // assistant's answers are plain, readable text beside a small avatar — no box around them, so a
-// long answer reads like a page rather than a speech bubble. Errors get a quiet warning card.
+// long answer reads like a page rather than a speech bubble. Errors get a quiet warning card. A file
+// the assistant made (a study PDF) sits under its answer.
 
+import { AttachmentCard } from '@/components/chat/attachment';
 import { Markdown } from '@/components/chat/markdown';
 import { Icon } from '@/components/common/icon';
 import type { ChatMessage } from '@/services/types';
@@ -27,6 +29,9 @@ export function Message({ message }: { message: ChatMessage }) {
             </span>
             <div class="ca-answer">
                 <Markdown text={message.text} />
+                {message.attachments?.map((file) => (
+                    <AttachmentCard key={file.url} file={file} />
+                ))}
             </div>
         </div>
     );

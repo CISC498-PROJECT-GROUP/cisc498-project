@@ -67,7 +67,8 @@
             <h3>Canvas is the only source of record</h3>
         </div>
         <div class="rule-body">
-            <p>Every grade, date and policy the widget or the assistant shows comes from the Canvas API. Invented
+            <p>Every grade, date and policy the widget or the assistant shows comes from the Canvas API — or, for
+                recorded lectures, from the course's Media Gallery, which Canvas itself launches. Invented
                 data exists only as the preview harness's fixtures in <code>extension/preview/</code>, which the
                 build never bundles. The assistant is told to state only what a tool returned, and tool results
                 carry times already in the student's zone (<code>localStamp</code>).</p>
@@ -76,6 +77,10 @@
                 in <code>canvas-write.ts</code> (POST with Canvas's <code>X-CSRF-Token</code>), runs only after the
                 student confirms in the submit view, and is never reachable from a chat tool — the assistant reads,
                 it never writes. Any other write (messaging, editing) is a product decision, not a refactor.</div>
+            <p>The Media Gallery is Kaltura's LTI tool. <code>services/media/</code> gets the launch form Canvas signs
+                for the student (<code>sessionless_launch</code>), and the background worker posts it and reads the
+                gallery's pages and Kaltura's API — reads only, and only to Kaltura hosts. A study PDF comes back as an
+                attachment on the assistant's message, held in a <code>blob:</code> URL, never stored.</p>
         </div>
     </section>
 
@@ -90,7 +95,10 @@
                 <li><code>services/hooks/</code> data · <code>services/types/</code> view-models ·
                     <code>services/format/</code> pure formatting · <code>services/canvas/</code> the REST client
                     and mappers · <code>services/tools/</code> tool executors · <code>services/chat/</code> the tool
-                    loop.</li>
+                    loop · <code>services/media/</code> the Media Gallery and captions · <code>services/study/</code>
+                    lecture digests and the study-PDF pipeline.</li>
+                <li>A tool that runs for minutes reports through <code>context.progress</code> (shown as the chat's
+                    status line); a tool that makes a file returns it as an <code>attachment</code>.</li>
                 <li>A new tool is added to <code>@canvas-assistant/shared</code> first; the executor map in
                     <code>services/tools/index.ts</code> is typed by the shared names, so a missing executor fails to
                     compile.</li>
@@ -146,7 +154,8 @@
                     <code>import</code>.</li>
                 <li><code>bun run --cwd extension preview</code> serves a stand-in dashboard on :5174 over a fake
                     Canvas API, with chat going to the real backend — the whole tool loop runs without a Canvas
-                    login.</li>
+                    login. Course 101 has a stand-in Media Gallery (<code>preview/canvas/gallery.ts</code>) with
+                    invented captions, so summaries and study PDFs run there too.</li>
             </ul>
         </div>
     </section>

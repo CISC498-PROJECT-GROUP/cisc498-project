@@ -4,6 +4,7 @@
 
 import { COURSE_TOOLS } from './course-tools';
 import { CONTENT_TOOLS } from './content-tools';
+import { LECTURE_TOOLS } from './lecture-tools';
 
 export interface ToolDefinition {
     name: string;
@@ -11,6 +12,6 @@ export interface ToolDefinition {
     input_schema: { type: 'object'; properties: Record<string, unknown>; required?: readonly string[]; additionalProperties?: boolean };
 }
 
-export const CANVAS_TOOLS = [...COURSE_TOOLS, ...CONTENT_TOOLS] as const satisfies readonly ToolDefinition[];
+export const CANVAS_TOOLS = [...COURSE_TOOLS, ...CONTENT_TOOLS, ...LECTURE_TOOLS] as const satisfies readonly ToolDefinition[];
 
 export type CanvasToolName = (typeof CANVAS_TOOLS)[number]['name'];
