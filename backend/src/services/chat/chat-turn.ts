@@ -11,11 +11,12 @@
 
 import type { ChatTurnRequest, ChatTurnResponse, ContentBlock } from '@canvas-assistant/shared';
 import { CANVAS_TOOLS } from '@canvas-assistant/shared';
-import { ChatNotConfiguredError, ChatUpstreamError } from '@/services/chat/chat-errors';
+import { ChatNotConfiguredError } from '@/services/chat/chat-errors';
 import { CHAT_SYSTEM } from '@/services/chat/chat-prompt';
 import { Anthropic, anthropic } from '@/services/common/svc-anthropic';
 import { ANTHROPIC_KEY_HINT, app_env, chatConfigured } from '@/services/common/svc-env';
 import { createLogger } from '@/services/common/svc-log';
+import { upstreamError } from '@/services/common/svc-model';
 
 const log = createLogger('chat');
 
@@ -46,7 +47,7 @@ export async function chatTurn(request: ChatTurnRequest, signal?: AbortSignal): 
             { signal },
         );
     } catch (error) {
-        throw upstream(error);
+        throw upstreamError(error);
     }
 
     const { usage } = response;
@@ -66,13 +67,4 @@ export async function chatTurn(request: ChatTurnRequest, signal?: AbortSignal): 
     if (response.stop_reason === 'refusal') return { content: [{ type: 'text', text: REFUSAL_TEXT }], stop_reason: 'end_turn' };
 
     return { content: response.content as unknown as ContentBlock[], stop_reason: response.stop_reason ?? 'end_turn' };
-}
-
-/** Typed SDK errors, most specific first. The upstream wording is kept — it is the useful part. */
-function upstream(error: unknown): Error {
-    if (error instanceof Anthropic.AuthenticationError || error instanceof Anthropic.PermissionDeniedError) return new ChatUpstreamError(`The API key was rejected (${error.status}). ${ANTHROPIC_KEY_HINT}.`, true);
-    if (error instanceof Anthropic.RateLimitError) return new ChatUpstreamError('The model is rate-limited right now — try again in a moment.');
-    if (error instanceof Anthropic.BadRequestError) return new ChatUpstreamError(`The model rejected the request: ${error.message}`);
-    if (error instanceof Anthropic.APIError) return new ChatUpstreamError(`The model API failed (${error.status ?? 'network'}): ${error.message}`);
-    return error instanceof Error ? error : new Error(String(error));
 }
