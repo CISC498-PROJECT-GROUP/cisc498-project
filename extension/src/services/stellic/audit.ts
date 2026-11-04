@@ -1,12 +1,14 @@
 // The degree audit, reduced to what a dashboard can show at a glance: for each program the student
 // is held to (the major, the university requirements, breadth, the credit minimum), whether Stellic
-// counts it satisfied, its credits taken / in progress / still needed, and the requirements it still
-// lists as open — Stellic's `cards_remaining`, named from the requirement tree.
+// counts it satisfied, its credits taken / in progress / planned / still needed, and the requirements
+// it still lists as open — Stellic's `cards_remaining`, named from the requirement tree.
 //
-// Nothing is judged here: satisfied, the credit figures and the open list are Stellic's own.
+// Nothing is judged here: satisfied, the credit figures and the open list are Stellic's own. The one
+// reading added is programStatus — Stellic's `satisfied` counts courses only planned for a later
+// term, so a plan can be "satisfied" on paper; the status says which credits it rests on.
 
 import type { RawAudit, RawReq } from '@/services/stellic/stellic-types';
-import type { DegreeAudit, OpenRequirement, ProgramProgress } from '@/services/types/stellic';
+import type { CreditSummary, DegreeAudit, OpenRequirement, ProgramProgress, ProgramStatus } from '@/services/types/stellic';
 
 const isReq = (value: unknown): value is RawReq => typeof value === 'object' && value !== null && 'id' in value;
 
@@ -20,6 +22,14 @@ export function requirementNames(programs: RawReq[]): Map<number, string> {
     programs.forEach(visit);
     return names;
 }
+
+/** What Stellic's `satisfied` amounts to once the credits behind it are known. */
+export const programStatus = (satisfied: boolean, credits: CreditSummary): ProgramStatus => {
+    if (!satisfied) return 'open';
+    if (credits.planned > 0) return 'planned';
+    if (credits.inProgress > 0) return 'in-progress';
+    return 'complete';
+};
 
 /** Program titles carry catalog noise ("… Minimum Total Credits 2019F", "(17F-current)"). */
 export const tidyProgramName = (name: string): string =>
@@ -45,22 +55,13 @@ export function mapAudit(raw: RawAudit): DegreeAudit {
                 entry.credits += card.units ?? 0;
                 open.set(name, entry);
             }
-            return {
-                id: String(p.id),
-                name: tidyProgramName(p.screen_name ?? 'Program'),
-                satisfied: node.satisfied === true,
-                credits: { taken: units.taken ?? 0, inProgress: units.in_progress ?? 0, remaining: units.remaining ?? 0 },
-                open: [...open.values()],
-            };
+            const credits = { taken: units.taken ?? 0, inProgress: units.in_progress ?? 0, planned: units.planned ?? 0, remaining: units.remaining ?? 0 };
+            return { id: String(p.id), name: tidyProgramName(p.screen_name ?? 'Program'), satisfied: node.satisfied === true, status: programStatus(node.satisfied === true, credits), credits, open: [...open.values()] };
         });
-    return {
-        gpa: raw.student_audit?.grades_summary?.c_gpa ?? null,
-        pathway: raw.remaining_reqs_details?.pathway?.name ?? null,
-        programs: progress,
-        computedAt: raw.last_computed ?? null,
-    };
+    return { gpa: raw.student_audit?.grades_summary?.c_gpa ?? null, pathway: raw.remaining_reqs_details?.pathway?.name ?? null, programs: progress, computedAt: raw.last_computed ?? null };
 }
 
+const total = (c: CreditSummary): number => c.taken + c.inProgress + c.planned + c.remaining;
+
 /** The program the credit bar is drawn from: the credit minimum when there is one, else the largest. */
-export const creditProgram = (audit: DegreeAudit): ProgramProgress | null =>
-    audit.programs.find((p) => /total credits/i.test(p.name)) ?? [...audit.programs].sort((a, b) => b.credits.taken + b.credits.inProgress + b.credits.remaining - (a.credits.taken + a.credits.inProgress + a.credits.remaining))[0] ?? null;
+export const creditProgram = (audit: DegreeAudit): ProgramProgress | null => audit.programs.find((p) => /total credits/i.test(p.name)) ?? [...audit.programs].sort((a, b) => total(b.credits) - total(a.credits))[0] ?? null;

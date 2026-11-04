@@ -28,17 +28,13 @@ export interface RawSemContent {
 }
 
 export interface RawStudentPlan {
-    student_plan?: {
-        plan_id?: string;
-        name?: string;
-        programs?: { id?: number; name?: string; short_name?: string }[];
-        sem_content?: RawSemContent[];
-    };
+    student_plan?: { plan_id?: string; name?: string; programs?: { id?: number; name?: string; short_name?: string }[]; sem_content?: RawSemContent[] };
 }
 
 export interface RawUnits {
     taken?: number;
     in_progress?: number;
+    planned?: number;
     remaining?: number;
 }
 
@@ -81,9 +77,5 @@ export interface RawProfile {
 }
 
 export interface RawReviewSummary {
-    data?: {
-        is_plan_reviewed?: boolean;
-        open_review_details?: { reviewer?: RawPerson | null; review_initiated_at?: string | null } | null;
-        last_reviewed_details?: { reviewed_at?: string | null } | null;
-    };
+    data?: { is_plan_reviewed?: boolean; open_review_details?: { reviewer?: RawPerson | null; review_initiated_at?: string | null } | null; last_reviewed_details?: { reviewed_at?: string | null } | null };
 }

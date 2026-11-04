@@ -38,8 +38,15 @@ export interface StellicPlan {
 export interface CreditSummary {
     taken: number;
     inProgress: number;
+    /** Planned in Stellic for a later term, not yet taken or registered. */
+    planned: number;
     remaining: number;
 }
+
+/** Stellic's `satisfied` counts planned courses too, so "satisfied" alone can mean "only on paper":
+    complete — nothing pending · in-progress — satisfied once this term ends · planned — satisfied only
+    with courses still to take · open — Stellic says not satisfied. */
+export type ProgramStatus = 'complete' | 'in-progress' | 'planned' | 'open';
 
 export interface OpenRequirement {
     name: string;
@@ -52,6 +59,7 @@ export interface ProgramProgress {
     id: string;
     name: string;
     satisfied: boolean;
+    status: ProgramStatus;
     credits: CreditSummary;
     open: OpenRequirement[];
 }

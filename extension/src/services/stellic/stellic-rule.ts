@@ -26,11 +26,7 @@ export async function installStellicRule(): Promise<void> {
                 { header: 'referer', operation: 'set' as chrome.declarativeNetRequest.HeaderOperation, value: `${STELLIC_ORIGIN}/app/planner` },
             ],
         },
-        condition: {
-            urlFilter: `|${STELLIC_ORIGIN}/`,
-            initiatorDomains: [chrome.runtime.id],
-            resourceTypes: ['xmlhttprequest' as chrome.declarativeNetRequest.ResourceType],
-        },
+        condition: { urlFilter: `|${STELLIC_ORIGIN}/`, initiatorDomains: [chrome.runtime.id], resourceTypes: ['xmlhttprequest' as chrome.declarativeNetRequest.ResourceType] },
     };
     await chrome.declarativeNetRequest.updateDynamicRules({ removeRuleIds: [RULE_ID], addRules: [rule] });
 }

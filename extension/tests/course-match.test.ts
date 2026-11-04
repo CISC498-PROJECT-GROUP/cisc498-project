@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'bun:test';
 import { courseKey, joinTerm, otherCanvas } from '@/services/dashboard/course-match';
+import { isWork } from '@/services/dashboard/work';
 import type { Course, Deadline } from '@/services/types';
 import type { Term } from '@/services/types/stellic';
 
@@ -56,5 +57,12 @@ describe('joinTerm', () => {
 
     it('lists the Canvas sites that belong to no course this term', () => {
         expect(otherCanvas(rows, canvas).map((c) => c.id)).toEqual(['1', '4']);
+    });
+});
+
+describe('isWork', () => {
+    it('keeps work and drops dated items with nothing to hand in', () => {
+        const kinds = ['assignment', 'quiz', 'discussion_topic', 'announcement', 'calendar_event', 'planner_note'];
+        expect(kinds.filter((kind) => isWork({ ...due('x', '1', '2026-11-05T12:00:00'), kind }))).toEqual(['assignment', 'quiz', 'discussion_topic', 'planner_note']);
     });
 });

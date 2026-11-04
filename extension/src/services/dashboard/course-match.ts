@@ -35,7 +35,12 @@ const pick = (matches: Course[], term: Term): Course | null => {
 export function joinTerm(term: Term, courses: Course[], deadlines: Deadline[], now: Date): TermCourse[] {
     return term.courses.map((plan) => {
         const key = courseKey(plan.code);
-        const canvas = key ? pick(courses.filter((c) => courseKey(c.code) === key || courseKey(c.name) === key), term) : null;
+        const canvas = key
+            ? pick(
+                  courses.filter((c) => courseKey(c.code) === key || courseKey(c.name) === key),
+                  term,
+              )
+            : null;
         const open = canvas ? deadlines.filter((d) => d.courseId === canvas.id && !d.submitted && d.dueAt.getTime() >= now.getTime()) : [];
         return { plan, canvas, next: open[0] ?? null, openCount: open.length };
     });

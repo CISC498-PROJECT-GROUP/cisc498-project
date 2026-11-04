@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test';
-import { creditProgram, mapAudit, tidyProgramName } from '@/services/stellic/audit';
+import { creditProgram, mapAudit, programStatus, tidyProgramName } from '@/services/stellic/audit';
 import { currentTerm, mapPlan, nextTerm } from '@/services/stellic/plan';
 import { mapProfile, mapReview } from '@/services/stellic/profile';
 import { parseStellicJson } from '@/services/stellic/stellic-api';
@@ -8,7 +8,7 @@ import { parseStellicJson } from '@/services/stellic/stellic-api';
 
 describe('parseStellicJson', () => {
     it('strips the anti-hijacking prefix', () => {
-        expect(parseStellicJson(")]}',\n{\"success\": true}")).toEqual({ success: true });
+        expect(parseStellicJson(')]}\',\n{"success": true}')).toEqual({ success: true });
         expect(parseStellicJson('{"a":1}')).toEqual({ a: 1 });
     });
 });
@@ -56,7 +56,7 @@ describe('mapPlan', () => {
 });
 
 describe('mapAudit', () => {
-    const units = (taken: number, in_progress: number, remaining: number) => ({ progress_data: { units_summary: { taken, in_progress, remaining } } });
+    const units = (taken: number, in_progress: number, remaining: number, planned = 0) => ({ progress_data: { units_summary: { taken, in_progress, planned, remaining } } });
     const audit = mapAudit({
         req_tree: {
             programs: [
@@ -66,9 +66,17 @@ describe('mapAudit', () => {
             ],
         },
         audit_data: {
-            '10': { satisfied: false, ...units(77, 12, 15), cards_remaining: [{ requirement_id: 11, units: 3 }, { requirement_id: 12, units: 3 }, { requirement_id: 12, units: 3 }] },
+            '10': {
+                satisfied: false,
+                ...units(77, 12, 15),
+                cards_remaining: [
+                    { requirement_id: 11, units: 3 },
+                    { requirement_id: 12, units: 3 },
+                    { requirement_id: 12, units: 3 },
+                ],
+            },
             '20': { satisfied: false, ...units(96, 15, 13), cards_remaining: [{ requirement_id: 21, units: 3 }] },
-            '30': { satisfied: true, ...units(90, 3, 0) },
+            '30': { satisfied: true, ...units(90, 3, 0, 15) },
         },
         student_audit: { grades_summary: { c_gpa: 3.5 } },
     });
@@ -80,7 +88,16 @@ describe('mapAudit', () => {
             ['Computer Science Major (CS-BS) Minimum Total Credits', false],
             ['University Requirements', true],
         ]);
-        expect(audit.programs[0]!.credits).toEqual({ taken: 77, inProgress: 12, remaining: 15 });
+        expect(audit.programs[0]!.credits).toEqual({ taken: 77, inProgress: 12, planned: 0, remaining: 15 });
+    });
+
+    it('never calls a requirement complete while it rests on planned or current courses', () => {
+        expect(audit.programs.map((p) => p.status)).toEqual(['open', 'open', 'planned']);
+        const credits = (inProgress: number, planned: number) => ({ taken: 90, inProgress, planned, remaining: 0 });
+        expect(programStatus(true, credits(0, 0))).toBe('complete');
+        expect(programStatus(true, credits(15, 0))).toBe('in-progress');
+        expect(programStatus(true, credits(15, 15))).toBe('planned');
+        expect(programStatus(false, credits(0, 0))).toBe('open');
     });
 
     it('names the open requirements and folds repeats together', () => {
@@ -99,11 +116,22 @@ describe('mapAudit', () => {
 
 describe('mapProfile / mapReview', () => {
     it('reads standing, graduation term and advisors', () => {
-        const profile = mapProfile({ first_name: 'Sam', last_name: 'Student', level_name: 'Senior', expected_graduation_usem: { semester: 3, year: 2027 }, primary_advisor: null, secondary_advisors: [{ first_name: 'Ada', last_name: 'Advisor', email: 'ada@example.edu' }] });
+        const profile = mapProfile({
+            first_name: 'Sam',
+            last_name: 'Student',
+            level_name: 'Senior',
+            expected_graduation_usem: { semester: 3, year: 2027 },
+            primary_advisor: null,
+            secondary_advisors: [{ first_name: 'Ada', last_name: 'Advisor', email: 'ada@example.edu' }],
+        });
         expect(profile).toEqual({ name: 'Sam Student', standing: 'Senior', school: null, graduation: 'Spring 2027', advisors: [{ name: 'Ada Advisor', email: 'ada@example.edu' }] });
     });
 
     it('reads an open plan review', () => {
-        expect(mapReview({ data: { is_plan_reviewed: false, open_review_details: { reviewer: { first_name: 'Ada', last_name: 'Advisor' }, review_initiated_at: '2025-11-11T17:12:47Z' } } })).toEqual({ reviewed: false, openWith: 'Ada Advisor', openSince: '2025-11-11T17:12:47Z' });
+        expect(mapReview({ data: { is_plan_reviewed: false, open_review_details: { reviewer: { first_name: 'Ada', last_name: 'Advisor' }, review_initiated_at: '2025-11-11T17:12:47Z' } } })).toEqual({
+            reviewed: false,
+            openWith: 'Ada Advisor',
+            openSince: '2025-11-11T17:12:47Z',
+        });
     });
 });

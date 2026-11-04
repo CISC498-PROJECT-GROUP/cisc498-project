@@ -14,14 +14,7 @@ const SEASON_ORDER: Record<Season, number> = { Winter: 0, Spring: 1, Summer: 2, 
 export const mapPlanCourse = (raw: RawPlanCourse): PlanCourse => {
     const grade = raw.grade?.trim() || null;
     const status = grade ? 'completed' : raw.is_registered ? 'enrolled' : 'planned';
-    return {
-        code: raw.code?.trim() ?? 'Course',
-        name: raw.name?.trim() ?? raw.code ?? 'Course',
-        credits: raw.units ?? 0,
-        grade,
-        status,
-        statusLabel: status === 'completed' ? null : (raw.registration_status?.screen_name ?? null),
-    };
+    return { code: raw.code?.trim() ?? 'Course', name: raw.name?.trim() ?? raw.code ?? 'Course', credits: raw.units ?? 0, grade, status, statusLabel: status === 'completed' ? null : (raw.registration_status?.screen_name ?? null) };
 };
 
 /** Where `now` falls against the term's dates; Stellic's own is_past when the dates are missing. */
@@ -46,15 +39,7 @@ export function mapPlan(raw: RawStudentPlan, now: Date): StellicPlan {
         for (const content of Object.values(season.content ?? {})) {
             const courses = (content.courses ?? []).map(mapPlanCourse);
             if (courses.length === 0 || !content.physical_year) continue;
-            terms.push({
-                label: `${name} ${content.physical_year}`,
-                season: name,
-                year: content.physical_year,
-                start: content.semester_dates?.start_date ?? null,
-                end: content.semester_dates?.end_date ?? null,
-                when: termWhen(content, now),
-                courses,
-            });
+            terms.push({ label: `${name} ${content.physical_year}`, season: name, year: content.physical_year, start: content.semester_dates?.start_date ?? null, end: content.semester_dates?.end_date ?? null, when: termWhen(content, now), courses });
         }
     }
     terms.sort((a, b) => termKey(a) - termKey(b));
