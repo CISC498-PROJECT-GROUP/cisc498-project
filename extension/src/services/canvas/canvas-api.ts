@@ -3,6 +3,10 @@
 // what the student can see. Reads only — GET is the only verb here; the one write the widget makes
 // (submitting an assignment) lives in canvas-write.ts.
 //
+// The dashboard page (dashboard.tsx) is not on the Canvas origin: it calls setCanvasOrigin() once, and
+// the same client then makes absolute, credentialed requests that the manifest's host_permissions
+// allow. On Canvas the origin stays the page's own and nothing changes.
+//
 // `Accept: application/json` matters: without it Canvas prefixes JSON with `while(1);` (an old
 // JSON-hijacking guard). The prefix is stripped anyway in case an install ignores the header.
 
@@ -14,6 +18,16 @@ export class CanvasError extends Error {
         super(message);
     }
 }
+
+let origin: string | null = null;
+
+/** Point the client at a Canvas site other than the page's own — the dashboard page's case. */
+export const setCanvasOrigin = (canvas: string): void => {
+    origin = canvas.replace(/\/+$/, '');
+};
+
+/** The Canvas site the client talks to: the page's own unless the dashboard set one. */
+export const canvasOrigin = (): string => origin ?? location.origin;
 
 type Params = Record<string, string | number | boolean | readonly string[] | undefined>;
 
@@ -39,8 +53,9 @@ export const explain = (status: number, path: string): string => {
 export const parseCanvasJson = (text: string): unknown => JSON.parse(text.replace(/^while\(1\);/, ''));
 
 async function request(url: string): Promise<{ body: unknown; next: string | null }> {
-    const response = await fetch(url, { headers: { Accept: 'application/json' }, credentials: 'same-origin' });
-    if (!response.ok) throw new CanvasError(explain(response.status, new URL(url, location.origin).pathname), response.status);
+    const absolute = new URL(url, canvasOrigin());
+    const response = await fetch(absolute, { headers: { Accept: 'application/json' }, credentials: origin ? 'include' : 'same-origin' });
+    if (!response.ok) throw new CanvasError(explain(response.status, absolute.pathname), response.status);
     const text = await response.text();
     const next = /<([^>]+)>;\s*rel="next"/.exec(response.headers.get('link') ?? '')?.[1] ?? null;
     return { body: parseCanvasJson(text), next };
@@ -64,4 +79,4 @@ export async function canvasGetAll<T>(path: string, params?: Params, maxPages = 
 }
 
 /** Canvas returns html_url values as absolute or site-relative; make them absolute. */
-export const absoluteUrl = (url: string | null | undefined): string | null => (url ? new URL(url, location.origin).toString() : null);
+export const absoluteUrl = (url: string | null | undefined): string | null => (url ? new URL(url, canvasOrigin()).toString() : null);
