@@ -36,6 +36,10 @@
     --ca-done-ink: #116d2c;
     --ca-done-bg: #e9f9e8;
 
+    /* The dashboard page's source tags: which system a card reads. */
+    --ca-src-canvas: #b5542d;
+    --ca-src-stellic: #3b5a9a;
+
     /* The pressable look: an ink outline and a hard drop in the darker green, like a key. */
     --ca-press: 0 2px 0 var(--ca-accent-ink);
     --ca-press-lg: 0 3px 0 var(--ca-accent-ink);

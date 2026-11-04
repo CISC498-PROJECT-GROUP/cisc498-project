@@ -1,0 +1,57 @@
+/* Advising (advisor rows, review line) and the folded academic history grid. */
+
+.ca-advisor-initial {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    font-weight: 700;
+    color: var(--ca-accent-ink);
+    background: var(--ca-accent-soft);
+    border-radius: 999px;
+}
+
+.ca-advisor-name {
+    flex: 1;
+    font-weight: 600;
+}
+
+.ca-history-toggle {
+    width: max-content;
+    font-weight: 600;
+    color: var(--ca-accent-ink);
+    cursor: pointer;
+}
+
+.ca-history-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px;
+    margin-top: 14px;
+}
+
+.ca-history-term {
+    padding: 12px 14px;
+    background: var(--ca-ground);
+    border: 1px solid var(--ca-divider);
+    border-radius: var(--ca-radius-sm);
+}
+
+.ca-history-label {
+    margin: 0 0 6px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.ca-history-item {
+    justify-content: space-between;
+    padding: 2px 0;
+    font-size: 12px;
+}
+
+.ca-history-grade {
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}

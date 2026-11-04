@@ -1,0 +1,171 @@
+<meta charset="utf-8" />
+<title>Stellic integration — Canvas Assistant</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="docs.css" />
+
+<header class="hero">
+    <div class="wrap">
+        <h1>Stellic integration</h1>
+        <p>How the dashboard page reads a student's degree plan and audit from UD's Stellic, which has no public
+            API. Read this before touching <code>extension/src/services/stellic/</code>. Everything here was worked out
+            by watching UD's own Stellic web app (<code>stellic.udel.edu</code>) in November 2026, with permission from
+            Stellic's technical team and the course instructor.</p>
+    </div>
+</header>
+
+<div class="wrap">
+    <div class="stackline">
+        <strong>Django</strong> session cookie &middot; <strong>CSRF</strong> token + Origin check &middot;
+        <strong>declarativeNetRequest</strong> header rule &middot; reads only
+    </div>
+
+    <nav class="toc">
+        <h2>Contents</h2>
+        <ol>
+            <li><a href="#s1"><span class="n">01</span> How Stellic signs a student in</a></li>
+            <li><a href="#s2"><span class="n">02</span> Why the extension rewrites Origin</a></li>
+            <li><a href="#s3"><span class="n">03</span> The endpoints the dashboard reads</a></li>
+            <li><a href="#s4"><span class="n">04</span> Response quirks</a></li>
+            <li><a href="#s5"><span class="n">05</span> Limits and risks</a></li>
+            <li><a href="#s6"><span class="n">06</span> Re-discovering an endpoint</a></li>
+        </ol>
+    </nav>
+
+    <section class="rule" id="s1">
+        <div class="rule-head"><span class="num crit">01</span>
+            <h3>How Stellic signs a student in</h3>
+        </div>
+        <div class="rule-body">
+            <ul>
+                <li>Stellic is a Django app. Signing in goes through UD's SAML identity provider
+                    (<code>idp.nss.udel.edu</code>, then CAS + Duo); after it, the browser holds a Django
+                    <code>sessionid</code> cookie (SameSite=Lax) and a <code>csrftoken</code> cookie. There are no API keys
+                    and no OAuth.</li>
+                <li>The session times out after an hour idle (<code>/auth/getsessioninfo/</code> reports
+                    <code>session_timeout: 3600</code>). Stellic's own app keeps it alive with
+                    <code>POST /auth/extendsession/</code>; the dashboard does not.</li>
+                <li>A request without a valid session gets a <strong>302 to the IdP</strong>, never a 401. The client
+                    fetches with <code>redirect: 'manual'</code> and treats the resulting <code>opaqueredirect</code> as
+                    "signed out".</li>
+            </ul>
+            <div class="note warn">The dashboard cannot sign the student in itself — the IdP answers with an
+                auto-submitting HTML form a <code>fetch</code> can't follow. It shows "Open Stellic to sign in", and
+                retries every failed card when the student comes back to the tab.</div>
+        </div>
+    </section>
+
+    <section class="rule" id="s2">
+        <div class="rule-head"><span class="num crit">02</span>
+            <h3>Why the extension rewrites Origin</h3>
+        </div>
+        <div class="rule-body">
+            <p>Stellic's read endpoints that take a body are POSTs, so Django's CSRF middleware runs on them. Replaying
+                one (<code>POST /planner/getstudentprofile/</code>) with the student's cookies gave:</p>
+            <ul>
+                <li>token + <code>Origin: https://stellic.udel.edu</code> → <strong>200</strong></li>
+                <li>token, no Origin or Referer → 403 · token + <code>Origin: chrome-extension://…</code> → 403 ·
+                    token + <code>Origin: https://udel.instructure.com</code> → 403</li>
+                <li>Origin right, no token → 403</li>
+                <li>GET endpoints → 200 with the cookie alone</li>
+            </ul>
+            <p>A page can't set <code>Origin</code> or <code>Referer</code> on a <code>fetch</code>. So
+                <code>stellic-rule.ts</code> installs one dynamic declarativeNetRequest rule that sets both to Stellic's
+                own values, and the token comes from the <code>csrftoken</code> cookie via
+                <code>chrome.cookies</code>. Permissions: <code>cookies</code>,
+                <code>declarativeNetRequestWithHostAccess</code> and the <code>https://stellic.udel.edu/*</code> host.</p>
+            <div class="note warn">The rule is limited by <code>initiatorDomains: [chrome.runtime.id]</code>: it changes
+                only this extension's own requests. Never widen it — without that condition, any website's
+                cross-site POST to Stellic would pass the Origin check, and only the token would stand in the way.</div>
+        </div>
+    </section>
+
+    <section class="rule" id="s3">
+        <div class="rule-head"><span class="num">03</span>
+            <h3>The endpoints the dashboard reads</h3>
+        </div>
+        <div class="rule-body">
+            <ul>
+                <li><code>POST /planner/getstudentplan/</code> (form: <code>include_grades=true</code>; no username
+                    means the signed-in student) — the primary plan: <code>plan_id</code>, programs, and
+                    <code>sem_content</code>, every term's courses with grade and registration status. ~56 KB, ~2–3 s.</li>
+                <li><code>POST /planner/getauditinfo/</code> (JSON: <code>plan_id</code>, <code>mainaudit: true</code>,
+                    <code>req_tree: true</code>, …) — the degree audit: <code>req_tree</code> (programs → requirement
+                    groups → courses), <code>audit_data</code> by requirement id (<code>satisfied</code>,
+                    <code>progress_data.units_summary</code>, <code>cards_remaining</code>), and
+                    <code>student_audit.grades_summary.c_gpa</code>. Up to ~550 KB, ~2 s.</li>
+                <li><code>POST /planner/getstudentprofile/</code> (empty form) — standing, school, expected graduation
+                    term, advisors, and the username. ~200 KB, ~5–10 s: the slowest call, so it loads alongside the
+                    rest and never blocks the plan.</li>
+                <li><code>GET /planner/plan-review-summary/?student_username=…</code> — whether the plan has been
+                    reviewed, and with whom a review is open. Needs the username from the profile.</li>
+            </ul>
+            <p>Stellic's own app also calls <code>POST /planner/getinitdata/</code> first (~750 KB, ~10 s). The
+                dashboard skips it: the plan call needs no arguments and returns the plan id.</p>
+            <p>Seen but not used: <code>getplancredits</code> (transfer and exam credit),
+                <code>getmilestonesandcoursesandunitssummary</code> (course and credit totals), <code>getplanwarnings</code>
+                (per-term alerts and holds), <code>getgrades</code>, <code>getprereqchain</code>,
+                <code>searchcourses</code>, <code>/student_notes/search_notes/</code>,
+                <code>/notifications/countunread/</code>, <code>/explore/get_list/</code>.</p>
+        </div>
+    </section>
+
+    <section class="rule" id="s4">
+        <div class="rule-head"><span class="num">04</span>
+            <h3>Response quirks</h3>
+        </div>
+        <div class="rule-body">
+            <ul>
+                <li>Every body starts with <code>)]}',</code> and a newline (a JSON-hijacking guard);
+                    <code>parseStellicJson</code> strips it.</li>
+                <li>Failure can be a 200 with <code>{"success": false, "message": {...}}</code>; the client treats that
+                    as an error.</li>
+                <li><code>sem_content</code> is keyed by <strong>season</strong> first (<code>id</code> 1 fall, 2 winter,
+                    3 spring, 4 summer — confirmed by the term dates) and then by plan year (<code>"1"</code>…<code>"4"</code>).
+                    <code>physical_year</code> is the calendar year the term runs in.</li>
+                <li>A course with a grade is finished; <code>is_registered</code> without a grade is current
+                    enrollment; neither is planned. <code>registration_status.screen_name</code> gives Stellic's own
+                    label ("Enrolled").</li>
+                <li>Program names carry catalog suffixes ("… Minimum Total Credits 2019F", "(17F-current)");
+                    <code>tidyProgramName</code> drops them for display.</li>
+            </ul>
+        </div>
+    </section>
+
+    <section class="rule" id="s5">
+        <div class="rule-head"><span class="num crit">05</span>
+            <h3>Limits and risks</h3>
+        </div>
+        <div class="rule-body">
+            <ul>
+                <li><strong>Undocumented.</strong> These are internal endpoints and can change with any Stellic release.
+                    Every mapper tolerates missing fields, and every card fails on its own, so a change breaks one
+                    card, not the page.</li>
+                <li><strong>One school.</strong> Stellic is deployed per institution; the origin lives in
+                    <code>services/school.ts</code> (with UD's Canvas, <code>udel.instructure.com</code>) and in the
+                    manifest's host permissions.</li>
+                <li><strong>Reads only.</strong> Nothing writes to Stellic. A write would be a product decision and a
+                    conversation with Stellic first, not a refactor.</li>
+                <li><strong>Source of record.</strong> The dashboard shows Stellic's figures as Stellic states them —
+                    satisfied flags, credit totals, GPA. It adds credits up but computes no GPA or requirement status
+                    of its own.</li>
+                <li><strong>Privacy.</strong> Stellic data stays in the student's browser: it is fetched by the
+                    dashboard page and goes nowhere else — not to our backend, not to storage.</li>
+            </ul>
+        </div>
+    </section>
+
+    <section class="rule" id="s6">
+        <div class="rule-head"><span class="num">06</span>
+            <h3>Re-discovering an endpoint</h3>
+        </div>
+        <div class="rule-body">
+            <p>Open Stellic in Chrome with DevTools → Network → Fetch/XHR, sign in, and use the screen that shows the data
+                you want; the call it makes is the endpoint. Copy it as cURL to see the body and headers. For a
+                scripted capture, launch Chromium with <code>--remote-debugging-port</code> and record
+                <code>Network.requestWillBeSent</code> / <code>Network.getResponseBody</code> over the DevTools
+                protocol — that is how this page was written.</p>
+        </div>
+    </section>
+</div>
+
+<footer>Update this page in the same commit that changes how the extension talks to Stellic. See <code>CLAUDE.md</code>.</footer>

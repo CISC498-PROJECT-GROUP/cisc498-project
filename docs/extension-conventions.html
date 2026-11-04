@@ -22,7 +22,7 @@
         <ol>
             <li><a href="#e1"><span class="n">01</span> Isolation from Canvas</a></li>
             <li><a href="#e2"><span class="n">02</span> Data only through hooks</a></li>
-            <li><a href="#e3"><span class="n">03</span> Canvas is the only source of record</a></li>
+            <li><a href="#e3"><span class="n">03</span> Canvas and Stellic are the only sources of record</a></li>
             <li><a href="#e4"><span class="n">04</span> Folder layout</a></li>
             <li><a href="#e5"><span class="n">05</span> Styling</a></li>
             <li><a href="#e6"><span class="n">06</span> Accessibility</a></li>
@@ -57,14 +57,16 @@
                 <code>services/hooks/use-*.ts</code> and returns a <code>Loadable&lt;T&gt;</code> —
                 <code>{ data, loading, error }</code>, rendered by <code>&lt;LoadState&gt;</code>.</p>
             <p>Canvas calls are same-origin <code>fetch('/api/v1/…')</code> from the content script, which carries the
-                student's session. Calls to our backend go through the extension's background service worker, not
+                student's session. The dashboard page is not on Canvas: it calls <code>setCanvasOrigin()</code> once and
+                the same client makes credentialed requests to the school's Canvas, allowed by the manifest's host
+                permissions. Calls to our backend go through the extension's background service worker, not
                 the page, so Canvas's CSP and CORS never apply to them.</p>
         </div>
     </section>
 
     <section class="rule" id="e3">
         <div class="rule-head"><span class="num crit">03</span>
-            <h3>Canvas is the only source of record</h3>
+            <h3>Canvas and Stellic are the only sources of record</h3>
         </div>
         <div class="rule-body">
             <p>Every grade, date and policy the widget or the assistant shows comes from the Canvas API — or, for
@@ -81,6 +83,11 @@
                 for the student (<code>sessionless_launch</code>), and the background worker posts it and reads the
                 gallery's pages and Kaltura's API — reads only, and only to Kaltura hosts. A study PDF comes back as an
                 attachment on the assistant's message, held in a <code>blob:</code> URL, never stored.</p>
+            <p>The <strong>dashboard page</strong> (<code>dashboard.html</code>, opened from the toolbar button) also reads
+                the student's degree plan, audit and advisor from <strong>Stellic</strong>, on their own Stellic session
+                — reads only, shown as Stellic states them. Stellic has no public API; how the extension calls it, and
+                the header rule that makes its POSTs pass Django's CSRF check, are in
+                <a href="stellic-integration.html">Stellic integration</a>.</p>
         </div>
     </section>
 
@@ -96,7 +103,11 @@
                     <code>services/format/</code> pure formatting · <code>services/canvas/</code> the REST client
                     and mappers · <code>services/tools/</code> tool executors · <code>services/chat/</code> the tool
                     loop · <code>services/media/</code> the Media Gallery and captions · <code>services/study/</code>
-                    lecture digests and the study-PDF pipeline.</li>
+                    lecture digests and the study-PDF pipeline · <code>services/stellic/</code> the Stellic client,
+                    its header rule and mappers · <code>services/dashboard/</code> the Canvas–Stellic join ·
+                    <code>services/school.ts</code> the dashboard's Canvas and Stellic origins.</li>
+                <li><code>components/dashboard/</code> is the dashboard page; <code>dashboard.tsx</code> is its entry,
+                    beside <code>content.tsx</code> and <code>background.ts</code>.</li>
                 <li>A tool that runs for minutes reports through <code>context.progress</code> (shown as the chat's
                     status line); a tool that makes a file returns it as an <code>attachment</code>.</li>
                 <li>A new tool is added to <code>@canvas-assistant/shared</code> first; the executor map in
@@ -114,8 +125,9 @@
         </div>
         <div class="rule-body">
             <ul>
-                <li>Plain CSS in <code>src/styles/</code>, one file per area, joined by <code>styles/index.ts</code>.
-                    Every class is prefixed <code>ca-</code>.</li>
+                <li>Plain CSS in <code>src/styles/</code>, one file per area, joined by <code>styles/index.ts</code> for the
+                    widget and <code>styles/page.ts</code> for the dashboard page (tokens, the shared feedback styles,
+                    then the <code>dash-*.css</code> sheets). Every class is prefixed <code>ca-</code>.</li>
                 <li>Colours come from the tokens in <code>tokens.css</code> — never a hex in a component. A per-course
                     colour is passed as the <code>--ca-course</code> custom property.</li>
                 <li>The palette is the widget's own, from the Canvas Assistant Figma file: paper ground, ink
@@ -152,6 +164,9 @@
                     and refresh Canvas.</li>
                 <li>The bundle is an IIFE — content scripts are classic scripts and cannot contain
                     <code>import</code>.</li>
+                <li>The dashboard page is <code>chrome-extension://&lt;id&gt;/dashboard.html</code>; the toolbar button
+                    opens it. It needs the student signed in to Canvas and Stellic in the same browser. There is no
+                    preview fixture for Stellic — test it against a real session.</li>
                 <li><code>bun run --cwd extension preview</code> serves a stand-in dashboard on :5174 over a fake
                     Canvas API, with chat going to the real backend — the whole tool loop runs without a Canvas
                     login. Course 101 has a stand-in Media Gallery (<code>preview/canvas/gallery.ts</code>) with

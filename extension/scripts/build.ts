@@ -1,5 +1,6 @@
-// Builds the unpacked extension into dist/: the content script and the background service worker,
-// each bundled from src/, plus the manifest from static/. Load dist/ in chrome://extensions with
+// Builds the unpacked extension into dist/: the content script, the background service worker and
+// the dashboard page's script, each bundled from src/, plus the manifest and dashboard.html from
+// static/. Load dist/ in chrome://extensions with
 // "Load unpacked".
 //
 // The backend address is baked in at build time from CANVAS_ASSISTANT_API (default
@@ -24,7 +25,7 @@ async function build(): Promise<boolean> {
     const started = performance.now();
     rmSync(DIST, { recursive: true, force: true });
     const result = await Bun.build({
-        entrypoints: [join(ROOT, 'src', 'content.tsx'), join(ROOT, 'src', 'background.ts')],
+        entrypoints: [join(ROOT, 'src', 'content.tsx'), join(ROOT, 'src', 'background.ts'), join(ROOT, 'src', 'dashboard.tsx')],
         outdir: DIST,
         naming: '[name].js',
         target: 'browser',

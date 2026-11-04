@@ -1,0 +1,76 @@
+/* Dashboard cards: the shared frame with its source tag, the sign-in link and the empty line.
+   The sections inside are in dash-term.css, dash-due.css, dash-stellic.css and dash-people.css. */
+
+.ca-dash-card {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 18px 20px 20px;
+    background: var(--ca-surface);
+    border: 1px solid var(--ca-line);
+    border-radius: var(--ca-radius);
+}
+
+.ca-dash-card-head {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.ca-dash-card-title {
+    margin: 0;
+    font-family: var(--ca-font-display);
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+}
+
+.ca-dash-card-aside {
+    margin-left: auto;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ca-muted);
+}
+
+.ca-source {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 2px 8px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--ca-muted);
+    border: 1px solid var(--ca-divider);
+    border-radius: 999px;
+}
+
+.ca-source::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--ca-src-canvas);
+}
+
+.ca-source--stellic::before {
+    background: var(--ca-src-stellic);
+}
+
+.ca-source--both::before {
+    background: linear-gradient(90deg, var(--ca-src-canvas) 50%, var(--ca-src-stellic) 50%);
+}
+
+.ca-dash-signin {
+    align-self: flex-start;
+    font-size: 13px;
+}
+
+.ca-empty-line {
+    margin: 0;
+    color: var(--ca-muted);
+}
+
+.ca-faint {
+    color: var(--ca-faint);
+}

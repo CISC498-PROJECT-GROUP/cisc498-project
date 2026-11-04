@@ -9,9 +9,13 @@
 //   - The course's Media Gallery, which is Kaltura's: launching it (the LTI form Canvas signs),
 //     reading its pages with the session that launch sets, and calling Kaltura's API for captions.
 //     Only Kaltura hosts are reachable this way — this worker is not a general-purpose proxy.
+//
+// It also opens the dashboard page when the toolbar button is pressed, and installs the Stellic
+// header rule (services/stellic/stellic-rule.ts) at install and browser start.
 
 import type { ApiReply, ApiRequest, FileReply, FileRequest, WebReply, WebRequest, WorkerRequest } from '@/services/api/messages';
 import { API_BASE } from '@/services/config';
+import { installStellicRule } from '@/services/stellic/stellic-rule';
 
 async function callApi(request: ApiRequest): Promise<ApiReply> {
     try {
@@ -79,3 +83,7 @@ chrome.runtime.onMessage.addListener((message: WorkerRequest, _sender, sendRespo
     else return false;
     return true; // keep the channel open for the async reply
 });
+
+chrome.action.onClicked.addListener(() => void chrome.tabs.create({ url: chrome.runtime.getURL('dashboard.html') }));
+chrome.runtime.onInstalled.addListener(() => void installStellicRule());
+chrome.runtime.onStartup.addListener(() => void installStellicRule());

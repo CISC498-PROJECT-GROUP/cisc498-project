@@ -29,14 +29,20 @@ The build is a **working prototype**:
   date range the student gives, or that it works out from Canvas for an exam (it asks when there is
   neither). The backend's `study` module writes the guide in steps (`claude-opus-5-5`, structured
   outputs, every quote and link checked against its source) and prints it with headless Chrome.
+- **The dashboard page** — `dashboard.html`, an extension page the toolbar button opens, puts Canvas
+  beside **Stellic** (UD's degree planner): this semester's courses joined across both, what's due,
+  degree progress, next semester's plan, advising and the academic history. Stellic has no public
+  API; the page reads its internal `/planner/*` endpoints on the student's own Stellic session —
+  see [`docs/stellic-integration.html`](docs/stellic-integration.html). Reads only.
 
 No database.
 
 Two rules follow from the subject matter and override convenience:
 
 1. **Never pass invented data off as the student's record.** A grade, date or policy the widget or
-   the assistant shows must come from Canvas. Invented data exists only as the preview harness's
-   fixtures in `extension/preview/`, which are never bundled into the extension.
+   the assistant shows must come from Canvas (or, on the dashboard page, from Stellic — shown as
+   Stellic states it). Invented data exists only as the preview harness's fixtures in
+   `extension/preview/`, which are never bundled into the extension.
 2. **A student's data goes nowhere it doesn't need to.** Canvas content — lecture transcripts
    included — is sent to the backend only to answer the question asked, is never logged (see
    `svc-log.ts`), and is never stored. A study PDF lives in a `blob:` URL in the student's page.
@@ -97,6 +103,7 @@ Before starting any task, read the relevant conventions file in `docs/`:
 
 - Backend: [`docs/backend-conventions.html`](docs/backend-conventions.html) — before any work in `backend/`.
 - Extension: [`docs/extension-conventions.html`](docs/extension-conventions.html) — before any work in `extension/`.
+- Stellic: [`docs/stellic-integration.html`](docs/stellic-integration.html) — before touching `extension/src/services/stellic/`.
 
 `docs/` is HTML only — no Markdown originals. Pages share `docs/docs.css` and follow its rule-card
 layout (hero → stackline → TOC → numbered rule cards). Classic CSS, no build step, no dependencies —
@@ -224,6 +231,11 @@ onto Canvas. Path alias `@/*` → `extension/src`.
   `styles/index.ts`. Colours come from the tokens in `tokens.css` — never hardcoded in a component.
   The palette is the widget's own (the Figma file's "Brilliant-inspired" redesign): ink outlines on a
   paper ground, and one green (`--ca-accent`, text in `--ca-accent-ink`) for the main action.
+- `dashboard.tsx` + `components/dashboard/` — the dashboard page. It points the Canvas client at
+  the school's Canvas (`services/school.ts`, `setCanvasOrigin`). `services/stellic/` is the Stellic
+  client: the CSRF token comes from the `csrftoken` cookie, and a declarativeNetRequest rule scoped
+  to this extension's own requests sets `Origin`/`Referer`, which Django's CSRF check requires.
+  `services/dashboard/` joins a Stellic course to its Canvas site by subject + number.
 - The manifest is `extension/static/manifest.json`, copied into `dist/` by the build. It matches
   `*.instructure.com` and `canvas.udel.edu`; add a school's self-hosted domain there. Its
   `https://*.kaltura.com/*` host permission is what lets the worker open the Media Gallery.

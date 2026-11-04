@@ -1,0 +1,130 @@
+/* The dashboard page: the ground, the top bar, the hero with its three figures, and the two-column
+   grid the cards sit in (one column on a narrow window). Card internals are in dash-cards.css and
+   dash-stellic.css. */
+
+body {
+    margin: 0;
+}
+
+.ca-page {
+    min-height: 100vh;
+    background: var(--ca-ground);
+    font-size: 14px;
+}
+
+.ca-page-shell {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.ca-topbar {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    height: 56px;
+    padding: 0 max(16px, calc((100vw - 1180px) / 2));
+    background: color-mix(in srgb, var(--ca-ground) 88%, transparent);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--ca-divider);
+}
+
+.ca-topbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.ca-mark {
+    width: 28px;
+    height: 28px;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ca-on-accent);
+    background: var(--ca-accent);
+}
+
+.ca-topbar-name {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.ca-topbar-sep {
+    width: 1px;
+    height: 16px;
+    background: var(--ca-line);
+}
+
+.ca-topbar-page {
+    font-family: var(--ca-font-display);
+    font-weight: 600;
+    color: var(--ca-muted);
+}
+
+.ca-topbar-links {
+    display: flex;
+    gap: 6px;
+}
+
+.ca-topbar-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    min-height: 32px;
+    padding: 0 12px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ca-ink);
+    text-decoration: none;
+    border: 1px solid var(--ca-line);
+    border-radius: 999px;
+    background: var(--ca-surface);
+}
+
+.ca-topbar-link:hover {
+    border-color: var(--ca-ink);
+}
+
+.ca-page-main {
+    width: 100%;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 28px 16px 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.ca-dash-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    gap: 20px;
+    align-items: start;
+}
+
+.ca-dash-col {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.ca-page-foot {
+    margin: 4px 0 0;
+    font-size: 12px;
+    text-align: center;
+    color: var(--ca-faint);
+}
+
+@media (max-width: 900px) {
+    .ca-dash-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
