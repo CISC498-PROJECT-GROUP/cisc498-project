@@ -1,29 +1,33 @@
-// Reading and answering Duo's prompt in the sign-in browser. Duo's Universal Prompt is a page on a
-// *.duosecurity.com host (older deployments put it in an iframe, so every frame on a Duo host is
-// read). Duo changes its markup without notice, so the page is read by what it SAYS — headings,
+// Reading and answering the second-factor prompt in the sign-in browser. Duo's Universal Prompt is a
+// page on a *.duosecurity.com host (older deployments put it in an iframe), and UD's CAS can ask for
+// a code on a page of its own — often in a popup window, which login-flow.ts follows — so every
+// frame on a Duo or CAS host is read, except CAS's username/password form itself. Duo changes its markup without notice, so the page is read by what it SAYS — headings,
 // button labels — with the few stable selectors as a first try. If Duo moves on, the sign-in fails
 // with "Duo showed a screen the site doesn't recognise" rather than doing something it shouldn't;
 // LOGIN_BROWSER_VISIBLE=1 shows the browser so the new screen can be seen.
 
 import type { Frame, Page } from 'puppeteer-core';
 import type { DuoMethod } from '@canvas-assistant/shared';
-import { isDuoHost } from '@/services/auth/ud-services';
+import { CAS_HOST, isDuoHost } from '@/services/auth/ud-services';
 
 export type DuoKind = 'waiting' | 'passcode' | 'choose' | 'trust' | 'error' | 'unknown';
 
 export interface DuoView {
-    /** Whether a Duo page is open at all. */
+    /** Whether a second-factor page (Duo's or CAS's) is open at all. */
     present: boolean;
     kind: DuoKind;
     methods: DuoMethod[];
     /** Duo's own words for an error, shown to the student. */
     error: string | null;
+    /** The start of the screen's text and its controls' labels — for the sign-in log, never the student. */
+    glimpse: string;
 }
 
 const duoFrames = (page: Page): Frame[] =>
     page.frames().filter((frame) => {
         try {
-            return isDuoHost(new URL(frame.url()).hostname);
+            const host = new URL(frame.url()).hostname;
+            return isDuoHost(host) || host === CAS_HOST;
         } catch {
             return false;
         }
@@ -33,7 +37,8 @@ const duoFrames = (page: Page): Frame[] =>
 const READ = `(() => {
     const text = document.body ? document.body.innerText : '';
     const labels = [...document.querySelectorAll('button, a, [role=button], li, label')].map((e) => (e.innerText || '').trim()).filter(Boolean);
-    const passcode = !!document.querySelector('input[name="passcode-input"], #passcode-input, input[autocomplete="one-time-code"], input[name="passcode"]');
+    if (document.querySelector('#password')) return null;
+    const passcode = !!document.querySelector('input[name="passcode-input"], #passcode-input, input[autocomplete="one-time-code"], input[name="passcode"], input[name*="code" i], input[name*="token" i], input[inputmode="numeric"], input[type="tel"]');
     const errorEl = document.querySelector('[role=alert], .message-text.error, .error-message, .alert-error');
     return { text, labels, passcode, error: errorEl ? (errorEl.innerText || '').trim() : '' };
 })()`;
@@ -46,6 +51,14 @@ interface Raw {
 }
 
 function classify(raw: Raw): DuoView {
+    const glimpse = `${raw.text.replace(/\s+/g, ' ').trim().slice(0, 240)} | controls: ${raw.labels
+        .slice(0, 12)
+        .map((l) => l.replace(/\s+/g, ' ').slice(0, 40))
+        .join(' / ')}`;
+    return { ...classifyKind(raw), glimpse };
+}
+
+function classifyKind(raw: Raw): Omit<DuoView, 'glimpse'> {
     const all = `${raw.text}\n${raw.labels.join('\n')}`;
     const methods: DuoMethod[] = [];
     if (/duo push/i.test(all)) methods.push('push');
@@ -59,6 +72,7 @@ function classify(raw: Raw): DuoView {
     if (/is this your device|trust this browser/i.test(raw.text)) return { present: true, kind: 'trust', methods, error: null };
     if (error !== '' && raw.labels.some((l) => /try again/i.test(l))) return { present: true, kind: 'error', methods, error };
     if (raw.passcode) return { present: true, kind: 'passcode', methods, error: error || null };
+    if (/enter (the|your|a) (\d-digit )?(code|passcode)|verification code|one-time code/i.test(raw.text)) return { present: true, kind: 'passcode', methods, error: error || null };
     if (/check for a duo push|sent a request|sent a duo push|we.re calling|calling your phone|verify.*push/i.test(raw.text)) return { present: true, kind: 'waiting', methods, error: null };
     if (/other options|choose an authentication method|how would you like to|select an option/i.test(all) && methods.length > 0) return { present: true, kind: 'choose', methods, error: error || null };
     return { present: true, kind: 'unknown', methods, error: error || null };
@@ -66,16 +80,19 @@ function classify(raw: Raw): DuoView {
 
 /** What the Duo prompt is showing now; 'unknown' while it is still loading. */
 export async function readDuo(page: Page): Promise<DuoView> {
-    const frames = duoFrames(page);
-    for (const frame of frames) {
+    let unknown: DuoView | null = null;
+    for (const frame of duoFrames(page)) {
         try {
-            const view = classify((await frame.evaluate(READ)) as Raw);
+            const raw = (await frame.evaluate(READ)) as Raw | null;
+            if (raw === null) continue; // CAS's username/password form — not a second factor
+            const view = classify(raw);
             if (view.kind !== 'unknown') return view;
+            unknown ??= view;
         } catch {
             // A frame navigating away mid-read; the next poll reads it again.
         }
     }
-    return { present: frames.length > 0, kind: 'unknown', methods: [], error: null };
+    return unknown ?? { present: false, kind: 'unknown', methods: [], error: null, glimpse: '' };
 }
 
 /** Runs in the page: click the first visible control whose label matches `pattern`. */
@@ -109,7 +126,7 @@ export async function chooseMethod(page: Page, method: DuoMethod): Promise<boole
 /** Type a passcode into Duo and submit it. */
 export async function enterPasscode(page: Page, code: string): Promise<boolean> {
     for (const frame of duoFrames(page)) {
-        const input = await frame.$('input[name="passcode-input"], #passcode-input, input[autocomplete="one-time-code"], input[name="passcode"]');
+        const input = await frame.$('input[name="passcode-input"], #passcode-input, input[autocomplete="one-time-code"], input[name="passcode"], input[name*="code" i], input[name*="token" i], input[inputmode="numeric"], input[type="tel"]');
         if (!input) continue;
         await input.click({ count: 3 });
         await input.type(code, { delay: 20 });
