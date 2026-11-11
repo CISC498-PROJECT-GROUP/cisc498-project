@@ -1,10 +1,12 @@
-// The tools the model may call. Each one is executed by the extension against the Canvas REST API,
-// with the student's own session — so a tool can only ever see what the student can see.
+// The tools the model may call. Each one is executed by the site — against Canvas, Stellic or WebReg
+// through the backend's UD proxy, with the student's own session — so a tool can only ever see what
+// the student can see.
 // Descriptions are written for the model: say what the tool returns and when to reach for it.
 
 import { COURSE_TOOLS } from './course-tools';
 import { CONTENT_TOOLS } from './content-tools';
 import { LECTURE_TOOLS } from './lecture-tools';
+import { RECORD_TOOLS } from './record-tools';
 
 export interface ToolDefinition {
     name: string;
@@ -12,6 +14,6 @@ export interface ToolDefinition {
     input_schema: { type: 'object'; properties: Record<string, unknown>; required?: readonly string[]; additionalProperties?: boolean };
 }
 
-export const CANVAS_TOOLS = [...COURSE_TOOLS, ...CONTENT_TOOLS, ...LECTURE_TOOLS] as const satisfies readonly ToolDefinition[];
+export const CANVAS_TOOLS = [...COURSE_TOOLS, ...CONTENT_TOOLS, ...LECTURE_TOOLS, ...RECORD_TOOLS] as const satisfies readonly ToolDefinition[];
 
 export type CanvasToolName = (typeof CANVAS_TOOLS)[number]['name'];

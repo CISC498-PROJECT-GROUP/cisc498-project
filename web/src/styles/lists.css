@@ -1,0 +1,167 @@
+/* The Deadlines list — the segmented filter, day groups and deadline cards. Status pills are in
+   dash-stellic.css; the submit panel beside the list is in submit.css. */
+
+.ca-segmented {
+    display: inline-flex;
+    height: 38px;
+    padding: 3px;
+    background: var(--ca-surface);
+    border: 1.2px solid var(--ca-ink);
+    border-radius: 999px;
+}
+
+.ca-seg {
+    padding: 0 14px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ca-muted);
+    background: transparent;
+    border: none;
+    border-radius: 999px;
+    transition:
+        background 140ms,
+        color 140ms;
+}
+
+.ca-seg--on {
+    font-weight: 700;
+    color: var(--ca-on-accent);
+    background: var(--ca-accent);
+}
+
+.ca-deadline-list {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    min-width: 0;
+}
+
+.ca-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.ca-group-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.35;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--ca-muted);
+}
+
+.ca-group-label--alert {
+    color: var(--ca-alert-ink);
+}
+
+.ca-group-count {
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    letter-spacing: 0;
+    border-radius: 999px;
+    background: var(--ca-sunken);
+}
+
+.ca-group-label--alert .ca-group-count {
+    background: var(--ca-alert-bg);
+}
+
+.ca-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.ca-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 62px;
+    padding: 10px 14px;
+    color: var(--ca-ink);
+    text-decoration: none;
+}
+
+.ca-row--card {
+    background: var(--ca-surface);
+    border: 1px solid var(--ca-line);
+    border-radius: var(--ca-radius);
+    transition: border-color 120ms;
+}
+
+.ca-row--card:hover {
+    border-color: var(--ca-line-2);
+}
+
+.ca-row--late {
+    border-color: var(--ca-alert-line);
+}
+
+.ca-row--selected,
+.ca-row--selected:hover {
+    border-color: var(--ca-ink);
+    box-shadow: 0 2px 0 var(--ca-ink);
+}
+
+.ca-row--done .ca-row-title {
+    color: var(--ca-muted);
+    text-decoration: line-through;
+    text-decoration-color: var(--ca-line-2);
+}
+
+.ca-row-bar {
+    align-self: stretch;
+    width: 4px;
+    min-height: 36px;
+    flex-shrink: 0;
+    border-radius: 3px;
+    background: var(--ca-course);
+}
+
+.ca-row-main {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    line-height: 1.35;
+}
+
+.ca-row-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--ca-ink);
+    text-decoration: none;
+    overflow-wrap: anywhere;
+}
+
+a.ca-row-link:hover {
+    text-decoration: underline;
+}
+
+.ca-row-meta {
+    font-size: 13px;
+    color: var(--ca-muted);
+    font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 480px) {
+    .ca-row {
+        gap: 10px;
+        padding: 10px 12px;
+    }
+
+    .ca-row-title {
+        font-size: 14px;
+    }
+}

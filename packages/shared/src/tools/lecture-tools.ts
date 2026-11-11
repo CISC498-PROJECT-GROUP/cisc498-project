@@ -20,7 +20,7 @@ export const LECTURE_TOOLS = [
     {
         name: 'list_lectures',
         description:
-            "The recorded lectures in a course's Media Gallery, oldest first: title, recording date and length. Use it to see what was covered when — a recording titled like \"Midterm Review\" marks the end of an exam's material — and to check which dates have recordings before summarizing or building a study PDF.",
+            'The recorded lectures in a course\'s Media Gallery, oldest first: title, recording date and length. Use it to see what was covered when — a recording titled like "Midterm Review" marks the end of an exam\'s material — and to check which dates have recordings before summarizing or building a study PDF.',
         input_schema: { type: 'object', properties: { course_id: courseId }, required: ['course_id'], additionalProperties: false },
     },
     {
@@ -37,7 +37,7 @@ export const LECTURE_TOOLS = [
     {
         name: 'create_study_pdf',
         description:
-            "Build a PDF from the recorded lectures in a date range and attach it to your reply as a download. kind \"topics\" is a short outline of the topics covered, lecture by lecture; \"study_guide\" is a full illustrated study guide — an exam-at-a-glance page, every topic explained with worked examples and the instructor's own words, and a one-page review sheet. Needs a time frame from the student, or an exam whose range you work out — never assume all lectures. Takes a few minutes.",
+            'Build a PDF from the recorded lectures in a date range and attach it to your reply as a download. kind "topics" is a short outline of the topics covered, lecture by lecture; "study_guide" is a full illustrated study guide — an exam-at-a-glance page, every topic explained with worked examples and the instructor\'s own words, and a one-page review sheet. Needs a time frame from the student, or an exam whose range you work out — never assume all lectures. Takes a few minutes.',
         input_schema: {
             type: 'object',
             properties: {
@@ -49,10 +49,7 @@ export const LECTURE_TOOLS = [
                 title: { type: 'string', description: 'A short title for the cover, e.g. "Midterm Study Guide" or "Weeks 3–5 Topics".' },
                 exam_name: { type: 'string', description: 'The exam this is for, e.g. "Midterm 1", or "" if none.' },
                 exam_date: { type: 'string', description: 'When and where the exam is, as Canvas states it, e.g. "Mon, Oct 19 · in class", or "" if unknown.' },
-                exam_notes: {
-                    type: 'string',
-                    description: 'What Canvas (syllabus, announcements, pages) says about the exam — scope, format, allowed materials, topics excluded — quoted or closely paraphrased from tool results, or "" if nothing.',
-                },
+                exam_notes: { type: 'string', description: 'What Canvas (syllabus, announcements, pages) says about the exam — scope, format, allowed materials, topics excluded — quoted or closely paraphrased from tool results, or "" if nothing.' },
             },
             required: ['course_id', 'kind', 'from', 'to', 'range_basis', 'title', 'exam_name', 'exam_date', 'exam_notes'],
             additionalProperties: false,

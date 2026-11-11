@@ -1,0 +1,179 @@
+/* The sign-in screen: one card centred on the paper ground, the brand over it, the UD systems
+   under it. The form fields and buttons are the shared ones (forms.css). */
+
+.ca-signin {
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    padding: 32px 16px;
+    background: radial-gradient(circle at 18% 12%, var(--ca-accent-tint) 0, transparent 38%), radial-gradient(circle at 85% 90%, var(--ca-accent-tint) 0, transparent 34%), var(--ca-ground);
+}
+
+.ca-signin-card {
+    width: 100%;
+    max-width: 420px;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    padding: 28px 28px 26px;
+    background: var(--ca-surface);
+    border: 1.5px solid var(--ca-ink);
+    border-radius: 20px;
+    box-shadow:
+        0 4px 0 var(--ca-ink),
+        0 24px 48px -24px rgba(23, 27, 24, 0.25);
+    animation: ca-enter 260ms var(--ca-ease);
+}
+
+.ca-signin-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.ca-signin-name {
+    font-family: var(--ca-font-display);
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+}
+
+.ca-signin-form,
+.ca-signin-step {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.ca-signin-head {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.ca-signin-title {
+    margin: 0;
+    font-family: var(--ca-font-display);
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.015em;
+}
+
+.ca-signin-sub {
+    margin: 0;
+    color: var(--ca-muted);
+}
+
+.ca-signin-error {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin: 0;
+    padding: 10px 12px;
+    font-size: 13px;
+    color: var(--ca-alert-ink);
+    background: var(--ca-alert-bg);
+    border: 1px solid var(--ca-alert-line);
+    border-radius: var(--ca-radius-sm);
+}
+
+.ca-signin-error svg {
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+.ca-signin-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--ca-muted);
+}
+
+.ca-signin-note svg {
+    flex-shrink: 0;
+    margin-top: 2px;
+    color: var(--ca-accent-ink);
+}
+
+.ca-signin-wait {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 18px 0 6px;
+    text-align: center;
+}
+
+.ca-signin-wait-text {
+    margin: 8px 0 0;
+    font-family: var(--ca-font-display);
+    font-size: 19px;
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+.ca-spinner {
+    width: 52px;
+    height: 52px;
+    border-radius: 999px;
+    border: 4px solid var(--ca-accent-soft);
+    border-top-color: var(--ca-accent-ink);
+    animation: ca-spin 900ms linear infinite;
+}
+
+@keyframes ca-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.ca-signin-alt {
+    align-self: center;
+    min-height: 32px;
+    font-size: 13px;
+}
+
+.ca-signin-foot {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin: 0;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ca-muted);
+}
+
+.ca-signin-dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 999px;
+    background: var(--ca-line-2);
+}
+
+.ca-signin-foot-school {
+    width: 100%;
+    text-align: center;
+    font-weight: 400;
+    color: var(--ca-faint);
+}
+
+@media (max-width: 480px) {
+    .ca-signin {
+        justify-content: flex-start;
+        padding-top: 40px;
+    }
+
+    .ca-signin-card {
+        padding: 22px 18px;
+    }
+}

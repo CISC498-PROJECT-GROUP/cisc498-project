@@ -1,0 +1,125 @@
+/* A new chat: the intro, the starter questions and the connected-courses line. */
+
+.ca-empty-chat {
+    width: 100%;
+    max-width: 640px;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 26px;
+}
+
+.ca-empty-intro {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    text-align: center;
+}
+
+.ca-empty-title {
+    margin: 0;
+    font-family: var(--ca-font-display);
+    font-size: clamp(24px, 3vw, 30px);
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.015em;
+}
+
+.ca-empty-sub {
+    max-width: 52ch;
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--ca-muted);
+}
+
+.ca-starters {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
+    gap: 10px;
+}
+
+.ca-starter {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    min-height: 54px;
+    padding: 8px 14px;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.35;
+    text-align: left;
+    color: var(--ca-ink);
+    background: var(--ca-surface);
+    border: 1.3px solid var(--ca-ink);
+    border-radius: 12px;
+    transition:
+        transform 120ms var(--ca-ease),
+        box-shadow 120ms var(--ca-ease);
+}
+
+.ca-starter > :first-child {
+    flex-shrink: 0;
+    color: var(--ca-accent-ink);
+}
+
+.ca-starter > span:not(.ca-starter-go) {
+    flex: 1;
+}
+
+.ca-starter-go {
+    display: flex;
+    transition: transform 160ms var(--ca-ease);
+}
+
+.ca-starter:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 0 var(--ca-ink);
+}
+
+.ca-starter:hover .ca-starter-go {
+    transform: translateX(3px);
+}
+
+.ca-connected {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    margin: 0;
+    font-size: 13px;
+    color: var(--ca-muted);
+}
+
+.ca-connected .ca-dot {
+    color: var(--ca-accent-ink);
+}
+
+.ca-dot {
+    width: 7px;
+    height: 7px;
+    flex-shrink: 0;
+    border-radius: 999px;
+    background: currentColor;
+}
+
+@media (max-width: 720px) {
+    .ca-empty-chat {
+        gap: 18px;
+    }
+
+    .ca-avatar--lg {
+        width: 48px;
+        height: 48px;
+    }
+
+    .ca-empty-sub {
+        font-size: 13px;
+    }
+
+    .ca-starter {
+        min-height: 48px;
+    }
+}

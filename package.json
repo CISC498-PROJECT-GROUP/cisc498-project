@@ -4,16 +4,17 @@
     "version": "0.0.1",
     "workspaces": [
         "backend",
-        "extension",
+        "web",
         "packages/*"
     ],
     "scripts": {
-        "dev": "bun run --cwd extension dev",
+        "dev": "bun run --cwd web dev",
         "dev:api": "bun run --cwd backend dev",
-        "build": "bun run --cwd extension build",
-        "lint": "bun run --cwd backend lint && bun run --cwd extension lint",
-        "test": "bun run --cwd backend test && bun run --cwd extension test",
-        "format": "bun run --cwd backend format && bun run --cwd extension format",
-        "format:check": "bun run --cwd backend format:check && bun run --cwd extension format:check"
+        "preview": "bun run --cwd web preview",
+        "build": "bun run --cwd web build",
+        "lint": "bun run --cwd backend lint && bun run --cwd web lint",
+        "test": "bun run --cwd backend test && bun run --cwd web test",
+        "format": "bun run --cwd backend format && bun run --cwd web format",
+        "format:check": "bun run --cwd backend format:check && bun run --cwd web format:check"
     }
 }

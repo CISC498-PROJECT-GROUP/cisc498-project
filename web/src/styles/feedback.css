@@ -1,0 +1,136 @@
+/* Loading skeletons, error and empty states, and the small controls every page shares: text links
+   and chips. Buttons are in forms.css. */
+
+.ca-skeleton {
+    display: flex;
+    flex-direction: column;
+    background: var(--ca-surface);
+    border: 1px solid var(--ca-line);
+    border-radius: var(--ca-radius);
+}
+
+.ca-skel-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px;
+}
+
+.ca-skel-row + .ca-skel-row {
+    border-top: 1px solid var(--ca-divider);
+}
+
+.ca-skel-lines {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.ca-skel {
+    display: block;
+    height: 11px;
+    border-radius: 6px;
+    background: linear-gradient(90deg, var(--ca-sunken) 25%, var(--ca-ground) 50%, var(--ca-sunken) 75%) 0 0 / 200% 100%;
+    animation: ca-shimmer 1.4s linear infinite;
+}
+
+.ca-skel--thin {
+    height: 8px;
+}
+
+.ca-skel--dot {
+    flex-shrink: 0;
+    width: 30px;
+    height: 30px;
+    border-radius: 10px;
+}
+
+.ca-error-card {
+    display: flex;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 8px 10px;
+    padding: 12px 14px;
+    color: var(--ca-alert-ink);
+    background: var(--ca-alert-bg);
+    border: 1px solid var(--ca-alert-line);
+    border-radius: var(--ca-radius);
+}
+
+.ca-error-text {
+    flex: 1;
+    min-width: 180px;
+    font-size: 13px;
+}
+
+.ca-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 36px 16px;
+    text-align: center;
+    color: var(--ca-muted);
+}
+
+.ca-empty-state p {
+    margin: 0;
+}
+
+.ca-empty-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ca-on-accent);
+    background: var(--ca-accent);
+    border: 1.5px solid var(--ca-ink);
+}
+
+.ca-text-btn,
+.ca-link,
+.ca-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ca-accent-ink);
+    text-decoration: none;
+    background: none;
+    border: none;
+    padding: 0;
+}
+
+.ca-text-btn {
+    color: var(--ca-alert-ink);
+}
+
+.ca-link:hover,
+.ca-text-btn:hover {
+    text-decoration: underline;
+}
+
+.ca-chip {
+    flex-shrink: 0;
+    gap: 5px;
+    padding: 5px 10px;
+    font-size: 12px;
+    background: var(--ca-accent-soft);
+    border: 1px solid var(--ca-accent-ink);
+    border-radius: 999px;
+    transition: background 140ms;
+}
+
+.ca-chip:hover {
+    background: var(--ca-surface);
+}
+
+.ca-chip--lg {
+    min-height: 32px;
+    padding: 0 12px;
+    font-size: 13px;
+}

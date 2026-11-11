@@ -1,0 +1,167 @@
+/* The top bar: greeting, the connected UD systems as link-out chips, the username and Sign out.
+   On a phone it shows the mark, wraps the chips onto a second row and keeps Sign out as an icon. */
+
+.ca-top {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    min-height: var(--ca-top-h);
+    padding: 10px var(--ca-gutter);
+    background: color-mix(in srgb, var(--ca-ground) 90%, transparent);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--ca-divider);
+}
+
+.ca-top-mark {
+    display: none;
+    text-decoration: none;
+}
+
+.ca-top-hello {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+    font-family: var(--ca-font-display);
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.ca-top-services {
+    display: flex;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.ca-service {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    min-height: 32px;
+    padding: 0 11px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ca-ink);
+    text-decoration: none;
+    background: var(--ca-surface);
+    border: 1px solid var(--ca-line);
+    border-radius: 999px;
+    transition: border-color 120ms;
+}
+
+.ca-service:hover {
+    border-color: var(--ca-ink);
+}
+
+.ca-service svg {
+    color: var(--ca-faint);
+}
+
+.ca-service-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: var(--ca-accent);
+    box-shadow: 0 0 0 3px var(--ca-accent-soft);
+}
+
+.ca-service--off {
+    color: var(--ca-muted);
+}
+
+.ca-service--off .ca-service-dot {
+    background: var(--ca-alert-line);
+    box-shadow: 0 0 0 3px var(--ca-alert-bg);
+}
+
+.ca-top-user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-left: 14px;
+    border-left: 1px solid var(--ca-line);
+}
+
+.ca-top-username {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ca-muted);
+}
+
+.ca-top-signout {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 34px;
+    padding: 0 13px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ca-ink);
+    background: var(--ca-surface);
+    border: 1.2px solid var(--ca-ink);
+    border-radius: 999px;
+    transition: background 120ms;
+}
+
+.ca-top-signout:hover:not(:disabled) {
+    background: var(--ca-sunken);
+}
+
+@media (max-width: 960px) {
+    .ca-top-username {
+        display: none;
+    }
+}
+
+@media (max-width: 720px) {
+    .ca-top {
+        flex-wrap: wrap;
+        gap: 10px 12px;
+        padding: 10px var(--ca-gutter);
+    }
+
+    .ca-top-mark {
+        display: flex;
+    }
+
+    .ca-top-hello {
+        font-size: 16px;
+    }
+
+    .ca-top-services {
+        order: 3;
+        width: 100%;
+        overflow-x: auto;
+        scrollbar-width: none;
+    }
+
+    .ca-service {
+        min-height: 30px;
+        flex-shrink: 0;
+        font-size: 12px;
+    }
+
+    .ca-top-user {
+        padding-left: 0;
+        border-left: none;
+    }
+
+    .ca-top-signout {
+        width: 36px;
+        height: 36px;
+        padding: 0;
+        justify-content: center;
+    }
+
+    .ca-top-signout-label {
+        display: none;
+    }
+}

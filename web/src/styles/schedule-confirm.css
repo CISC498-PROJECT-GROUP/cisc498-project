@@ -1,0 +1,47 @@
+/* The review dialog's confirm (the "I understand" checkbox, which the register button waits on) and
+   the edit dialog's fields. */
+
+.ca-sched-confirm {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.ca-sched-confirm p {
+    margin: 0;
+}
+
+.ca-sched-confirm-check {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 14px;
+    font-weight: 600;
+    background: var(--ca-alert-bg);
+    border: 1px solid var(--ca-alert-line);
+    border-radius: var(--ca-radius-sm);
+    cursor: pointer;
+}
+
+.ca-sched-confirm-check input {
+    width: 18px;
+    height: 18px;
+    margin: 1px 0 0;
+    accent-color: var(--ca-alert-ink);
+}
+
+.ca-edit-fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+@media (max-width: 520px) {
+    .ca-edit-fields {
+        grid-template-columns: 1fr;
+    }
+
+    .ca-modal-actions .ca-btn {
+        flex: 1;
+    }
+}

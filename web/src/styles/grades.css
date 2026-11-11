@@ -1,0 +1,145 @@
+/* The Courses page: a grid of course cards, each with its code, name and instructor, the current
+   score and letter, a meter, the breakdown by assignment group and links into Canvas. */
+
+.ca-course-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
+    gap: 16px;
+    align-items: start;
+}
+
+.ca-grade {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-width: 0;
+    padding: 18px 20px 16px;
+    background: var(--ca-surface);
+    border: 1px solid var(--ca-line);
+    border-top: 5px solid var(--ca-course);
+    border-radius: var(--ca-radius);
+}
+
+.ca-grade-head {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.ca-grade-name {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.ca-grade-code {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    color: var(--ca-course);
+}
+
+.ca-grade-title {
+    margin: 0;
+    font-family: var(--ca-font-display);
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+}
+
+.ca-grade-teacher {
+    font-size: 13px;
+    color: var(--ca-muted);
+}
+
+.ca-grade-score {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+}
+
+.ca-grade-pct {
+    font-family: var(--ca-font-display);
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+}
+
+.ca-grade-letter {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ca-accent-ink);
+}
+
+.ca-meter {
+    display: block;
+    width: 100%;
+    height: 8px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: var(--ca-sunken);
+}
+
+.ca-meter-fill {
+    display: block;
+    height: 100%;
+    border-radius: 999px;
+    background: var(--ca-accent);
+    transition: width 500ms var(--ca-ease);
+}
+
+.ca-grade-body {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.ca-cat-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.ca-cat {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 7px 0;
+    font-size: 14px;
+}
+
+.ca-cat + .ca-cat {
+    border-top: 1px solid var(--ca-divider);
+}
+
+.ca-cat-name {
+    font-weight: 600;
+}
+
+.ca-cat-weight {
+    margin-left: 8px;
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--ca-muted);
+}
+
+.ca-cat-score {
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+.ca-grade-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 18px;
+    padding-top: 12px;
+    border-top: 1px dashed var(--ca-line);
+}

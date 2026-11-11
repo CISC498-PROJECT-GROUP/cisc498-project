@@ -1,0 +1,43 @@
+/* Home's ask card: the assistant's way in, picked out from the data cards by its green ground and
+   ink outline. */
+
+.ca-ask-card {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 18px 20px 20px;
+    background: var(--ca-accent-tint);
+    border: 1.5px solid var(--ca-ink);
+    border-radius: var(--ca-radius);
+    box-shadow: 0 3px 0 var(--ca-ink);
+}
+
+.ca-ask-head {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.ca-ask-head .ca-avatar {
+    width: 34px;
+    height: 34px;
+    margin: 0;
+}
+
+.ca-ask-sub {
+    margin: 3px 0 0;
+    font-size: 13px;
+    color: var(--ca-muted);
+}
+
+.ca-ask-starters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+@media (max-width: 720px) {
+    .ca-ask-card {
+        padding: 16px;
+    }
+}

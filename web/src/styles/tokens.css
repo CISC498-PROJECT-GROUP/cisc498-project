@@ -1,0 +1,132 @@
+/* Design tokens. Components never hardcode a colour — they use these. The palette is the product's
+   own (the "Brilliant-inspired" redesign in the Canvas Assistant Figma file): warm paper ground,
+   near-black ink outlines and one bright green for the action that matters. The green is the
+   product's identity; a school blue would fight the course colours that carry meaning on every
+   screen.
+
+   Fonts: Poppins for display type and Inter for text, loaded by static/index.html, each falling
+   back to the system UI face. */
+
+:root {
+    --ca-accent: #27d655;
+    --ca-accent-ink: #116d2c;
+    --ca-accent-soft: #e9f9e8;
+    --ca-accent-tint: #f4fcf3;
+    --ca-on-accent: #171b18;
+
+    --ca-ink: #171b18;
+    --ca-ink-2: #2f3530;
+    --ca-muted: #646b65;
+    --ca-faint: #8e958e;
+    --ca-line: #d6dbd3;
+    --ca-line-2: #c2c9bf;
+    --ca-divider: #e7ede4;
+    --ca-surface: #ffffff;
+    --ca-ground: #fafaf5;
+    --ca-sunken: #e7ede4;
+
+    --ca-alert-ink: #b74426;
+    --ca-alert-line: #b5542d;
+    --ca-alert-bg: #fff0e9;
+    --ca-done-ink: #116d2c;
+    --ca-done-bg: #e9f9e8;
+
+    /* The dashboard page's source tags: which system a card reads. */
+    --ca-src-canvas: #b5542d;
+    --ca-src-stellic: #3b5a9a;
+
+    /* The pressable look: an ink outline and a hard drop in the darker green, like a key. */
+    --ca-press: 0 2px 0 var(--ca-accent-ink);
+    --ca-press-lg: 0 3px 0 var(--ca-accent-ink);
+    --ca-shadow-card: none;
+    --ca-shadow-lift: 0 6px 16px -8px rgba(23, 27, 24, 0.18);
+    --ca-shadow-panel: 0 10px 24px -8px rgba(23, 27, 24, 0.16), 0 28px 60px -16px rgba(23, 27, 24, 0.26);
+    --ca-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+    --ca-font: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    --ca-font-display: Poppins, Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    --ca-radius: 14px;
+    --ca-radius-sm: 10px;
+
+    /* The shell's fixed parts, which the chat page sizes itself against. */
+    --ca-nav-w: 232px;
+    --ca-top-h: 64px;
+    --ca-bottom-h: 0px;
+    --ca-gutter: 32px;
+}
+
+body {
+    margin: 0;
+    background: var(--ca-ground);
+}
+
+.ca-root {
+    min-height: 100vh;
+    font-family: var(--ca-font);
+    font-size: 14px;
+    line-height: 1.45;
+    color: var(--ca-ink);
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Resets are wrapped in :where() so they carry zero specificity — any component class, however
+   plain, overrides them. Without it `.ca-root button` outranks `.ca-launcher` and every button
+   loses its colour. */
+:where(.ca-root) *,
+:where(.ca-root) *::before,
+:where(.ca-root) *::after {
+    box-sizing: border-box;
+}
+
+:where(.ca-root) :is(button, input, textarea, select) {
+    font: inherit;
+    color: inherit;
+}
+
+:where(.ca-root) button {
+    cursor: pointer;
+}
+
+:where(.ca-root) button:disabled {
+    cursor: default;
+}
+
+.ca-root :focus-visible {
+    outline: 2px solid var(--ca-accent-ink);
+    outline-offset: 2px;
+}
+
+.ca-sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+}
+
+.ca-display {
+    font-family: var(--ca-font-display);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+}
+
+.ca-muted {
+    color: var(--ca-muted);
+}
+
+.ca-small {
+    font-size: 13px;
+}
+
+.ca-faint {
+    color: var(--ca-faint);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ca-root *,
+    .ca-root *::before,
+    .ca-root *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+    }
+}

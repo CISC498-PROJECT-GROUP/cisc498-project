@@ -6,29 +6,18 @@ const courseId = { type: 'string', description: 'Canvas course id, from list_cou
 export const CONTENT_TOOLS = [
     {
         name: 'get_syllabus',
-        description:
-            "The course's Syllabus page as text. Often empty or just a link — many instructors put the syllabus in a file (usually a PDF), a page, or a module instead; if so, look there with list_files / list_pages / list_modules.",
+        description: "The course's Syllabus page as text. Often empty or just a link — many instructors put the syllabus in a file (usually a PDF), a page, or a module instead; if so, look there with list_files / list_pages / list_modules.",
         input_schema: { type: 'object', properties: { course_id: courseId }, required: ['course_id'], additionalProperties: false },
     },
     {
         name: 'list_pages',
         description: 'The wiki pages in a course (title, url slug, last updated). Optionally filter by a search term matched against titles.',
-        input_schema: {
-            type: 'object',
-            properties: { course_id: courseId, search: { type: 'string', description: 'Only pages whose title contains this, e.g. "syllabus".' } },
-            required: ['course_id'],
-            additionalProperties: false,
-        },
+        input_schema: { type: 'object', properties: { course_id: courseId, search: { type: 'string', description: 'Only pages whose title contains this, e.g. "syllabus".' } }, required: ['course_id'], additionalProperties: false },
     },
     {
         name: 'get_page',
         description: 'One wiki page as text.',
-        input_schema: {
-            type: 'object',
-            properties: { course_id: courseId, page_url: { type: 'string', description: 'The page url slug from list_pages or a module item.' } },
-            required: ['course_id', 'page_url'],
-            additionalProperties: false,
-        },
+        input_schema: { type: 'object', properties: { course_id: courseId, page_url: { type: 'string', description: 'The page url slug from list_pages or a module item.' } }, required: ['course_id', 'page_url'], additionalProperties: false },
     },
     {
         name: 'list_modules',
@@ -38,12 +27,7 @@ export const CONTENT_TOOLS = [
     {
         name: 'list_files',
         description: 'Files uploaded to a course (id, name, type, size, updated). Optionally filter by a search term, e.g. "syllabus" or "schedule". Some courses hide the Files list from students; module items still link files.',
-        input_schema: {
-            type: 'object',
-            properties: { course_id: courseId, search: { type: 'string', description: 'Only files whose name contains this (2+ characters).' } },
-            required: ['course_id'],
-            additionalProperties: false,
-        },
+        input_schema: { type: 'object', properties: { course_id: courseId, search: { type: 'string', description: 'Only files whose name contains this (2+ characters).' } }, required: ['course_id'], additionalProperties: false },
     },
     {
         name: 'read_file',

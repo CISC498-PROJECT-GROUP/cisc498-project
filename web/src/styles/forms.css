@@ -1,0 +1,111 @@
+/* Form fields and buttons shared by the sign-in screen, the submit panel and the page actions. */
+
+.ca-field-label {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ca-ink-2);
+}
+
+.ca-field {
+    width: 100%;
+    min-height: 44px;
+    padding: 9px 13px;
+    font-size: 15px;
+    font-weight: 400;
+    color: var(--ca-ink);
+    background: var(--ca-surface);
+    border: 1.2px solid var(--ca-line-2);
+    border-radius: 10px;
+    outline: none;
+    transition:
+        border-color 140ms,
+        box-shadow 140ms;
+}
+
+.ca-field:focus {
+    border-color: var(--ca-ink);
+    box-shadow: 0 0 0 3px var(--ca-accent-soft);
+}
+
+.ca-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 38px;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 700;
+    white-space: nowrap;
+    text-decoration: none;
+    border: none;
+    border-radius: 999px;
+    transition:
+        filter 140ms,
+        opacity 140ms;
+}
+
+.ca-btn:disabled {
+    opacity: 0.55;
+}
+
+.ca-btn--primary {
+    color: var(--ca-on-accent);
+    background: var(--ca-accent);
+    border: 1.2px solid var(--ca-accent-ink);
+    box-shadow: var(--ca-press);
+}
+
+.ca-btn--primary:hover:not(:disabled) {
+    filter: brightness(1.08);
+}
+
+.ca-btn--quiet {
+    color: var(--ca-ink);
+    background: var(--ca-surface);
+    border: 1px solid var(--ca-ink);
+}
+
+.ca-btn--wide {
+    align-self: stretch;
+}
+
+.ca-field--code {
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: 0.3em;
+    font-variant-numeric: tabular-nums;
+}
+
+.ca-field:disabled {
+    background: var(--ca-ground);
+    color: var(--ca-muted);
+}
+
+.ca-field::placeholder {
+    color: var(--ca-faint);
+    letter-spacing: normal;
+}
+
+.ca-btn--quiet:hover:not(:disabled) {
+    background: var(--ca-sunken);
+}
+
+.ca-btn--block {
+    width: 100%;
+    min-height: 46px;
+    font-size: 15px;
+    border-radius: 12px;
+}
+
+.ca-btn--primary.ca-btn--block {
+    box-shadow: var(--ca-press-lg);
+}
+
+.ca-btn--primary:active:not(:disabled) {
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 var(--ca-accent-ink);
+}

@@ -1,0 +1,43 @@
+/* The Degree page: the two headline figures and the terms planned after next. The program list,
+   credit bar, advising and history are the dashboard's (dash-stellic.css, dash-people.css). */
+
+.ca-stats--two {
+    grid-template-columns: minmax(180px, 1fr) minmax(0, 3fr);
+}
+
+.ca-later {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+}
+
+.ca-later-term {
+    padding: 12px 14px;
+    background: var(--ca-ground);
+    border: 1px solid var(--ca-divider);
+    border-radius: var(--ca-radius-sm);
+}
+
+.ca-later-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 10px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ca-ink-2);
+}
+
+@media (max-width: 900px) {
+    .ca-stats--two {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+@media (max-width: 720px) {
+    .ca-stats--two .ca-stat--wide {
+        order: 0;
+    }
+}

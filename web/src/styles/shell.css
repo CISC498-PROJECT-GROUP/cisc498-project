@@ -1,0 +1,116 @@
+/* The signed-in layout: the nav (sidebar → icon rail → bottom bar as the screen narrows), the main
+   column, the page entrance and the shared mark and icon button. The top bar is in top-bar.css,
+   page headings in page.css. */
+
+.ca-shell {
+    display: grid;
+    grid-template-columns: var(--ca-nav-w) minmax(0, 1fr);
+    min-height: 100vh;
+}
+
+.ca-skip {
+    position: fixed;
+    top: -60px;
+    left: 16px;
+    z-index: 50;
+    padding: 10px 14px;
+    font-weight: 700;
+    color: var(--ca-on-accent);
+    background: var(--ca-accent);
+    border: 1.5px solid var(--ca-ink);
+    border-radius: var(--ca-radius-sm);
+    text-decoration: none;
+}
+
+.ca-skip:focus {
+    top: 12px;
+}
+
+.ca-mark {
+    flex-shrink: 0;
+    width: 30px;
+    height: 30px;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ca-on-accent);
+    background: var(--ca-accent);
+    border: 1.5px solid var(--ca-ink);
+}
+
+.ca-mark--lg {
+    width: 44px;
+    height: 44px;
+    box-shadow: 0 3px 0 var(--ca-ink);
+}
+
+.ca-shell-main {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.ca-main {
+    flex: 1;
+    width: 100%;
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 28px var(--ca-gutter) 48px;
+    outline: none;
+}
+
+.ca-page {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    animation: ca-enter 240ms var(--ca-ease);
+}
+
+@keyframes ca-enter {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+}
+
+/* The assistant fills the window instead of scrolling it: the thread scrolls inside. */
+.ca-shell--assistant .ca-shell-main {
+    height: calc(100vh - var(--ca-bottom-h));
+    height: calc(100dvh - var(--ca-bottom-h));
+}
+
+.ca-shell--assistant .ca-main {
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 24px;
+}
+
+.ca-shell--assistant .ca-page {
+    flex: 1;
+    min-height: 0;
+}
+
+.ca-icon-btn {
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: none;
+    border-radius: var(--ca-radius-sm);
+    background: transparent;
+    color: var(--ca-ink);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 120ms;
+}
+
+.ca-icon-btn:hover:not(:disabled) {
+    background: var(--ca-sunken);
+}
+
+.ca-icon-btn:disabled {
+    opacity: 0.4;
+}

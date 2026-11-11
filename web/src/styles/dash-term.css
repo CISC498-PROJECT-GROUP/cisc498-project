@@ -1,0 +1,129 @@
+/* This semester's course rows: Stellic's code, title and status joined to Canvas's grade and next item. */
+
+.ca-term-list,
+.ca-due-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.ca-term-row {
+    display: grid;
+    grid-template-columns: 4px minmax(0, 1fr) auto;
+    gap: 14px;
+    align-items: center;
+    padding: 12px 0;
+}
+
+.ca-term-row + .ca-term-row {
+    border-top: 1px solid var(--ca-divider);
+}
+
+.ca-term-swatch {
+    align-self: stretch;
+    border-radius: 4px;
+    background: var(--ca-course);
+}
+
+.ca-term-name {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    min-width: 0;
+}
+
+.ca-term-code {
+    flex-shrink: 0;
+    font-weight: 700;
+}
+
+.ca-term-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--ca-ink-2);
+}
+
+.ca-term-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 12px;
+    margin-top: 4px;
+    font-size: 12px;
+    color: var(--ca-muted);
+}
+
+.ca-term-next {
+    color: var(--ca-accent-ink);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.ca-term-next:hover,
+.ca-due-title:hover {
+    text-decoration: underline;
+}
+
+.ca-term-more {
+    font-weight: 400;
+    color: var(--ca-muted);
+}
+
+.ca-term-link {
+    display: grid;
+    grid-template-columns: auto auto;
+    align-items: center;
+    column-gap: 6px;
+    padding: 6px 10px;
+    color: var(--ca-ink);
+    text-align: right;
+    text-decoration: none;
+    border-radius: var(--ca-radius-sm);
+}
+
+.ca-term-link:hover {
+    background: var(--ca-ground);
+}
+
+.ca-term-value {
+    font-family: var(--ca-font-display);
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.ca-term-letter {
+    grid-row: 2;
+    font-size: 12px;
+    color: var(--ca-muted);
+}
+
+.ca-term-link svg {
+    grid-row: 1 / span 2;
+    grid-column: 2;
+    color: var(--ca-faint);
+}
+
+.ca-term-skel {
+    width: 56px;
+    height: 22px;
+}
+
+.ca-also {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 10px;
+    margin: 0;
+    padding-top: 12px;
+    font-size: 12px;
+    border-top: 1px dashed var(--ca-line);
+}
+
+.ca-also-label {
+    font-weight: 600;
+    color: var(--ca-muted);
+}
+
+.ca-also-link {
+    color: var(--ca-ink-2);
+}

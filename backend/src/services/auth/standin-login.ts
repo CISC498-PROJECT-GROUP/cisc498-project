@@ -18,11 +18,14 @@ function signIn(session: Session, username: string): void {
 export function startStandinLogin(session: Session, username: string): void {
     session.status = { step: 'working', message: 'Contacting UD (stand-in)…' };
     let approve: ReturnType<typeof setTimeout> | undefined;
+    let start: ReturnType<typeof setTimeout> | undefined;
     const waitForPush = () => {
         session.status = { step: 'duo-waiting', message: 'Duo is waiting for you — approve the sign-in on your phone. (Stand-in: approves itself.)', methods: ['push', 'call', 'passcode'] };
         approve = setTimeout(() => signIn(session, username), AUTO_APPROVE_MS);
     };
     session.answer = (reply: DuoAction) => {
+        // An answer that beats the first "push" cancels it — it must not put the session back to waiting.
+        clearTimeout(start);
         clearTimeout(approve);
         if (reply.action === 'passcode') {
             if (reply.code.trim() === STANDIN_PASSCODE) signIn(session, username);
@@ -31,5 +34,5 @@ export function startStandinLogin(session: Session, username: string): void {
             session.status = { step: 'duo-passcode', message: 'Enter a passcode from Duo Mobile, a text message, or a bypass code. (Stand-in: 123456.)', methods: ['push', 'call', 'passcode'] };
         } else waitForPush();
     };
-    setTimeout(waitForPush, 800);
+    start = setTimeout(waitForPush, 800);
 }

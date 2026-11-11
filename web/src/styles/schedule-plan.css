@@ -1,0 +1,178 @@
+/* The schedule builder's plan (adds, swaps, drops, their options and the footer with the register
+   button), and the tags, mini buttons and list resets the schedule cards share. */
+
+.ca-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+    color: var(--ca-ink-2);
+    background: var(--ca-sunken);
+    border-radius: 999px;
+}
+
+.ca-tag--done {
+    color: var(--ca-done-ink);
+    background: var(--ca-done-bg);
+}
+
+.ca-tag--warn {
+    color: var(--ca-alert-ink);
+    background: var(--ca-alert-bg);
+}
+
+.ca-mini-btn {
+    min-height: 32px;
+    padding: 4px 11px;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+    color: var(--ca-ink);
+    background: var(--ca-surface);
+    border: 1px solid var(--ca-line-2);
+    border-radius: 999px;
+    transition:
+        border-color 120ms,
+        background 120ms;
+}
+
+.ca-mini-btn:hover {
+    border-color: var(--ca-ink);
+}
+
+.ca-mini-btn[aria-pressed='true'] {
+    background: var(--ca-sunken);
+}
+
+.ca-mini-btn--alert {
+    color: var(--ca-alert-ink);
+}
+
+.ca-mini-btn--alert:hover {
+    border-color: var(--ca-alert-line);
+    background: var(--ca-alert-bg);
+}
+
+.ca-mini-select {
+    min-height: 32px;
+    padding: 4px 8px;
+    font-size: 12px;
+    background: var(--ca-surface);
+    border: 1px solid var(--ca-line-2);
+    border-radius: 8px;
+}
+
+.ca-plan-list,
+.ca-reg-list,
+.ca-stellic-list,
+.ca-reg-card-list {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.ca-plan-list {
+    gap: 10px;
+}
+
+.ca-plan-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 12px 14px;
+    background: color-mix(in srgb, var(--ca-src-stellic) 6%, var(--ca-surface));
+    border: 1.5px dashed var(--ca-src-stellic);
+    border-radius: var(--ca-radius-sm);
+}
+
+.ca-plan-item--drop {
+    background: var(--ca-ground);
+    border-color: var(--ca-line-2);
+}
+
+.ca-plan-item p {
+    margin: 0;
+}
+
+.ca-plan-item-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.ca-plan-item-head .ca-search-code {
+    flex: 1;
+    min-width: 0;
+    white-space: normal;
+}
+
+.ca-plan-item-head .ca-icon-btn {
+    width: 32px;
+    height: 32px;
+}
+
+.ca-plan-kind {
+    padding: 2px 7px;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--ca-surface);
+    background: var(--ca-src-stellic);
+    border-radius: 5px;
+}
+
+.ca-plan-kind--drop {
+    background: var(--ca-alert-line);
+}
+
+.ca-plan-title {
+    font-weight: 600;
+}
+
+.ca-plan-opts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+    margin-top: 6px;
+}
+
+.ca-plan-opt {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 12px;
+    color: var(--ca-muted);
+}
+
+.ca-plan-opt--check {
+    color: var(--ca-ink-2);
+}
+
+.ca-plan-foot {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-top: 12px;
+    border-top: 1px solid var(--ca-divider);
+}
+
+.ca-plan-foot p {
+    margin: 0;
+}
+
+.ca-plan-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: 13px;
+}
+
+.ca-plan-total strong {
+    font-family: var(--ca-font-display);
+    font-size: 17px;
+}

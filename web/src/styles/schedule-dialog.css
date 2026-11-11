@@ -1,0 +1,159 @@
+/* The schedule builder's dialogs on the native <dialog>: the frame and backdrop, and the review list
+   of writes with each one's status and WebReg's messages and errors. The confirm and the edit fields
+   are in schedule-confirm.css. */
+
+.ca-modal {
+    width: min(560px, calc(100vw - 24px));
+    max-height: calc(100vh - 48px);
+    padding: 0;
+    color: var(--ca-ink);
+    background: var(--ca-surface);
+    border: 1.5px solid var(--ca-ink);
+    border-radius: var(--ca-radius);
+    box-shadow: var(--ca-shadow-panel);
+}
+
+.ca-modal::backdrop {
+    background: color-mix(in srgb, var(--ca-ink) 40%, transparent);
+}
+
+.ca-modal-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 16px 18px 0;
+}
+
+.ca-modal-title {
+    margin: 0;
+    font-family: var(--ca-font-display);
+    font-size: 19px;
+    font-weight: 700;
+}
+
+.ca-modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 12px 18px 18px;
+}
+
+.ca-modal-lead {
+    margin: 0;
+    color: var(--ca-ink-2);
+}
+
+.ca-modal-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.ca-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.ca-step {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 12px 14px;
+    border: 1px solid var(--ca-line);
+    border-radius: var(--ca-radius-sm);
+}
+
+.ca-step--done {
+    border-color: var(--ca-accent-ink);
+    background: var(--ca-accent-tint);
+}
+
+.ca-step--failed {
+    border-color: var(--ca-alert-line);
+    background: var(--ca-alert-bg);
+}
+
+.ca-step--skipped {
+    opacity: 0.6;
+}
+
+.ca-step-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.ca-step-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    font-size: 12px;
+    font-weight: 700;
+    border: 1.5px solid var(--ca-ink);
+    border-radius: 50%;
+}
+
+.ca-step--done .ca-step-num {
+    color: var(--ca-on-accent);
+    background: var(--ca-accent);
+    border-color: var(--ca-accent-ink);
+}
+
+.ca-step--failed .ca-step-num {
+    color: var(--ca-alert-ink);
+    border-color: var(--ca-alert-line);
+}
+
+.ca-step-verb {
+    flex: 1;
+    font-weight: 700;
+}
+
+.ca-step-status {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ca-muted);
+}
+
+.ca-step--running .ca-step-status {
+    color: var(--ca-accent-ink);
+}
+
+.ca-step-lines,
+.ca-step-results {
+    margin: 0;
+    padding-left: 34px;
+    font-size: 13px;
+}
+
+.ca-step-results {
+    list-style: none;
+    font-size: 12px;
+}
+
+.ca-step-ok {
+    color: var(--ca-done-ink);
+}
+
+.ca-step-no {
+    color: var(--ca-alert-ink);
+}
+
+.ca-step-msg,
+.ca-step-err {
+    margin: 0 0 0 34px;
+    font-size: 12px;
+}
+
+.ca-step-err {
+    font-weight: 600;
+    color: var(--ca-alert-ink);
+}

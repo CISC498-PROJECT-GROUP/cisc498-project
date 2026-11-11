@@ -1,0 +1,196 @@
+/* The schedule builder's search card: the field, course and section rows, a section's detail with
+   its facts, notes and lab picker, and the conflict and seat notes. */
+
+.ca-search-field {
+    display: block;
+}
+
+.ca-search-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    max-height: 460px;
+    overflow-y: auto;
+}
+
+.ca-search-course,
+.ca-section-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 10px;
+    width: 100%;
+    min-height: 44px;
+    padding: 10px 12px;
+    text-align: left;
+    background: var(--ca-surface);
+    border: 1px solid var(--ca-line);
+    border-radius: var(--ca-radius-sm);
+    transition:
+        border-color 120ms,
+        background 120ms;
+}
+
+.ca-search-course:hover,
+.ca-section-row:hover,
+.ca-search-course:focus-visible,
+.ca-section-row:focus-visible {
+    border-color: var(--ca-ink);
+    background: var(--ca-ground);
+}
+
+.ca-section-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 3px;
+}
+
+.ca-section-row-top {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.ca-section-row-when {
+    font-size: 13px;
+    color: var(--ca-ink-2);
+}
+
+.ca-search-code {
+    font-weight: 700;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+.ca-search-title {
+    flex: 1;
+    min-width: 0;
+    color: var(--ca-ink-2);
+}
+
+.ca-search-crumb {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 10px;
+    margin-bottom: 10px;
+}
+
+.ca-seat {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ca-accent-ink);
+    white-space: nowrap;
+}
+
+.ca-seat--full {
+    color: var(--ca-alert-ink);
+}
+
+.ca-clash {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin: 0;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ca-alert-ink);
+}
+
+.ca-detail {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.ca-detail > .ca-btn {
+    align-self: stretch;
+}
+
+.ca-detail-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 10px;
+    font-size: 15px;
+}
+
+.ca-detail-facts {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 6px 14px;
+    margin: 0;
+    font-size: 13px;
+}
+
+.ca-detail-facts dt {
+    font-weight: 700;
+    color: var(--ca-muted);
+}
+
+.ca-detail-facts dd {
+    margin: 0;
+}
+
+.ca-detail-note {
+    margin: 0;
+    padding: 8px 10px;
+    font-size: 12px;
+    background: var(--ca-ground);
+    border-left: 3px solid var(--ca-line-2);
+    border-radius: 4px;
+}
+
+.ca-detail-descr {
+    margin: 0;
+    font-size: 13px;
+    color: var(--ca-ink-2);
+}
+
+.ca-detail-pick {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+    margin: 0;
+    padding: 10px 12px 12px;
+    border: 1px solid var(--ca-line);
+    border-radius: var(--ca-radius-sm);
+}
+
+.ca-detail-pick legend {
+    padding: 0 4px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.ca-pick {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    min-height: 36px;
+    padding: 6px 4px;
+    font-size: 13px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.ca-pick:hover {
+    background: var(--ca-ground);
+}
+
+.ca-pick input {
+    margin-top: 3px;
+    accent-color: var(--ca-accent-ink);
+}
+
+.ca-pick-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}

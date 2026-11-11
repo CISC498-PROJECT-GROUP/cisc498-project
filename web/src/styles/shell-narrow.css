@@ -1,0 +1,120 @@
+/* The shell on narrower screens. A tablet keeps the nav at the side as a rail of icons; a phone
+   moves it to a bar along the bottom (icon over a one-word label) and the gutters drop to 16px. */
+
+@media (max-width: 1100px) {
+    .ca-root {
+        --ca-nav-w: 76px;
+        --ca-gutter: 24px;
+    }
+
+    .ca-nav {
+        align-items: center;
+        padding-inline: 12px;
+    }
+
+    .ca-nav-brand {
+        padding: 0;
+    }
+
+    .ca-nav-brand-name,
+    .ca-nav-foot {
+        display: none;
+    }
+
+    .ca-nav-link {
+        justify-content: center;
+        width: 48px;
+        padding: 0;
+    }
+
+    .ca-nav-label {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+        white-space: nowrap;
+    }
+}
+
+@media (max-width: 720px) {
+    .ca-root {
+        --ca-bottom-h: 64px;
+        --ca-gutter: 16px;
+    }
+
+    .ca-shell {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .ca-nav {
+        position: fixed;
+        top: auto;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 20;
+        height: calc(var(--ca-bottom-h) + env(safe-area-inset-bottom, 0px));
+        flex-direction: row;
+        padding: 0 4px env(safe-area-inset-bottom, 0px);
+        border-right: none;
+        border-top: 1px solid var(--ca-line);
+    }
+
+    .ca-nav-brand {
+        display: none;
+    }
+
+    .ca-nav-list {
+        flex: 1;
+        flex-direction: row;
+        gap: 0;
+        height: 100%;
+    }
+
+    .ca-nav-list > li {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+    }
+
+    .ca-nav-link,
+    .ca-nav-link--on,
+    .ca-nav-link--on:hover {
+        flex: 1;
+        width: auto;
+        flex-direction: column;
+        gap: 3px;
+        margin: 6px 1px;
+        border: none;
+        box-shadow: none;
+        border-radius: 10px;
+    }
+
+    .ca-nav-link--on {
+        background: var(--ca-accent-soft);
+    }
+
+    .ca-nav-short {
+        display: block;
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-size: 10px;
+        font-weight: 700;
+        line-height: 1;
+        white-space: nowrap;
+    }
+
+    .ca-main {
+        padding: 20px var(--ca-gutter) calc(var(--ca-bottom-h) + 28px);
+    }
+
+    .ca-shell--assistant .ca-main {
+        padding-bottom: 12px;
+    }
+
+    .ca-page {
+        gap: 16px;
+    }
+}

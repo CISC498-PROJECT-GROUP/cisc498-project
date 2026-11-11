@@ -1,0 +1,180 @@
+/* The Assistant page: one card that fills the window — its header, the thread (which scrolls on
+   its own) and the composer foot — then the messages and the live status line. The empty state is
+   in chat-empty.css, the composer in composer.css. */
+
+.ca-chat-page {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--ca-surface);
+    border: 1px solid var(--ca-line);
+    border-radius: 18px;
+}
+
+.ca-chat-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px 12px 20px;
+    border-bottom: 1px solid var(--ca-line);
+}
+
+.ca-chat-head .ca-avatar {
+    width: 34px;
+    height: 34px;
+    margin: 0;
+}
+
+.ca-chat-head-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.ca-chat-title {
+    margin: 0;
+    font-family: var(--ca-font-display);
+    font-size: 19px;
+    font-weight: 700;
+    line-height: 1.25;
+}
+
+.ca-chat-sub {
+    margin: 0;
+    font-size: 13px;
+    color: var(--ca-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.ca-thread {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 28px max(20px, calc((100% - 760px) / 2));
+    background: var(--ca-ground);
+    scrollbar-width: thin;
+    scrollbar-color: var(--ca-line-2) transparent;
+}
+
+.ca-thread > * {
+    flex-shrink: 0;
+}
+
+.ca-msg {
+    display: flex;
+    gap: 10px;
+    animation: ca-enter 220ms var(--ca-ease);
+}
+
+.ca-msg--user {
+    justify-content: flex-end;
+}
+
+.ca-bubble {
+    max-width: 82%;
+    padding: 10px 15px;
+    font-size: 15px;
+    color: var(--ca-ink);
+    background: var(--ca-accent-soft);
+    border: 1px solid var(--ca-accent-ink);
+    border-radius: 14px 14px 4px 14px;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.ca-avatar {
+    flex-shrink: 0;
+    width: 30px;
+    height: 30px;
+    margin-top: 0;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ca-on-accent);
+    background: var(--ca-accent);
+    border: 1.2px solid var(--ca-ink);
+}
+
+.ca-avatar--lg {
+    width: 64px;
+    height: 64px;
+    margin: 0;
+    border-width: 2px;
+}
+
+.ca-avatar--busy {
+    animation: ca-breathe 1.6s ease-in-out infinite;
+}
+
+@keyframes ca-breathe {
+    50% {
+        transform: scale(0.88);
+        opacity: 0.75;
+    }
+}
+
+.ca-answer {
+    min-width: 0;
+    flex: 1;
+    padding-top: 4px;
+    font-size: 15px;
+    color: var(--ca-ink-2);
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+}
+
+.ca-status {
+    padding-top: 4px;
+}
+
+.ca-status-text {
+    font-size: 13px;
+    font-weight: 700;
+    color: transparent;
+    background: linear-gradient(90deg, var(--ca-faint) 0%, var(--ca-ink-2) 40%, var(--ca-faint) 80%) 0 0 / 200% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    animation: ca-shimmer 1.8s linear infinite;
+}
+
+@keyframes ca-shimmer {
+    to {
+        background-position: -200% 0;
+    }
+}
+
+.ca-msg--error {
+    align-items: flex-start;
+    gap: 8px;
+    padding: 12px 14px;
+    font-size: 14px;
+    color: var(--ca-alert-ink);
+    background: var(--ca-alert-bg);
+    border: 1px solid var(--ca-alert-line);
+    border-radius: 12px;
+}
+
+@media (max-width: 720px) {
+    .ca-chat-page {
+        border-radius: var(--ca-radius);
+    }
+
+    .ca-chat-head {
+        padding: 10px 12px 10px 14px;
+    }
+
+    .ca-chat-sub {
+        display: none;
+    }
+
+    .ca-thread {
+        padding: 18px 14px;
+    }
+}

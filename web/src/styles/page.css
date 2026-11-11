@@ -1,0 +1,80 @@
+/* Page headings (kicker, title, sub-line and the page's actions), the two-column card grid most
+   pages sit on, and the line at the foot of Home. */
+
+.ca-page-head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 14px 20px;
+}
+
+.ca-page-head-text {
+    min-width: 0;
+    flex: 1 1 340px;
+}
+
+.ca-page-kicker {
+    margin: 0 0 6px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ca-accent-ink);
+}
+
+.ca-page-title {
+    margin: 0;
+    font-family: var(--ca-font-display);
+    font-size: clamp(26px, 3vw, 34px);
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+}
+
+.ca-page-sub {
+    margin: 8px 0 0;
+    max-width: 68ch;
+    color: var(--ca-ink-2);
+}
+
+.ca-page-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.ca-dash-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    gap: 20px;
+    align-items: start;
+}
+
+.ca-dash-col {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-width: 0;
+}
+
+.ca-page-foot {
+    margin: 4px 0 0;
+    font-size: 12px;
+    text-align: center;
+    color: var(--ca-faint);
+}
+
+@media (max-width: 960px) {
+    .ca-dash-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+@media (max-width: 720px) {
+    .ca-dash-grid,
+    .ca-dash-col {
+        gap: 16px;
+    }
+}

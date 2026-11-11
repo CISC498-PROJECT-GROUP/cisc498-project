@@ -1,0 +1,62 @@
+/* The Duo method buttons on the sign-in screen: an icon tile, the method and a hint, a chevron. */
+
+.ca-duo-methods {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.ca-duo-method {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    min-height: 56px;
+    padding: 8px 14px 8px 10px;
+    text-align: left;
+    color: var(--ca-ink);
+    background: var(--ca-surface);
+    border: 1.3px solid var(--ca-ink);
+    border-radius: 12px;
+    transition:
+        transform 120ms var(--ca-ease),
+        box-shadow 120ms var(--ca-ease);
+}
+
+.ca-duo-method:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 0 var(--ca-ink);
+}
+
+.ca-duo-method:disabled {
+    opacity: 0.55;
+}
+
+.ca-duo-method-icon {
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ca-accent-ink);
+    background: var(--ca-accent-soft);
+    border-radius: 10px;
+}
+
+.ca-duo-method-text {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.ca-duo-method-label {
+    font-weight: 700;
+}
+
+.ca-duo-method-hint {
+    font-size: 12px;
+    color: var(--ca-muted);
+}

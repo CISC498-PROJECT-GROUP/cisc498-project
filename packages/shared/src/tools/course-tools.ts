@@ -23,7 +23,7 @@ export const COURSE_TOOLS = [
     },
     {
         name: 'list_assignments',
-        description: 'Every assignment in one course: id, name, due date, points, assignment group, and the student\'s submission status and score. Descriptions are omitted — use get_assignment for one assignment\'s full instructions.',
+        description: "Every assignment in one course: id, name, due date, points, assignment group, and the student's submission status and score. Descriptions are omitted — use get_assignment for one assignment's full instructions.",
         input_schema: { type: 'object', properties: { course_id: courseId }, required: ['course_id'], additionalProperties: false },
     },
     {
@@ -45,10 +45,6 @@ export const COURSE_TOOLS = [
     {
         name: 'list_announcements',
         description: 'Recent announcements, newest first, with their full text. Omit course_id for all courses.',
-        input_schema: {
-            type: 'object',
-            properties: { course_id: courseId, days_back: { type: 'integer', description: 'How far back to look. Default 30, max 180.' } },
-            additionalProperties: false,
-        },
+        input_schema: { type: 'object', properties: { course_id: courseId, days_back: { type: 'integer', description: 'How far back to look. Default 30, max 180.' } }, additionalProperties: false },
     },
 ] as const;

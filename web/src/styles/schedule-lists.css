@@ -1,0 +1,152 @@
+/* The registered sections with their actions, the Stellic plan's courses, Home's registration card,
+   and the builder's one-column order on narrower screens. */
+
+.ca-reg-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    align-items: center;
+    gap: 8px 16px;
+    padding: 12px 0;
+}
+
+.ca-reg-row + .ca-reg-row {
+    border-top: 1px solid var(--ca-divider);
+}
+
+.ca-reg-row--dropping .ca-reg-main {
+    opacity: 0.55;
+}
+
+.ca-reg-row--dropping .ca-search-code {
+    text-decoration: line-through;
+}
+
+.ca-reg-main {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.ca-reg-title {
+    font-weight: 600;
+}
+
+.ca-reg-facts {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+    text-align: right;
+}
+
+.ca-reg-actions {
+    display: flex;
+    gap: 6px;
+}
+
+.ca-stellic-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 9px 0;
+}
+
+.ca-stellic-row + .ca-stellic-row {
+    border-top: 1px solid var(--ca-divider);
+}
+
+.ca-stellic-text {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+}
+
+.ca-reg-card-window {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 10px;
+    margin: 0;
+}
+
+.ca-reg-card-credits {
+    margin: 0;
+    font-size: 14px;
+}
+
+.ca-reg-card-credits strong {
+    font-family: var(--ca-font-display);
+    font-size: 24px;
+}
+
+.ca-reg-card-list {
+    gap: 8px;
+}
+
+.ca-reg-card-list li {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 0 10px;
+}
+
+.ca-reg-card-list .ca-muted {
+    grid-column: 2;
+}
+
+.ca-reg-card-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ca-reg-card-link {
+    align-self: flex-start;
+}
+
+@media (max-width: 720px) {
+    .ca-reg-row {
+        grid-template-columns: minmax(0, 1fr) auto;
+    }
+
+    .ca-reg-actions {
+        grid-column: 1 / -1;
+        flex-wrap: wrap;
+    }
+}
+
+/* One column: the cards interleave so search and the plan sit right under the calendar. */
+@media (max-width: 1100px) {
+    .ca-sched {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .ca-sched-main,
+    .ca-sched-side {
+        display: contents;
+    }
+
+    .ca-sched-registered {
+        order: 4;
+    }
+
+    .ca-sched-stellic {
+        order: 5;
+    }
+
+    .ca-cal-card {
+        order: 1;
+    }
+
+    .ca-search {
+        order: 2;
+    }
+
+    .ca-plan {
+        order: 3;
+    }
+}

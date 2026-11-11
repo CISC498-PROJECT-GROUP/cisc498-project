@@ -1,0 +1,166 @@
+/* The submit panel on the Deadlines page: the assignment header, the submission's own fields, the
+   confirm step and the receipt. Shared fields and buttons are in forms.css. */
+
+.ca-submit-head {
+    display: flex;
+    gap: 12px;
+    padding: 12px 14px;
+    background: var(--ca-surface);
+    border: 1px solid var(--ca-line);
+    border-radius: var(--ca-radius);
+    box-shadow: var(--ca-shadow-card);
+}
+
+.ca-submit-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.ca-field--area {
+    min-height: 140px;
+    resize: vertical;
+    line-height: 1.45;
+}
+
+.ca-field--file {
+    padding: 7px 10px;
+    font-size: 13px;
+}
+
+.ca-file-list {
+    margin: 0;
+    padding: 0 2px;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 13px;
+}
+
+.ca-submit-error {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin: 0;
+    padding: 10px 12px;
+    font-size: 13px;
+    color: var(--ca-alert-ink);
+    background: var(--ca-alert-bg);
+    border-radius: 10px;
+}
+
+.ca-notice {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    margin: 0;
+    padding: 12px 14px;
+    font-size: 13px;
+    color: var(--ca-ink-2);
+    background: var(--ca-sunken);
+    border-radius: var(--ca-radius);
+}
+
+.ca-notice p {
+    margin: 0;
+}
+
+.ca-confirm {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 12px 14px;
+    background: var(--ca-accent-soft);
+    border: 1px solid var(--ca-accent-ink);
+    border-radius: var(--ca-radius);
+}
+
+.ca-confirm-text {
+    margin: 0;
+    font-size: 13px;
+}
+
+.ca-confirm-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.ca-receipt {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 28px 16px;
+    text-align: center;
+}
+
+.ca-receipt p {
+    margin: 0;
+}
+
+.ca-receipt-title {
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.ca-receipt .ca-confirm-actions {
+    justify-content: center;
+    margin-top: 8px;
+}
+
+.ca-deadlines {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+    align-items: start;
+}
+
+.ca-deadlines--submitting {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 420px);
+}
+
+.ca-submit-panel {
+    position: sticky;
+    top: calc(var(--ca-top-h) + 16px);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 16px 18px 20px;
+    background: var(--ca-surface);
+    border: 1.5px solid var(--ca-ink);
+    border-radius: var(--ca-radius);
+    box-shadow: 0 3px 0 var(--ca-ink);
+    animation: ca-enter 220ms var(--ca-ease);
+}
+
+.ca-submit-panel-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: -4px -6px -4px 0;
+}
+
+.ca-submit-body {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+@media (max-width: 960px) {
+    .ca-deadlines--submitting {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .ca-deadlines--submitting .ca-deadline-list {
+        display: none;
+    }
+
+    .ca-submit-panel {
+        position: static;
+    }
+}

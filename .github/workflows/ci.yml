@@ -1,4 +1,4 @@
-# Every PR and every push to main: typecheck, test, format check and an extension build.
+# Every PR and every push to main: typecheck, test, format check and an site build.
 # The same commands run locally — `bun run lint && bun run test && bun run format:check`.
 name: CI
 
@@ -31,5 +31,5 @@ jobs:
               run: bun run test
             - name: Format
               run: bun run format:check
-            - name: Build extension
+            - name: Build site
               run: bun run build

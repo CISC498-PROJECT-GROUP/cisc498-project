@@ -1,0 +1,183 @@
+/* The schedule builder's week grid: a time column and one column per day, hour lines drawn as a
+   repeating background, and blocks placed absolutely — registered solid, planned dashed and tinted,
+   a planned drop struck through, the search preview as a ghost, conflicts outlined in the alert
+   colour. It scrolls sideways inside its card on a narrow screen. */
+
+.ca-cal-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 12px;
+    margin: 0 0 0 auto;
+    padding: 0;
+    list-style: none;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--ca-muted);
+}
+
+.ca-cal-key {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.ca-cal-key::before {
+    content: '';
+    width: 12px;
+    height: 10px;
+    border-radius: 3px;
+    border: 1.5px solid var(--ca-accent-ink);
+    background: var(--ca-accent-soft);
+}
+
+.ca-cal-key--planned::before {
+    border-style: dashed;
+    border-color: var(--ca-src-stellic);
+    background: color-mix(in srgb, var(--ca-src-stellic) 12%, var(--ca-surface));
+}
+
+.ca-cal-key--dropping::before {
+    border-style: dashed;
+    border-color: var(--ca-line-2);
+    background: var(--ca-ground);
+}
+
+.ca-cal-key--conflict::before {
+    border-color: var(--ca-alert-line);
+    background: var(--ca-alert-bg);
+}
+
+.ca-cal-scroll {
+    overflow-x: auto;
+    margin: 0 -4px;
+    padding: 0 4px 4px;
+    border-radius: var(--ca-radius-sm);
+}
+
+.ca-cal {
+    display: grid;
+    min-width: 560px;
+}
+
+.ca-cal-corner,
+.ca-cal-day-head {
+    position: sticky;
+    top: 0;
+    padding: 6px 0 8px;
+    font-size: 12px;
+    font-weight: 700;
+    text-align: center;
+    color: var(--ca-ink-2);
+    background: var(--ca-surface);
+}
+
+.ca-cal-day-head abbr {
+    text-decoration: none;
+}
+
+.ca-cal-hours {
+    position: relative;
+}
+
+.ca-cal-hours span {
+    position: absolute;
+    right: 8px;
+    transform: translateY(-50%);
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--ca-faint);
+    font-variant-numeric: tabular-nums;
+}
+
+.ca-cal-hours span:first-child {
+    transform: none;
+}
+
+.ca-cal-col {
+    position: relative;
+    border-left: 1px solid var(--ca-divider);
+    background-image: linear-gradient(to bottom, var(--ca-divider) 1px, transparent 1px);
+    background-repeat: repeat-y;
+}
+
+.ca-cal-col:last-child {
+    border-right: 1px solid var(--ca-divider);
+}
+
+.ca-cal-block {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    padding: 4px 6px;
+    overflow: hidden;
+    font-size: 11px;
+    line-height: 1.25;
+    color: var(--ca-ink);
+    background: var(--ca-accent-soft);
+    border: 1.5px solid var(--ca-accent-ink);
+    border-radius: 7px;
+    transition: opacity 140ms;
+}
+
+.ca-cal-block--planned {
+    background: color-mix(in srgb, var(--ca-src-stellic) 12%, var(--ca-surface));
+    border-style: dashed;
+    border-color: var(--ca-src-stellic);
+}
+
+.ca-cal-block--dropping {
+    color: var(--ca-muted);
+    background: var(--ca-ground);
+    border-style: dashed;
+    border-color: var(--ca-line-2);
+}
+
+.ca-cal-block--dropping .ca-cal-code {
+    text-decoration: line-through;
+}
+
+.ca-cal-block--preview {
+    z-index: 2;
+    background: color-mix(in srgb, var(--ca-ink) 7%, var(--ca-surface));
+    border: 1.5px dashed var(--ca-ink);
+    box-shadow: var(--ca-shadow-lift);
+}
+
+.ca-cal-block--conflict {
+    border-color: var(--ca-alert-line);
+    border-style: solid;
+    background: var(--ca-alert-bg);
+}
+
+.ca-cal-code {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.ca-cal-block--conflict .ca-cal-code {
+    color: var(--ca-alert-ink);
+}
+
+.ca-cal-time,
+.ca-cal-room {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--ca-ink-2);
+}
+
+.ca-cal-room {
+    color: var(--ca-muted);
+}
+
+.ca-cal-untimed {
+    margin: 0;
+    font-size: 12px;
+    color: var(--ca-ink-2);
+}
