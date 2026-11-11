@@ -32,8 +32,11 @@ async function relay(req: Request, url: URL): Promise<Response> {
     try {
         const response = await fetch(target, { method: req.method, headers, body: req.method === 'GET' || req.method === 'HEAD' ? undefined : await req.arrayBuffer(), redirect: 'manual' });
         return new Response(response.body, { status: response.status, headers: response.headers });
-    } catch {
-        return Response.json({ data: null, statusCode: 502, message: `The backend isn't running on ${API} — start it with bun run dev:api.` }, { status: 502 });
+    } catch (error) {
+        const refused = /ECONNREFUSED|Unable to connect|ConnectionRefused/i.test(String(error));
+        const message = refused ? `The backend isn't running on ${API} — start it with bun run dev:api.` : `The backend dropped the request (${error instanceof Error ? error.message : String(error)}). Try again.`;
+        console.warn(`[serve] relay failed ${req.method} ${url.pathname}: ${String(error)}`);
+        return Response.json({ data: null, statusCode: 502, message }, { status: 502 });
     }
 }
 

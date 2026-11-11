@@ -14,7 +14,6 @@ import page from './page.css' with { type: 'text' };
 import forms from './forms.css' with { type: 'text' };
 import feedback from './feedback.css' with { type: 'text' };
 import signin from './signin.css' with { type: 'text' };
-import signinDuo from './signin-duo.css' with { type: 'text' };
 
 // Home and Degree (the Canvas + Stellic cards)
 import dashHero from './dash-hero.css' with { type: 'text' };
@@ -58,7 +57,6 @@ export const SITE_CSS = [
     forms,
     feedback,
     signin,
-    signinDuo,
     // Home and Degree
     dashHero,
     dashCards,

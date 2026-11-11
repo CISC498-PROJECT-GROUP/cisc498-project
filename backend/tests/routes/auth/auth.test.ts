@@ -1,7 +1,7 @@
 // Route tests for /auth, run against the stand-in sign-in (UD_STANDIN) so no browser starts and
 // nothing reaches UD. What matters: the session cookie is HttpOnly + SameSite=Strict, a write
-// without the site's header is refused, Duo answers move the sign-in along, and signing out ends the
-// session.
+// without the site's header is refused, the sign-in waits on UD's own 2FA step, and signing out ends
+// the session.
 
 import { afterAll, beforeAll, describe, expect, it } from 'bun:test';
 import { Hono } from 'hono';
@@ -50,15 +50,12 @@ describe('/auth', () => {
         expect(cookie).toContain('SameSite=Strict');
     });
 
-    it('signs in with a Duo passcode, and refuses a malformed one', async () => {
+    it('waits on UD’s own 2FA window, then signs in — the site never handles a code', async () => {
         const cookie = await signIn();
-        await Bun.sleep(900); // the stand-in "sends a push" after a beat
-        expect((await status(await app.request('/auth/status', { headers: { cookie } }))).data?.step).toBe('duo-waiting');
-
-        const bad = await app.request('/auth/duo', { method: 'POST', headers: { ...SITE, cookie }, body: JSON.stringify({ action: 'passcode', code: 'abc' }) });
-        expect(bad.status).toBe(435);
-
-        await app.request('/auth/duo', { method: 'POST', headers: { ...SITE, cookie }, body: JSON.stringify({ action: 'passcode', code: '123456' }) });
+        await Bun.sleep(900); // the stand-in "sends the code" after a beat
+        expect((await status(await app.request('/auth/status', { headers: { cookie } }))).data?.step).toBe('verify');
+        expect((await app.request('/auth/duo', { method: 'POST', headers: { ...SITE, cookie }, body: JSON.stringify({ code: '123456' }) })).status).toBe(404);
+        await Bun.sleep(2700);
         const done = (await status(await app.request('/auth/status', { headers: { cookie } }))).data;
         expect(done?.step).toBe('signed-in');
         expect(done?.username).toBe('student');
@@ -74,6 +71,5 @@ describe('/auth', () => {
 
     it('reports a stranger as signed out', async () => {
         expect((await status(await app.request('/auth/status'))).data?.step).toBe('failed');
-        expect((await app.request('/auth/duo', { method: 'POST', headers: SITE, body: JSON.stringify({ action: 'retry' }) })).status).toBe(401);
     });
 });

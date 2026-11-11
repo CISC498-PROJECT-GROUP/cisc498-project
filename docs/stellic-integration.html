@@ -38,7 +38,7 @@
         <div class="rule-body">
             <ul>
                 <li>Stellic is a Django app. Signing in goes through UD's SAML identity provider
-                    (<code>idp.nss.udel.edu</code>, then CAS + Duo); after it, the browser holds a Django
+                    (<code>idp.nss.udel.edu</code>, then CAS + UD's 2FA); after it, the browser holds a Django
                     <code>sessionid</code> cookie (SameSite=Lax) and a <code>csrftoken</code> cookie. There are no API keys
                     and no OAuth.</li>
                 <li>The session times out after an hour idle (<code>/auth/getsessioninfo/</code> reports
@@ -48,7 +48,7 @@
                     proxy follows redirects itself and treats one to the IdP or CAS as a lapsed session.</li>
             </ul>
             <div class="note warn">A fetch can't sign Stellic in — the IdP answers with an auto-submitting HTML form. So
-                the backend opens Stellic in the student's sign-in browser instead: right after the CAS + Duo sign-in,
+                the backend opens Stellic in the student's sign-in browser instead: right after the CAS + 2FA sign-in,
                 and again whenever the Stellic session lapses, the browser visits <code>/app/planner</code>, CAS single
                 sign-on answers without a prompt, and the new <code>sessionid</code> goes back into the student's cookie
                 jar (<code>backend/src/services/auth/renew.ts</code>).</div>

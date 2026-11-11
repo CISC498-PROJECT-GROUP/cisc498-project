@@ -43,8 +43,8 @@ export interface AppEnv {
         http://localhost:5175/__standin. Set, sign-in is faked and no request reaches UD: the only way
         to exercise registration writes without touching a real record. '' means the real UD. */
     ud_standin: string;
-    /** Show the browser that signs students in, instead of running it headless. For debugging a CAS
-        or Duo change on a developer's machine; never on a server. */
+    /** Keep every window of the sign-in browser on screen — the CAS steps too — instead of off-screen
+        until UD's 2FA page needs the student. For debugging a change to UD's sign-in; never on a server. */
     login_browser_visible: boolean;
 }
 

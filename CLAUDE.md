@@ -26,8 +26,10 @@ an AI assistant that reads all three. A student signs in once with their UD acco
   headless Chrome.
 
 **How it reaches UD.** None of the three has a public API. The backend signs the student in through
-UD's own CAS + Duo in a headless Chrome (one isolated context per student; Duo answered on the site
-and relayed), which opens Canvas, Stellic and WebReg by single sign-on. The cookies that leaves live
+UD's own CAS in a Chrome window kept off-screen (one isolated context per student); when CAS asks
+for the 2FA code, UD's page is brought on screen and the student enters the code there — the site
+never sees it. That one sign-in opens Canvas, Stellic and WebReg by single sign-on. Because the
+student must see that window, the backend runs on their own machine. The cookies that leaves live
 in an in-memory jar on the student's session; the site's requests go through the backend's proxy
 (`/up/<host>/<path>`), which adds them. See [`docs/stellic-integration.html`](docs/stellic-integration.html)
 and [`docs/webreg-integration.html`](docs/webreg-integration.html).
@@ -151,7 +153,7 @@ From the repo root: `bun install` (once, for the whole workspace), then:
   print study PDFs). `bun run dev` — build the site in watch mode and serve it on
   **localhost:5175**, relaying `/api` to :3010. Sign in with a real UD account.
 - `bun run preview` — the whole site against the **stand-in UD** on :5175, with its own backend on
-  :3011 (`UD_STANDIN`): any username and password, Duo approves itself or takes passcode 123456.
+  :3011 (`UD_STANDIN`): any username and password; the 2FA step finishes by itself.
   Nothing reaches UD — the only place registration may be exercised.
 - `bun run build` — one-off site build into `web/dist/`.
 - `bun run lint` — typecheck both. `bun run test` — both suites. `bun run format` /
@@ -162,8 +164,8 @@ From the repo root: `bun install` (once, for the whole workspace), then:
 - `docker compose up -d --build` — the backend alone in a container (root `Dockerfile` +
   `compose.yaml`, env from `backend/.env`), published on loopback only; whatever serves the site
   relays `/api/*` to it over HTTPS.
-- `LOGIN_BROWSER_VISIBLE=1` in `backend/.env` shows the sign-in browser — for debugging a change to
-  UD's CAS or Duo pages.
+- `LOGIN_BROWSER_VISIBLE=1` in `backend/.env` keeps every sign-in window on screen, the CAS steps
+  too — for debugging a change to UD's sign-in pages.
 
 ## Environment
 
@@ -192,8 +194,9 @@ routers) → `src/services/<module>/` (business logic). A repositories layer arr
 - `src/services/<module>/` — business logic. `tests/{routes,services}/` mirror the same shape.
 - `src/services/common/svc-*.ts` — cross-cutting clients (env, response, log, the Anthropic SDK, the
   browser: printing, and one isolated context per signing-in student).
-- `src/services/auth/` — `POST /auth/{login,duo,logout}`, `GET /auth/status`: the CAS + Duo sign-in
-  (`login-flow.ts`, `cas.ts`, `duo.ts` — read by what UD's pages say), opening each service by SSO
+- `src/services/auth/` — `POST /auth/{login,logout}`, `GET /auth/status`: the CAS sign-in
+  (`login-flow.ts`, `cas.ts` — read by what UD's pages say), UD's 2FA page brought on screen for
+  the student (`second-factor.ts`, `login-window.ts`), opening each service by SSO
   (`ud-services.ts`, `open-service.ts`) and renewing it when it lapses (`renew.ts`), the in-memory
   sessions and cookie jar, and the stand-in sign-in.
 - `src/services/upstream/` — `/up/<host>/<path>`: the proxy. `policy.ts` is the allowlist — the

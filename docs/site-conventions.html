@@ -49,8 +49,9 @@
                     returns to the sign-in screen. Signing out reloads the page, so no student's memoised data outlives
                     their session.</li>
                 <li>The sign-in screen (<code>components/signin/</code>, <code>use-session.ts</code>) sends the username and
-                    password to <code>/api/auth/login</code> once, then polls <code>/api/auth/status</code> and relays Duo
-                    answers. The page never stores the password.</li>
+                    password to <code>/api/auth/login</code> once, then polls <code>/api/auth/status</code>. UD's 2FA code
+                    is entered in UD's own window, which the backend brings up — the site never asks for it. The page
+                    never stores the password.</li>
             </ul>
         </div>
     </section>
@@ -158,7 +159,7 @@
                 <li><code>bun run preview</code> runs the whole site against the <strong>stand-in UD</strong>: it serves
                     <code>web/preview/</code>'s fake Canvas, Media Gallery, Stellic and WebReg on <code>/__standin</code> and
                     starts its own backend on :3011 with <code>UD_STANDIN</code> pointing there. Sign in with any username
-                    and password; Duo approves itself, or choose a passcode and enter 123456. Nothing reaches UD.</li>
+                    and password; the 2FA step finishes by itself. Nothing reaches UD.</li>
             </ul>
         </div>
     </section>

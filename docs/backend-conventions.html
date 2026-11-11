@@ -98,7 +98,7 @@
         <div class="rule-body">
             <p>Log through <code>createLogger(tag)</code> from <code>svc-log.ts</code>: one line per event,
                 <code>[tag] message key=value</code>.</p>
-            <div class="note warn"><strong>Never log</strong> an API key, a student's password, Duo code, session id
+            <div class="note warn"><strong>Never log</strong> an API key, a student's password, 2FA code, session id
                 or UD cookie, a student's question, anything a UD system returned (Canvas content and lecture
                 transcripts, Stellic records, WebReg schedules), or model output. Counts, statuses, hosts, timings and
                 field names only. Student data is used to answer the question asked and is not stored.</div>
@@ -162,8 +162,8 @@
         </div>
         <div class="rule-body">
             <p>The site has no login of its own. <code>services/auth/</code> signs a student into UD once — their
-                username and password typed into CAS's own form in a headless Chrome, Duo answered on the site and
-                relayed — and the Canvas, Stellic and WebReg sessions that sign-in leaves behind are what
+                username and password typed into CAS's own form in a Chrome window kept off-screen, then UD's 2FA page
+                brought on screen for the student to enter their code in — and the Canvas, Stellic and WebReg sessions that sign-in leaves behind are what
                 <code>services/upstream/</code> makes every request with.</p>
             <ul>
                 <li><strong>The password is used once.</strong> It goes from the request into CAS's form and is dropped.
@@ -181,8 +181,12 @@
                     swap / edit. A new write is a product decision, made there and in the docs, not a refactor.
                     <code>/up</code> is the one route that answers with the upstream response itself rather than
                     <code>rsp()</code>; its failures still use the envelope.</li>
-                <li>CAS and Duo are driven by what their pages say (<code>cas.ts</code>, <code>duo.ts</code>). When UD
-                    changes them, <code>LOGIN_BROWSER_VISIBLE=1</code> shows the browser so the new screen can be seen.</li>
+                <li><strong>The 2FA code never touches the site.</strong> When CAS asks for it — on its own page, or in
+                    a popup — <code>login-window.ts</code> brings that window on screen and the student enters the code
+                    there; <code>second-factor.ts</code> only notices the page is up. So the backend must run where the
+                    student can see its windows: their own machine. CAS is driven by what its pages say
+                    (<code>cas.ts</code>); <code>LOGIN_BROWSER_VISIBLE=1</code> keeps every sign-in window on screen
+                    for debugging a change to it.</li>
                 <li><code>UD_STANDIN</code> fakes the sign-in and sends every UD request to the stand-in
                     (<code>web/preview/</code>) — the only place registration writes may be exercised.</li>
             </ul>

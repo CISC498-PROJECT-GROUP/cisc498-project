@@ -1,11 +1,11 @@
-/* @canvas-assistant/shared — the one declaration of a type both the API and the extension speak.
+/* @canvas-assistant/shared — the one declaration of a type both the API and the site speak.
    No build step: `main`/`types` point straight at this TypeScript, which Bun runs and bundles as
-   project source. A type belongs here only when both sides use it; a view-model the extension never
-   sends or receives stays in extension/src/services/types, and a shape only the API handles stays
+   project source. A type belongs here only when both sides use it; a view-model the site never
+   sends or receives stays in web/src/services/types, and a shape only the API handles stays
    in its service folder. */
 
 export type { Envelope, HealthStatus } from './types/api';
-export type { DuoAction, DuoMethod, LoginRequest, LoginStatus, LoginStep, UdService } from './types/auth';
+export type { LoginRequest, LoginStatus, LoginStep, UdService } from './types/auth';
 export type { ChatMessageParam, ChatTurnRequest, ChatTurnResponse, ContentBlock } from './types/chat';
 export type {
     CheatSheet,

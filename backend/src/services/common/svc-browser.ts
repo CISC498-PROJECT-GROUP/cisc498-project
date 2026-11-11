@@ -7,8 +7,9 @@
 // printed document can reach out, and the documents carry no script.
 //
 // Signing a student in (services/auth/) uses a second browser: one isolated context per student, so
-// no two students' UD cookies ever meet. It is a separate process from the printer because it is
-// the one that talks to UD, and LOGIN_BROWSER_VISIBLE can put it on screen for debugging.
+// no two students' UD cookies ever meet. It runs with a real window — never headless — because UD's
+// 2FA page is shown to the student in it (auth/login-window.ts); every window starts off-screen, and
+// it opens with no start-up window at all. LOGIN_BROWSER_VISIBLE=1 keeps its windows on screen.
 
 import { existsSync } from 'node:fs';
 import puppeteer, { type Browser, type BrowserContext } from 'puppeteer-core';
@@ -31,13 +32,19 @@ export function chromePath(): string | null {
 let browser: Promise<Browser> | null = null;
 let loginBrowser: Promise<Browser> | null = null;
 
-async function launch(purpose: string, headless = true, onGone: () => void = () => (browser = null)): Promise<Browser> {
+interface LaunchOptions {
+    headless?: boolean;
+    args?: string[];
+    onGone?: () => void;
+}
+
+async function launch(purpose: string, { headless = true, args: extra = [], onGone = () => (browser = null) }: LaunchOptions = {}): Promise<Browser> {
     const executablePath = chromePath();
     if (executablePath === null) throw new BrowserUnavailableError(`${purpose} needs Chrome or Chromium on the server — install one or set CHROME_PATH in backend/.env.`);
     // Chrome's sandbox needs kernel features container images usually lack; on Linux (the Docker
     // image) it runs without it, which is why the page is locked down instead.
-    const args = ['--disable-gpu', '--no-first-run', '--no-default-browser-check', '--disable-dev-shm-usage', ...(process.platform === 'linux' ? ['--no-sandbox'] : [])];
-    const launched = await puppeteer.launch({ executablePath, headless, args, defaultViewport: { width: 1100, height: 900 } });
+    const args = ['--disable-gpu', '--no-first-run', '--no-default-browser-check', '--disable-dev-shm-usage', ...(process.platform === 'linux' ? ['--no-sandbox'] : []), ...extra];
+    const launched = await puppeteer.launch({ executablePath, headless, args, defaultViewport: headless ? { width: 1100, height: 900 } : null, waitForInitialPage: headless });
     launched.on('disconnected', onGone);
     return launched;
 }
@@ -52,7 +59,8 @@ function getBrowser(): Promise<Browser> {
 
 /** A fresh, isolated browser context — its own cookies, nothing shared — for one student's sign-in. */
 export async function newLoginContext(): Promise<BrowserContext> {
-    loginBrowser ??= launch('Signing in', !app_env.login_browser_visible, () => (loginBrowser = null)).catch((error: unknown) => {
+    const offscreen = app_env.login_browser_visible ? [] : ['--window-position=-32000,-32000'];
+    loginBrowser ??= launch('Signing in', { headless: false, args: ['--no-startup-window', '--window-size=520,720', ...offscreen], onGone: () => (loginBrowser = null) }).catch((error: unknown) => {
         loginBrowser = null;
         throw error;
     });

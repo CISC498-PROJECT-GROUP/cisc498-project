@@ -7,9 +7,3 @@ export function normalizeUsername(input: string): string | null {
     const local = trimmed.includes('@') ? trimmed.slice(0, trimmed.indexOf('@')) : trimmed;
     return /^[a-z0-9._-]+$/.test(local) ? local : null;
 }
-
-/** A Duo passcode: 6–9 digits once spaces are taken out, or null. */
-export function normalizePasscode(input: string): string | null {
-    const digits = input.replace(/\s+/g, '');
-    return /^\d{6,9}$/.test(digits) ? digits : null;
-}

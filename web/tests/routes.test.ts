@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test';
-import { normalizePasscode, normalizeUsername } from '@/services/auth/username';
+import { normalizeUsername } from '@/services/auth/username';
 import { parseRoute, routeHref, ROUTES } from '@/services/routes';
 
 describe('parseRoute', () => {
@@ -22,19 +22,12 @@ describe('parseRoute', () => {
     });
 });
 
-describe('normalizeUsername / normalizePasscode', () => {
+describe('normalizeUsername', () => {
     it('takes the UD username from a username or an email', () => {
         expect(normalizeUsername('  JDoe ')).toBe('jdoe');
         expect(normalizeUsername('jdoe@udel.edu')).toBe('jdoe');
         expect(normalizeUsername('')).toBeNull();
         expect(normalizeUsername('@udel.edu')).toBeNull();
         expect(normalizeUsername('j doe')).toBeNull();
-    });
-
-    it('accepts a 6–9 digit passcode, spaces ignored', () => {
-        expect(normalizePasscode('123 456')).toBe('123456');
-        expect(normalizePasscode('123456789')).toBe('123456789');
-        expect(normalizePasscode('12345')).toBeNull();
-        expect(normalizePasscode('12345a')).toBeNull();
     });
 });

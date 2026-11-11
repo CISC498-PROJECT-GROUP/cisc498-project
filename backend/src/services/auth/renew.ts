@@ -8,6 +8,7 @@
 
 import { SignedOutError } from '@/services/auth/cas';
 import { jarExport, jarSeed } from '@/services/auth/cookie-jar';
+import { hideWindow } from '@/services/auth/login-window';
 import { openService } from '@/services/auth/open-service';
 import type { Session } from '@/services/auth/sessions';
 import type { UdServiceInfo } from '@/services/auth/ud-services';
@@ -20,6 +21,7 @@ async function renewNow(session: Session, service: UdServiceInfo): Promise<void>
     if (!context) throw new SignedOutError();
     await context.setCookie(...jarExport(session.jar).map((c) => ({ ...c, sameSite: c.sameSite as 'Strict' | 'Lax' | 'None', expires: c.expires < 0 ? undefined : c.expires })));
     const page = await context.newPage();
+    await hideWindow(page);
     try {
         const opened = await openService(page, service);
         log.info('renewed', { service: service.service, ok: opened });

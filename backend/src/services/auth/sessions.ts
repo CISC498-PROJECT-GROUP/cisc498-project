@@ -7,7 +7,7 @@
 // single sign-on without asking for the password again. Idle sessions are closed after IDLE_MS.
 
 import type { BrowserContext } from 'puppeteer-core';
-import type { DuoAction, LoginStatus, UdService } from '@canvas-assistant/shared';
+import type { LoginStatus, UdService } from '@canvas-assistant/shared';
 import { createJar, type Jar } from '@/services/auth/cookie-jar';
 
 export const IDLE_MS = 60 * 60 * 1000;
@@ -18,8 +18,6 @@ export interface Session {
     jar: Jar;
     context: BrowserContext | null;
     status: LoginStatus;
-    /** Resolves the student's answer to the Duo step the sign-in is waiting on. */
-    answer: ((reply: DuoAction) => void) | null;
     /** WebReg's CSRF token, read off the last WebReg page the proxy relayed. */
     webregCsrf: string | null;
     /** In-flight SSO renewals, one per service, so concurrent requests share one. */
@@ -35,7 +33,7 @@ const newId = (): string => {
 };
 
 export function createSession(username: string): Session {
-    const session: Session = { id: newId(), username, jar: createJar(), context: null, status: { step: 'working', message: 'Contacting UD…' }, answer: null, webregCsrf: null, renewing: {}, lastUsed: Date.now() };
+    const session: Session = { id: newId(), username, jar: createJar(), context: null, status: { step: 'working', message: 'Contacting UD…' }, webregCsrf: null, renewing: {}, lastUsed: Date.now() };
     sessions.set(session.id, session);
     return session;
 }
@@ -61,7 +59,6 @@ export async function endSession(id: string): Promise<void> {
     if (!session) return;
     sessions.delete(id);
     session.jar.clear();
-    session.answer = null;
     await session.context?.close().catch(() => undefined);
     session.context = null;
 }

@@ -1,5 +1,5 @@
 // The University of Delaware systems the site signs a student into, and the sign-on hosts between
-// them. All three sit behind the same CAS (cas.nss.udel.edu, with Duo); Stellic reaches it through
+// them. All three sit behind the same CAS (cas.nss.udel.edu, with UD's own 2FA); Stellic reaches it through
 // UD's SAML IdP (idp.nss.udel.edu). Visiting a service's `entry` with a live CAS session signs the
 // browser into that service without a prompt — which is how the sign-in opens all three, and how an
 // expired service session is renewed later.

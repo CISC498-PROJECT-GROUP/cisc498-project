@@ -45,4 +45,7 @@ console.log(
     `[api] listening on ${app_env.host}:${app_env.port} — chat model ${app_env.chat_model}, effort ${app_env.chat_effort}; study model ${app_env.study_model}, UD ${app_env.ud_standin === '' ? 'live' : `stand-in at ${app_env.ud_standin}`}, PDF printing ${chromePath() === null ? 'unavailable (no Chrome found)' : 'ready'}`,
 );
 
-export default { port: app_env.port, hostname: app_env.host, fetch: app.fetch };
+// Bun drops a connection that has been silent for its idle timeout (10 s by default). A proxied UD
+// call can take longer — Stellic's profile, or renewing a lapsed session through SSO — so the
+// connection gets Bun's maximum and the request's own timeouts decide instead.
+export default { port: app_env.port, hostname: app_env.host, idleTimeout: 255, fetch: app.fetch };

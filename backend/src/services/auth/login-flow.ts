@@ -1,18 +1,20 @@
 // One student's sign-in, start to finish, run in the background while the site polls its status:
 //
-//   Canvas's login → CAS (username + password) → Duo (push, call or passcode — the student answers
-//   on the site, which relays it here) → back on Canvas → Stellic and WebReg through single sign-on
-//   → the browser's cookies copied into the session's jar.
+//   Canvas's login → CAS (username + password, filled in off-screen) → UD's 2FA page, brought on
+//   screen in its own small window where the student enters the code UD sent them → back on Canvas
+//   → Stellic and WebReg through single sign-on → the browser's cookies copied into the jar.
 //
-// The password is typed into CAS's form and then dropped; it is never stored or logged. The browser
-// context stays open with the session, so lapsed service sessions can be renewed (renew.ts).
+// The password is typed into CAS's form and then dropped; it is never stored or logged. The 2FA
+// code never passes through the site at all. The browser context stays open with the session, so
+// lapsed service sessions can be renewed (renew.ts).
 
-import type { Page } from 'puppeteer-core';
-import type { DuoAction, LoginStatus, UdService } from '@canvas-assistant/shared';
+import type { BrowserContext, Page } from 'puppeteer-core';
+import type { LoginStatus, UdService } from '@canvas-assistant/shared';
 import { casError, LoginError, submitCas } from '@/services/auth/cas';
 import { jarSeed } from '@/services/auth/cookie-jar';
-import { chooseMethod, declineTrust, enterPasscode, readDuo, retryDuo, type DuoView } from '@/services/auth/duo';
+import { hideWindow, showWindow } from '@/services/auth/login-window';
 import { openService } from '@/services/auth/open-service';
+import { readPrompt } from '@/services/auth/second-factor';
 import type { Session } from '@/services/auth/sessions';
 import { CAS_HOST, UD_SERVICES } from '@/services/auth/ud-services';
 import { newLoginContext } from '@/services/common/svc-browser';
@@ -20,80 +22,54 @@ import { createLogger } from '@/services/common/svc-log';
 
 const log = createLogger('auth');
 const LOGIN_TIMEOUT_MS = 4 * 60 * 1000;
-/** How long a Duo screen the site can't read may stay up before the sign-in gives up on it. */
-const UNKNOWN_DUO_MS = 45_000;
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const set = (session: Session, status: LoginStatus): void => {
     session.status = status;
 };
 
-/** Act on the student's Duo answer, if one came in since the last poll. */
-async function answer(page: Page, reply: DuoAction): Promise<void> {
-    if (reply.action === 'method') await chooseMethod(page, reply.method);
-    else if (reply.action === 'passcode') await enterPasscode(page, reply.code);
-    else await retryDuo(page);
-}
+const VERIFY: LoginStatus = { step: 'verify', message: 'UD sent you a 2FA code. Enter it in the UD sign-in window that just opened — this page carries on by itself once UD accepts it.' };
 
-function show(session: Session, view: DuoView): void {
-    if (view.kind === 'waiting') set(session, { step: 'duo-waiting', message: 'Duo is waiting for you — approve the sign-in on your phone.', methods: view.methods });
-    else if (view.kind === 'passcode') set(session, { step: 'duo-passcode', message: view.error ?? 'Enter a passcode from Duo Mobile, a text message, or a bypass code.', methods: view.methods });
-    else if (view.kind === 'choose' || view.kind === 'error') set(session, { step: 'duo-choose', message: view.error ?? 'How do you want to verify with Duo?', methods: view.methods });
-}
+const openPages = async (context: BrowserContext): Promise<Page[]> => (await context.pages()).filter((p) => !p.isClosed());
 
-/** The window the sign-in is happening in now: UD's second factor can open in a popup, so the
-    newest open page in the student's browser context is the one to read and answer. */
-async function activePage(page: Page): Promise<Page> {
-    const pages = await page.browserContext().pages();
-    return pages.filter((p) => !p.isClosed()).at(-1) ?? page;
-}
-
-/** Follow CAS and Duo — in whatever window they open — until a window is back on Canvas, signed in. */
-async function followSignOn(session: Session, page: Page): Promise<void> {
+/** Follow CAS until a window is back on Canvas, signed in — showing UD's 2FA window when it asks. */
+async function followSignOn(session: Session, context: BrowserContext, page: Page): Promise<void> {
     const canvas = UD_SERVICES[0]!;
     const deadline = Date.now() + LOGIN_TIMEOUT_MS;
-    let pending: DuoAction | null = null;
-    session.answer = (reply) => {
-        pending = reply;
-        set(session, { step: 'working', message: 'Checking with Duo…' });
-    };
+    const shown = new Set<Page>();
     let quietOnCas = 0;
-    let unknownSince: number | null = null;
     let lastPlace = '';
-    let lastKind = '';
-    while (Date.now() < deadline) {
-        if (canvas.signedIn(new URL(page.url()))) return;
-        const active = await activePage(page);
-        const url = new URL(active.url());
-        const place = `${url.hostname}${url.pathname}${active === page ? '' : ' (popup)'}`;
-        if (place !== lastPlace) {
-            log.info('sign-in at', { place });
-            lastPlace = place;
+    try {
+        while (Date.now() < deadline) {
+            const pages = await openPages(context);
+            if (pages.some((p) => canvas.signedIn(new URL(p.url())))) return;
+            if (shown.size > 0 && ![...shown].some((p) => !p.isClosed())) throw new LoginError('The UD sign-in window was closed before UD accepted the code. Sign in again.');
+            // UD's 2FA can open in a popup: the newest window is the one in play.
+            const active = pages.at(-1) ?? page;
+            const url = new URL(active.url());
+            const place = `${url.hostname}${url.pathname}${active === page ? '' : ' (popup)'}`;
+            if (place !== lastPlace) {
+                log.info('sign-in at', { place });
+                lastPlace = place;
+            }
+            if (url.hostname === CAS_HOST) {
+                const error = await casError(active);
+                if (error) throw new LoginError(error);
+                if (error === '' && ++quietOnCas > 12) throw new LoginError("UD didn't accept that username and password.");
+            }
+            const prompt = await readPrompt(active);
+            if (prompt.present && !shown.has(active)) {
+                log.info('sign-in showing UD 2FA window', { screen: prompt.glimpse });
+                shown.add(active);
+                await showWindow(active);
+                set(session, VERIFY);
+            }
+            await sleep(600);
         }
-        if (canvas.signedIn(url)) return;
-        if (url.hostname === CAS_HOST) {
-            const error = await casError(active);
-            if (error) throw new LoginError(error);
-            if (error === '' && ++quietOnCas > 12) throw new LoginError("UD didn't accept that username and password.");
-        }
-        const view = await readDuo(active);
-        const kind = view.present ? `duo:${view.kind}` : 'no-duo';
-        if (kind !== lastKind) {
-            log.info('sign-in sees', { kind, methods: view.methods.join(',') || undefined, screen: view.present ? view.glimpse : undefined });
-            lastKind = kind;
-            if (view.present && view.kind === 'unknown') set(session, { step: 'working', message: 'Waiting for Duo…' });
-        }
-        unknownSince = view.present && view.kind === 'unknown' ? (unknownSince ?? Date.now()) : null;
-        if (unknownSince !== null && Date.now() - unknownSince > UNKNOWN_DUO_MS) throw new LoginError("Duo showed a screen the site doesn't recognise. Sign in on Canvas directly, or try again later.");
-        if (pending) {
-            const reply: DuoAction = pending;
-            pending = null;
-            await answer(active, reply);
-        } else if (view.kind === 'trust') await declineTrust(active);
-        else show(session, view);
-        await sleep(700);
+        throw new LoginError('The sign-in took too long — UD may have timed out waiting for the code. Sign in again.');
+    } finally {
+        for (const p of shown) if (!p.isClosed()) await hideWindow(p);
     }
-    throw new LoginError('The sign-in took too long — Duo may have timed out. Try again.');
 }
 
 async function run(session: Session, username: string, password: string): Promise<void> {
@@ -101,24 +77,26 @@ async function run(session: Session, username: string, password: string): Promis
     const context = await newLoginContext();
     session.context = context;
     const page = await context.newPage();
+    await hideWindow(page);
     log.info('sign-in started');
     await page.goto(UD_SERVICES[0]!.entry, { waitUntil: 'domcontentloaded', timeout: 30_000 });
     set(session, { step: 'working', message: "Signing in to UD's CAS…" });
     await submitCas(page, username, password);
     log.info('sign-in submitted CAS form', { ms: Date.now() - started });
     set(session, { step: 'working', message: 'Checking with UD…' });
-    await followSignOn(session, page);
+    await followSignOn(session, context, page);
     log.info('sign-in back on Canvas', { ms: Date.now() - started });
-    session.answer = null;
 
     set(session, { step: 'working', message: 'Signed in — opening Stellic and WebReg…' });
+    const work = (await openPages(context)).find((p) => UD_SERVICES[0]!.signedIn(new URL(p.url()))) ?? page;
+    await hideWindow(work);
     const services: Record<UdService, boolean> = { canvas: true, stellic: false, webreg: false };
     for (const service of UD_SERVICES.slice(1)) {
-        services[service.service] = await openService(page, service);
-        log.info('sign-in opened', { service: service.service, ok: services[service.service], at: new URL(page.url()).hostname });
+        services[service.service] = await openService(work, service);
+        log.info('sign-in opened', { service: service.service, ok: services[service.service], at: new URL(work.url()).hostname });
     }
     jarSeed(session.jar, await context.cookies());
-    await page.close().catch(() => undefined);
+    for (const p of await openPages(context)) await p.close().catch(() => undefined);
     log.info('signed in', { ms: Date.now() - started, stellic: services.stellic, webreg: services.webreg });
     set(session, { step: 'signed-in', message: 'Signed in.', services, username });
 }
@@ -126,7 +104,6 @@ async function run(session: Session, username: string, password: string): Promis
 /** Start signing a student in. Returns at once; progress shows in session.status. */
 export function startLogin(session: Session, username: string, password: string): void {
     void run(session, username, password).catch(async (error: unknown) => {
-        session.answer = null;
         const message = error instanceof LoginError ? error.message : "UD's sign-in didn't finish. Try again in a minute.";
         // A LoginError's text is UD's or ours, never the student's; an unexpected error's is puppeteer's.
         log.warn('sign-in failed', { kind: error instanceof LoginError ? 'refused' : error instanceof Error ? error.name : 'unknown', reason: error instanceof Error ? error.message.slice(0, 200) : undefined });

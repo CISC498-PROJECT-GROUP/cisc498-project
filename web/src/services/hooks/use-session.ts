@@ -1,6 +1,6 @@
-// The student's UD session: where the sign-in stands, and the three things the student can do about
-// it — sign in, answer Duo, sign out. While the backend is working (talking to CAS, or waiting on a
-// Duo push) the status is polled about once a second; on a step that waits for the student it is not.
+// The student's UD session: where the sign-in stands, and what the student can do about it — sign in,
+// sign out. While the sign-in runs (talking to CAS, or waiting while the student enters UD's 2FA code
+// in UD's own window) the status is polled about once a second.
 //
 // `notice` is what the sign-in screen should say: why the last attempt failed, or that the session
 // ended. A fresh visitor (GET /auth/status → "failed: Not signed in") gets no notice.
@@ -9,10 +9,10 @@
 // a different UD account signs in, or the student signs out, the page reloads to drop all of it —
 // the chat included.
 
-import type { DuoAction, LoginStatus } from '@canvas-assistant/shared';
+import type { LoginStatus } from '@canvas-assistant/shared';
 import { useCallback, useEffect, useRef, useState } from 'preact/hooks';
 import { onSignedOut } from '@/services/api/upstream';
-import { fetchStatus, isPolling, postDuo, postLogin, postLogout } from '@/services/auth/auth-api';
+import { fetchStatus, isPolling, postLogin, postLogout } from '@/services/auth/auth-api';
 
 const POLL_MS = 1000;
 
@@ -20,10 +20,9 @@ export interface SessionState {
     /** null until the first status check answers. */
     status: LoginStatus | null;
     notice: string | null;
-    /** A request from the student (sign in, a Duo answer) is on its way. */
+    /** A request from the student (sign in, sign out) is on its way. */
     sending: boolean;
     signIn: (username: string, password: string) => void;
-    answerDuo: (action: DuoAction) => void;
     signOut: () => void;
 }
 
@@ -74,7 +73,6 @@ export function useSession(): SessionState {
     }, []);
 
     const signIn = useCallback((username: string, password: string) => send(() => postLogin(username, password)), []);
-    const answerDuo = useCallback((action: DuoAction) => send(() => postDuo(action)), []);
     const signOut = useCallback(() => {
         setSending(true);
         postLogout()
@@ -85,5 +83,5 @@ export function useSession(): SessionState {
             });
     }, []);
 
-    return { status, notice, sending, signIn, answerDuo, signOut };
+    return { status, notice, sending, signIn, signOut };
 }
