@@ -1,82 +1,71 @@
 # Canvas Assistant
 
-A Chrome extension that adds an AI assistant to the Canvas dashboard. Ask about due dates, grades,
-late policies, office hours, or anything in a syllabus. It answers from your own Canvas courses and
-finds the syllabus even when it's buried in a page or a PDF.
+A website for University of Delaware students that puts **Canvas**, **Stellic** (UD's degree planner)
+and **WebReg** (registration) in one place, with an AI assistant that reads all three.
 
-It also has a **student dashboard**: a full page that puts Canvas next to
-[Stellic](https://stellic.udel.edu), UD's degree planner. It shows this semester's courses with
-grades and what's due, your progress toward the degree, next semester's plan, and your advisor.
+- **Home:** your GPA and degree credits, this semester's courses with grades and what's next, what's
+  due, next term's registration, and a box to ask the assistant.
+- **Schedule:** build next term's schedule on a week calendar. You can search classes, compare
+  sections and labs, and see the courses your Stellic plan has for that term. Conflicts are flagged.
+  When you're ready, you can **register, drop or swap** from the same page after reviewing every
+  change.
+- **Courses, Deadlines, Degree, Help:**
+  - grade breakdowns for every course;
+  - everything due, with a Submit button;
+  - your full Stellic audit and plan;
+  - where to get help.
+- **Assistant:** ask about due dates, grades, policies, a syllabus buried in a PDF, recorded
+  lectures (it can summarize them and build study-guide PDFs), what's left for your degree, or when
+  a class meets next semester. It reads your accounts and never changes anything.
 
 ## Run it
 
-Requires [Bun](https://bun.sh) 1.3+ and Chrome (or any Chromium browser).
+Requires [Bun](https://bun.sh) 1.3+ and an installed Chrome, Edge or Chromium. The server uses it to
+sign you in through UD's own login page.
 
 ```sh
 bun install                              # once, at the repo root
 cp backend/.env.example backend/.env     # then put your ANTHROPIC_API_KEY in it
-bun run dev:api                          # the assistant server, 127.0.0.1:3010
-bun run dev                              # builds extension/dist/ and rebuilds on change
+bun run dev:api                          # the server, 127.0.0.1:3010
+bun run dev                              # the site, http://localhost:5175
 ```
 
-Then open `chrome://extensions`, turn on **Developer mode**, click **Load unpacked**, and pick
-`extension/dist/`. Open your Canvas dashboard; the assistant button is in the bottom-right corner.
-After a rebuild, press the extension's reload arrow and refresh the Canvas tab.
+Open http://localhost:5175 and sign in with your UD username and password. Approve Duo on your
+phone, or type a passcode into the site.
 
-The extension runs on `*.instructure.com` (UD's Canvas is `udel.instructure.com`). For another
-school's Canvas domain, add it to `extension/static/manifest.json`.
-
-**Just want to try it?** Each [GitHub Release](../../releases) has the built extension as a zip:
-unzip it and **Load unpacked** the folder. It still needs the assistant server running locally.
+**No UD login handy, or working on registration?** `bun run preview` runs the whole site against a
+stand-in UD with invented data. Any username and password works. Duo approves itself, or you can
+choose a passcode and enter `123456`. Nothing reaches UD, so it's safe to add and drop there.
 
 Before opening a PR, run what CI runs: `bun run lint && bun run test && bun run format:check`
 (`bun run format` fixes formatting).
 
-**No Canvas login handy?** `bun run --cwd extension preview` serves a stand-in dashboard at
-http://localhost:5174 with a fake Canvas API behind it. Chat still goes to the real assistant server.
-
-## The dashboard (Canvas + Stellic)
-
-Click the extension's toolbar icon to open the dashboard in a new tab. It needs you signed in to
-both Canvas and Stellic in the same browser, and it doesn't need the assistant server.
-
-- **This semester:** each course you're registered for in Stellic, joined to its Canvas site:
-  credits and status from Stellic, your current grade and next assignment from Canvas.
-- **Coming up:** Canvas work due in the next two weeks.
-- **Degree progress:** each program in your Stellic audit, with credits earned, in progress, planned
-  and still needed, and the requirements still open.
-- **Next semester, advising and history:** your plan for next term, your advisor and plan review
-  status, and every past term's grades.
-
-If Stellic's session has expired (it times out after an hour idle), the Stellic cards say so and
-link to Stellic. Sign in there and come back to the tab: the cards reload on their own.
-
-Stellic has no public API. The dashboard reads the same internal endpoints Stellic's own web app
-uses, with your own session, and it only reads. This is UD-only and experimental, done with
-permission from Stellic's technical team and our instructor. The endpoints could change with any
-Stellic release. Details: [`docs/stellic-integration.html`](docs/stellic-integration.html).
-
-## Run the server on a home server
-
-Only the assistant server needs hosting — the extension still loads from `extension/dist/` on each
-machine. On the server, with Docker (or Podman) and `backend/.env` filled in:
-
-```sh
-docker compose up -d --build             # the API on the server's 127.0.0.1:3010
-```
-
-It has no auth and spends your API key for whoever reaches it, so it is published on the server's
-loopback only. Reach it over Tailscale or a reverse proxy, then build the extension against that
-address: `CANVAS_ASSISTANT_API=https://assistant.example.ts.net bun run build`.
-
 ## How it works
 
-The extension reads Canvas through its REST API using your existing login: no token, read-only,
-and it sees only what you can see. Questions go to the backend, which asks Claude. Claude calls
-tools (planner, grades, syllabus, pages, modules, files) that the extension runs against Canvas,
-and it answers from what those return.
+None of Canvas, Stellic or WebReg has an API the site could use with a student's own access. So the
+server signs you in the way your browser would:
 
-The dashboard page calls Canvas the same way, and calls Stellic with your Stellic session. Stellic's
-data stays in your browser: nothing from it goes to the backend or gets stored.
+1. Your username and password go into **UD's own CAS login page**, in a headless Chrome on the
+   server. Duo's prompt is relayed to the site.
+2. That one login opens Canvas, Stellic and WebReg through single sign-on.
+3. The site's requests then go through the server, made with your sessions. The server can only
+   reach those systems, and the only changes it can make are submitting your assignment and the
+   registration changes you confirm.
+
+**Your password is used once and never stored.** Your UD sessions live only in the server's memory.
+They end when you sign out or after an hour idle, and a restart ends them all. Nothing you see is
+logged or saved.
+
+Stellic and WebReg have no public API. The site uses the same internal endpoints their own web pages
+use, with your session. These are UD-only and experimental, and could change with any release.
+Details: [`docs/stellic-integration.html`](docs/stellic-integration.html) and
+[`docs/webreg-integration.html`](docs/webreg-integration.html).
+
+## Hosting
+
+`docker compose up -d --build` runs the server in a container, published on the host's loopback
+only. Serve the site's static files (`bun run build` → `web/dist/`) from anything that also relays
+`/api/*` to the server **over HTTPS**. The server holds students' live UD sessions, so it must
+never be reachable except through the site.
 
 More: [`CLAUDE.md`](CLAUDE.md) and [`docs/`](docs/).

@@ -4,48 +4,51 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-**Canvas Assistant** — a browser extension that puts an AI assistant on the Canvas LMS dashboard. A
-student asks it about their classes — what is due, what a syllabus says, where their grade stands —
-and it answers from the courses they are enrolled in. It also offers quick views: grade breakdown,
-upcoming deadlines across every course, and where to get help.
+**Canvas Assistant** — a website for University of Delaware students that puts **Canvas** (their
+courses), **Stellic** (their degree plan and audit) and **WebReg** (registration) in one place, with
+an AI assistant that reads all three. A student signs in once with their UD account and gets:
 
-The build is a **working prototype**:
+- **Home** — the semester at a glance: GPA and degree credits (Stellic), this term's courses joined
+  across Canvas and Stellic with current grades and the next thing due, what's coming up, next
+  term's registration (WebReg), and a box to ask the assistant.
+- **Schedule** — a schedule builder on WebReg: the registered week on a calendar, class search,
+  sections with times, seats and required labs, the courses Stellic plans for that term, conflicts
+  flagged, and **registration** — add, drop, swap, change grading — after a review-and-confirm step.
+- **Courses**, **Deadlines** (with submitting an assignment), **Degree** (the full Stellic audit,
+  plan and advising), **Assistant** (full-page chat) and **Help**.
+- **AI chat** — questions go to `backend/`, which calls Claude (`claude-sonnet-5-5`) with eighteen
+  tools: twelve Canvas ones, three for recorded lectures (summaries and study PDFs from the course's
+  Kaltura Media Gallery), and three for the record — the Stellic degree plan, the WebReg
+  registration and WebReg class search. The **site runs the tools** and loops; the backend owns the
+  key, the frozen system prompt and the tool definitions. The assistant reads; it never writes.
+- **Study PDFs** — the backend's `study` module writes a topics outline or study guide from lecture
+  captions (`claude-opus-5-5`, structured outputs, every quote and link checked) and prints it with
+  headless Chrome.
 
-- **The widget** — the extension injects the assistant on the dashboard (only there), in a shadow
-  root, with home, chat, grades, deadlines, submit and support views.
-- **Canvas data** — every view reads the student's real courses, grades and planner. The content
-  script runs on the Canvas origin, so a same-origin `fetch('/api/v1/…')` carries the student's own
-  session: no token, no OAuth, and it sees exactly what the student can see. Read-only, except
-  that a student can submit their own assignment from the deadlines list after confirming it
-  (`services/canvas/canvas-write.ts`). The assistant never writes.
-- **AI chat** — questions go to `backend/`, which calls Claude (`claude-sonnet-5-5`) with fifteen
-  tools: twelve Canvas ones (courses, planner, assignments, grade breakdown, announcements, syllabus,
-  pages, modules, files, reading a PDF) and three for recorded lectures. The **extension runs the
-  tools** — it holds the Canvas session — and loops; the backend owns the key, the frozen system
-  prompt and the tool definitions, and stores nothing.
-- **Recorded lectures and study PDFs** — the lecture tools read a course's **Media Gallery**
-  (Kaltura, launched through Canvas's own LTI launch) for its recordings and their captions. The
-  assistant summarizes lectures, and builds a PDF — a topics outline or a full study guide — for a
-  date range the student gives, or that it works out from Canvas for an exam (it asks when there is
-  neither). The backend's `study` module writes the guide in steps (`claude-opus-5-5`, structured
-  outputs, every quote and link checked against its source) and prints it with headless Chrome.
-- **The dashboard page** — `dashboard.html`, an extension page the toolbar button opens, puts Canvas
-  beside **Stellic** (UD's degree planner): this semester's courses joined across both, what's due,
-  degree progress, next semester's plan, advising and the academic history. Stellic has no public
-  API; the page reads its internal `/planner/*` endpoints on the student's own Stellic session —
-  see [`docs/stellic-integration.html`](docs/stellic-integration.html). Reads only.
+**How it reaches UD.** None of the three has a public API. The backend signs the student in through
+UD's own CAS + Duo in a headless Chrome (one isolated context per student; Duo answered on the site
+and relayed), which opens Canvas, Stellic and WebReg by single sign-on. The cookies that leaves live
+in an in-memory jar on the student's session; the site's requests go through the backend's proxy
+(`/up/<host>/<path>`), which adds them. See [`docs/stellic-integration.html`](docs/stellic-integration.html)
+and [`docs/webreg-integration.html`](docs/webreg-integration.html).
 
 No database.
 
-Two rules follow from the subject matter and override convenience:
+Three rules follow from the subject matter and override convenience:
 
-1. **Never pass invented data off as the student's record.** A grade, date or policy the widget or
-   the assistant shows must come from Canvas (or, on the dashboard page, from Stellic — shown as
-   Stellic states it). Invented data exists only as the preview harness's fixtures in
-   `extension/preview/`, which are never bundled into the extension.
-2. **A student's data goes nowhere it doesn't need to.** Canvas content — lecture transcripts
-   included — is sent to the backend only to answer the question asked, is never logged (see
-   `svc-log.ts`), and is never stored. A study PDF lives in a `blob:` URL in the student's page.
+1. **Never pass invented data off as the student's record.** A grade, date, requirement, credit or
+   class time the site or the assistant shows must come from Canvas, Stellic or WebReg, as that
+   system states it. Invented data exists only as the stand-in UD's fixtures in `web/preview/`,
+   which `src/` never imports.
+2. **A student's data goes nowhere it doesn't need to.** Their password is typed into CAS's form
+   once and dropped — never stored or logged. Their UD sessions live in server memory only and end
+   on sign-out or an hour idle. UD content passes through the proxy to their page, and to the model
+   only to answer the question asked; it is never logged (see `svc-log.ts`) or stored. A study PDF
+   lives in a `blob:` URL in the student's page.
+3. **Registration is real.** A WebReg write enrolls or drops the student for real and can't be
+   undone. The site writes only after the student confirms the exact change; the assistant never
+   writes; and writes are exercised only against the stand-in (`bun run preview`), never a real
+   account.
 
 ## Git workflow
 
@@ -70,8 +73,8 @@ Keep branches small and short-lived: a PR per feature or fix, not per session.
 **Commit messages follow Conventional Commits.** Subject line is `type(scope): summary`: type from
 **`feat`** (new capability), **`fix`** (defect), **`refactor`** (behaviour unchanged), **`chore`**
 (housekeeping, config, deps) or **`docs`**; scope is the module or feature area in lower-kebab — a
-`components/<feature>` folder, a backend module, or a tooling surface (`extension`, `backend`,
-`shell`, `chat`, `grades`, `deadlines`, `support`, `docs`) — omitted when the change is repo-wide,
+`components/<feature>` folder, a backend module, or a tooling surface (`web`, `backend`,
+`shell`, `chat`, `schedule`, `degree`, `grades`, `deadlines`, `support`, `docs`) — omitted when the change is repo-wide,
 and comma-joined when a change genuinely spans two (`feat(chat,backend): …`). The summary is
 lower-case, imperative, no trailing period, and fits in ~72 characters.
 
@@ -102,8 +105,9 @@ your final message rather than acting on it.
 Before starting any task, read the relevant conventions file in `docs/`:
 
 - Backend: [`docs/backend-conventions.html`](docs/backend-conventions.html) — before any work in `backend/`.
-- Extension: [`docs/extension-conventions.html`](docs/extension-conventions.html) — before any work in `extension/`.
-- Stellic: [`docs/stellic-integration.html`](docs/stellic-integration.html) — before touching `extension/src/services/stellic/`.
+- Site: [`docs/site-conventions.html`](docs/site-conventions.html) — before any work in `web/`.
+- Stellic: [`docs/stellic-integration.html`](docs/stellic-integration.html) — before touching `web/src/services/stellic/`.
+- WebReg: [`docs/webreg-integration.html`](docs/webreg-integration.html) — before touching `web/src/services/webreg/`.
 
 `docs/` is HTML only — no Markdown originals. Pages share `docs/docs.css` and follow its rule-card
 layout (hero → stackline → TOC → numbered rule cards). Classic CSS, no build step, no dependencies —
@@ -113,8 +117,8 @@ the pages open straight off disk.
 
 1. **Every source file must be below 200 lines.** Split proactively, not after.
    `backend/tests/architecture/file-length.test.ts` enforces it across every workspace.
-2. **The extension uses hooks wherever possible** — components never call the network, Canvas or
-   `chrome.*` directly; every data source lives in a `services/hooks/use-*.ts` hook that owns
+2. **The site uses hooks wherever possible** — components never call the network, a UD client or
+   `localStorage` directly; every data source lives in a `services/hooks/use-*.ts` hook that owns
    loading/error state.
 3. **The `docs/*.html` pages stay current.** A change to a convention updates its page in the same
    commit. **All documentation lives in `docs/` — never inside `src/`.** A file's *why* belongs in
@@ -124,17 +128,17 @@ the pages open straight off disk.
 
 ## Repo layout
 
-A **Bun workspace** (root `package.json` → `backend`, `extension`, `packages/*`). ONE root
-`bun.lock` and ONE `bun install` at the root — `bun install` inside an app is wrong and will fight
-the workspace.
+A **Bun workspace** (root `package.json` → `backend`, `web`, `packages/*`). ONE root `bun.lock` and
+ONE `bun install` at the root — `bun install` inside an app is wrong and will fight the workspace.
 
-- `backend/` — Bun + Hono API (TypeScript). No database.
-- `extension/` — Chrome Manifest V3 extension. Preact + TypeScript, bundled by `Bun.build`
-  (`extension/scripts/build.ts`) into `extension/dist/`, which is what Chrome loads.
-- `packages/shared/` — `@canvas-assistant/shared`: types BOTH sides use. No build step —
-  `main`/`types` point at the TypeScript itself. A type goes here only when both sides use it; a
-  view-model the extension never sends or receives stays in `extension/src/services/types`.
-- `docs/` — conventions, as HTML (`docs.css` is shared).
+- `backend/` — Bun + Hono API (TypeScript): sign-in, the UD proxy, chat, study PDFs. No database.
+- `web/` — the site. Preact + TypeScript, bundled by `Bun.build` (`web/scripts/build.ts`) into
+  `web/dist/`; `web/scripts/serve.ts` serves it and relays `/api/*` to the backend.
+- `packages/shared/` — `@canvas-assistant/shared`: types BOTH sides use (auth, chat, study, the tool
+  definitions). No build step — `main`/`types` point at the TypeScript itself. A type goes here only
+  when both sides use it; a view-model the site never sends or receives stays in
+  `web/src/services/types`.
+- `docs/` — conventions and integrations, as HTML (`docs.css` is shared).
 
 Each app's `tsconfig.json` extends the root `tsconfig.base.json` and overrides only what is its own
 (`lib`, `types`, `jsx`, the `@/*` path). Options that belong to both go in the base.
@@ -142,30 +146,24 @@ Each app's `tsconfig.json` extends the root `tsconfig.base.json` and overrides o
 ## Common commands
 
 From the repo root: `bun install` (once, for the whole workspace), then:
-- `bun run dev` — build the extension in watch mode. `bun run dev:api` — the API on
-  **127.0.0.1:3010** (needs `ANTHROPIC_API_KEY` in `backend/.env` for chat, and an installed Chrome,
-  Edge or Chromium — or `CHROME_PATH` — to print study PDFs).
-- `bun run build` — one-off extension build into `extension/dist/`.
+- `bun run dev:api` — the API on **127.0.0.1:3010** (needs `ANTHROPIC_API_KEY` in `backend/.env`
+  for chat, and an installed Chrome, Edge or Chromium — or `CHROME_PATH` — to sign students in and
+  print study PDFs). `bun run dev` — build the site in watch mode and serve it on
+  **localhost:5175**, relaying `/api` to :3010. Sign in with a real UD account.
+- `bun run preview` — the whole site against the **stand-in UD** on :5175, with its own backend on
+  :3011 (`UD_STANDIN`): any username and password, Duo approves itself or takes passcode 123456.
+  Nothing reaches UD — the only place registration may be exercised.
+- `bun run build` — one-off site build into `web/dist/`.
 - `bun run lint` — typecheck both. `bun run test` — both suites. `bun run format` /
-  `bun run format:check` — Prettier over both.
-- CI (`.github/workflows/ci.yml`) runs lint, test, format check and the extension build on every PR
-  and push to `main`. Pushing a tag `vX.Y.Z` matching the manifest version publishes the built
-  extension as a zip on a GitHub Release (`release.yml`).
+  `bun run format:check` — Prettier over both (4-space, 250 width, single quotes).
+- CI (`.github/workflows/ci.yml`) runs lint, test, format check and the site build on every PR and
+  push to `main`. Pushing a tag `vX.Y.Z` matching `web/package.json`'s version publishes `web/dist`
+  as a zip on a GitHub Release (`release.yml`).
 - `docker compose up -d --build` — the backend alone in a container (root `Dockerfile` +
-  `compose.yaml`, env from `backend/.env`), for a server. Published on loopback only.
-
-**Loading the extension:** `chrome://extensions` → Developer mode → *Load unpacked* →
-`extension/dist/`. After a rebuild, press the extension's reload arrow, then refresh the Canvas tab —
-Chrome does not pick up a rebuild on its own.
-
-**Without a Canvas login:** `bun run --cwd extension preview` serves a stand-in dashboard on
-**:5174** that runs the same `content.js` against a fake Canvas API (`extension/preview/canvas/`),
-with chat going to the real backend. Where the extension would use `chrome.runtime` (backend calls,
-file downloads, the Media Gallery) it falls back to a direct fetch — see `services/config.ts`. Course
-101 has a stand-in Media Gallery (`preview/canvas/gallery.ts`) with invented lecture captions.
-
-Backend (inside `backend/`): `bun run dev` (watch), `bun run test`, `bun run lint`,
-`bun run format` (Prettier — 4-space, 250 width, single quotes; the extension uses the same config).
+  `compose.yaml`, env from `backend/.env`), published on loopback only; whatever serves the site
+  relays `/api/*` to it over HTTPS.
+- `LOGIN_BROWSER_VISIBLE=1` in `backend/.env` shows the sign-in browser — for debugging a change to
+  UD's CAS or Duo pages.
 
 ## Environment
 
@@ -174,12 +172,13 @@ Backend (inside `backend/`): `bun run dev` (watch), `bun run test`, `bun run lin
 - New env vars go in `EnvKey` + `app_env` + `getEnvStatus()` in `svc-env.ts` **and** `.env.example`
   in the same commit. Read env only through `app_env` — never `process.env.X` elsewhere.
 - Any external service the app can run without must **degrade gracefully, never crash** when it is
-  absent. The API still boots without a model key and `/health` still answers.
+  absent. The API still boots without a model key or a Chrome, and `/health` still answers.
 
 ## Backend architecture
 
-Entry: `backend/src/index.ts` — validates env via `getEnvStatus()`, mounts one Hono router per
-feature area, and defines the top-level `app.onError`. Path alias `@/*` → `backend/src/*`.
+Entry: `backend/src/index.ts` — validates env via `getEnvStatus()`, requires the site's client
+header on every write and a signed-in session on `/chat`, `/study` and `/up`, mounts one Hono router
+per feature area, and defines the top-level `app.onError`. Path alias `@/*` → `backend/src/*`.
 
 Layering — **central layer dirs** (functional, no classes/DI): `src/routes/<module>/` (thin Hono
 routers) → `src/services/<module>/` (business logic). A repositories layer arrives with a database.
@@ -187,10 +186,20 @@ routers) → `src/services/<module>/` (business logic). A repositories layer arr
 `routes/`, feature services never import Hono.
 
 - `src/routes/<module>/<module>.ts` — exports `router_<module>`; validate, delegate, respond ONLY via
-  `rsp(c, data, stc, message)` with the `stc`/`err` enums — never raw `c.json`. Hono-Context helpers
-  live here (a module's `common.ts`), never in services.
+  `rsp(c, data, stc, message)` with the `stc`/`err` enums — never raw `c.json` (the one exception is
+  `/up`, which relays UD's response as itself). Hono-Context helpers live here (a module's
+  `common.ts` — `routes/auth/common.ts` holds the session cookie and guards), never in services.
 - `src/services/<module>/` — business logic. `tests/{routes,services}/` mirror the same shape.
-- `src/services/common/svc-*.ts` — cross-cutting clients (env, response, log, the Anthropic SDK).
+- `src/services/common/svc-*.ts` — cross-cutting clients (env, response, log, the Anthropic SDK, the
+  browser: printing, and one isolated context per signing-in student).
+- `src/services/auth/` — `POST /auth/{login,duo,logout}`, `GET /auth/status`: the CAS + Duo sign-in
+  (`login-flow.ts`, `cas.ts`, `duo.ts` — read by what UD's pages say), opening each service by SSO
+  (`ud-services.ts`, `open-service.ts`) and renewing it when it lapses (`renew.ts`), the in-memory
+  sessions and cookie jar, and the stand-in sign-in.
+- `src/services/upstream/` — `/up/<host>/<path>`: the proxy. `policy.ts` is the allowlist — the
+  hosts, and the only writes (Canvas submissions; WebReg `sisqueue` add/drop/swap/edit);
+  `headers.ts` adds each system's CSRF and Origin headers; `upstream.ts` follows redirects, keeps the
+  jar current, renews a lapsed session once, and maps to the stand-in under `UD_STANDIN`.
 - `src/services/chat/` — `POST /chat/turn`: one model call per step. Sonnet 5.5, adaptive thinking at
   `CHAT_EFFORT` (default low), `fallbacks: "default"` for classifier refusals, prompt caching on
   tools + system + conversation. The system prompt in `chat-prompt.ts` is frozen — nothing
@@ -198,44 +207,33 @@ routers) → `src/services/<module>/` (business logic). A repositories layer arr
 - `src/services/study/` — `POST /study/{digest,plan,section,links,render}`: the study-PDF pipeline,
   one short step per request (types in `packages/shared/src/types/study.ts`). `STUDY_MODEL` (default
   `claude-opus-5-5`) with structured outputs; quotes are checked against the transcript, links against
-  the search results; `render/` turns a document into HTML (the guide's design) and
-  `svc-browser.ts` prints it with puppeteer-core and an installed Chrome (`CHROME_PATH`).
+  the search results; `render/` turns a document into HTML and `svc-browser.ts` prints it.
 
-## Extension architecture
+## Site architecture
 
-Entry: `extension/src/content.tsx` — the content script. It mounts only when
-`services/canvas/canvas-page.ts` says the page is the dashboard, and renders into a **shadow root**
-on its own host element: Canvas's CSS cannot restyle the widget and the widget's CSS cannot leak
-onto Canvas. Path alias `@/*` → `extension/src`.
+Entry: `web/src/main.tsx` — joins the stylesheets into one `<style>` and renders `app.tsx`: the
+session gate (`use-session.ts` — the sign-in screen until `/api/auth/status` says signed in), the
+hash router (`services/routes.ts`: `#/`, `#/schedule`, `#/courses`, `#/deadlines`, `#/assistant`,
+`#/degree`, `#/help`) and the chat conversation, held here so it survives navigation. Path alias
+`@/*` → `web/src`.
 
-- `app.tsx` — open/closed, the current view, and the chat conversation (held here so it survives a
-  trip back to the menu). Keyboard events are stopped at this root — Canvas binds global shortcuts
-  on `document`, and typing in the chat box would otherwise trigger them.
-- `components/<feature>/` — `shell/` is the launcher and panel chrome; `home/`, `chat/`,
-  `grades/`, `deadlines/`, `submit/`, `support/` are the views; `common/` holds the icon set, the segmented
-  toggle and `LoadState` (skeletons while loading, an error card with retry — every `Loadable` has
-  `retry()`). `chat/composer.tsx` is shared by the chat and the home screen.
-- `background.ts` — the service worker. It relays backend calls (avoiding the page's CORS and
-  Chrome's local-network prompt), file downloads (Canvas file URLs redirect cross-origin), and
-  requests to the Media Gallery — Kaltura hosts only.
-- `services/media/` — a course's recorded lectures: the gallery's launch, its pages and Kaltura's
-  API, and captions as text. `services/study/` — digests and the study-PDF pipeline; a PDF comes back
-  as an attachment on the assistant's message.
-- `services/hooks/use-*.ts` — every data source. `services/canvas/` — the REST client and the
-  loaders/mappers. `services/tools/` — one executor per shared tool name. `services/chat/` — the
-  tool loop and the conversation context. `services/format/` — dates and the Markdown parser.
+- `services/api/upstream.ts` — the one way to UD: real URL in, `/api/up/<host>/<path>` out. A 401
+  fires `onSignedOut`. `services/api/backend.ts` — our own routes.
+- `services/canvas/`, `services/stellic/`, `services/webreg/` — the three clients and their mappers.
+  `services/webreg/register.ts` holds the only registration writes (load the term's page, POST,
+  poll to completion), reached only from the Schedule page's review dialog.
+- `services/media/` + `services/study/` — a course's recorded lectures and the study-PDF pipeline;
+  a PDF comes back as an attachment on the assistant's message.
+- `services/hooks/use-*.ts` — every data source. `services/tools/` — one executor per shared tool
+  name. `services/chat/` — the tool loop and the conversation context. `services/format/` — dates
+  and the Markdown parser. `services/dashboard/` — the Canvas–Stellic join by subject + number.
+- `components/<feature>/` — `shell/` (sidebar, top bar, phone nav), `signin/`, and one folder per
+  page; `common/` holds the icon set, the segmented toggle and `LoadState`.
 - The chat conversation is **append-only** and sent back verbatim, thinking blocks included. The
-  student context (name, courses, time zone) rides in the first user message and each question is
-  stamped with the time asked, so the backend's system prompt never changes and stays cached.
-- Styling: `src/styles/*.css`, imported as text and joined into one `<style>` in the shadow root by
-  `styles/index.ts`. Colours come from the tokens in `tokens.css` — never hardcoded in a component.
-  The palette is the widget's own (the Figma file's "Brilliant-inspired" redesign): ink outlines on a
-  paper ground, and one green (`--ca-accent`, text in `--ca-accent-ink`) for the main action.
-- `dashboard.tsx` + `components/dashboard/` — the dashboard page. It points the Canvas client at
-  the school's Canvas (`services/school.ts`, `setCanvasOrigin`). `services/stellic/` is the Stellic
-  client: the CSRF token comes from the `csrftoken` cookie, and a declarativeNetRequest rule scoped
-  to this extension's own requests sets `Origin`/`Referer`, which Django's CSRF check requires.
-  `services/dashboard/` joins a Stellic course to its Canvas site by subject + number.
-- The manifest is `extension/static/manifest.json`, copied into `dist/` by the build. It matches
-  `*.instructure.com` and `canvas.udel.edu`; add a school's self-hosted domain there. Its
-  `https://*.kaltura.com/*` host permission is what lets the worker open the Media Gallery.
+  student context rides in the first user message and each question is stamped with the time
+  asked, so the backend's system prompt never changes and stays cached.
+- Styling: `src/styles/*.css`, imported as text and joined by `styles/index.ts`. Colours come from
+  the tokens in `tokens.css` — never hardcoded in a component: ink outlines on a paper ground, and
+  one green (`--ca-accent`, text in `--ca-accent-ink`) for the main action.
+- `web/preview/` — the stand-in UD (Canvas, Media Gallery, Stellic, WebReg) over invented
+  fixtures, dispatched by `preview/standin.ts`; never bundled.
