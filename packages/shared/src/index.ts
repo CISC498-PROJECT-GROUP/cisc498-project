@@ -5,6 +5,7 @@
    in its service folder. */
 
 export type { Envelope, HealthStatus } from './types/api';
+export type { DuoAction, DuoMethod, LoginRequest, LoginStatus, LoginStep, UdService } from './types/auth';
 export type { ChatMessageParam, ChatTurnRequest, ChatTurnResponse, ContentBlock } from './types/chat';
 export type {
     CheatSheet,

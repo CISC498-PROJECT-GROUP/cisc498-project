@@ -7,7 +7,7 @@
 
 import { existsSync } from 'node:fs';
 
-export type EnvKey = 'NODE_ENV' | 'PORT' | 'HOST' | 'ANTHROPIC_API_KEY' | 'CHAT_MODEL' | 'CHAT_EFFORT' | 'STUDY_MODEL' | 'CHROME_PATH';
+export type EnvKey = 'NODE_ENV' | 'PORT' | 'HOST' | 'ANTHROPIC_API_KEY' | 'CHAT_MODEL' | 'CHAT_EFFORT' | 'STUDY_MODEL' | 'CHROME_PATH' | 'UD_STANDIN' | 'LOGIN_BROWSER_VISIBLE';
 
 export type Effort = 'low' | 'medium' | 'high' | 'xhigh' | 'max';
 
@@ -39,6 +39,13 @@ export interface AppEnv {
     study_model: string;
     /** The Chrome/Chromium that prints study PDFs. '' means look in the usual install places. */
     chrome_path: string;
+    /** The stand-in UD (web/preview) to talk to instead of the real Canvas, Stellic and WebReg — e.g.
+        http://localhost:5175/__standin. Set, sign-in is faked and no request reaches UD: the only way
+        to exercise registration writes without touching a real record. '' means the real UD. */
+    ud_standin: string;
+    /** Show the browser that signs students in, instead of running it headless. For debugging a CAS
+        or Duo change on a developer's machine; never on a server. */
+    login_browser_visible: boolean;
 }
 
 const effort = (): Effort => {
@@ -55,6 +62,8 @@ export const app_env: AppEnv = {
     chat_effort: effort(),
     study_model: read('STUDY_MODEL', DEFAULT_STUDY_MODEL) || DEFAULT_STUDY_MODEL,
     chrome_path: read('CHROME_PATH'),
+    ud_standin: read('UD_STANDIN').replace(/\/+$/, ''),
+    login_browser_visible: read('LOGIN_BROWSER_VISIBLE') === '1',
 };
 
 export const ANTHROPIC_KEY_HINT = 'Set ANTHROPIC_API_KEY in backend/.env';
@@ -75,5 +84,6 @@ export function getEnvStatus(): EnvStatus {
     if (!chatConfigured()) warnings.push(`ANTHROPIC_API_KEY is unset — POST /chat/turn will answer 503. ${ANTHROPIC_KEY_HINT}.`);
     if (read('CHAT_EFFORT') !== '' && read('CHAT_EFFORT').toLowerCase() !== app_env.chat_effort) warnings.push(`CHAT_EFFORT "${read('CHAT_EFFORT')}" is not one of ${EFFORTS.join('/')} — using ${app_env.chat_effort}.`);
     if (app_env.chrome_path !== '' && !existsSync(app_env.chrome_path)) warnings.push(`CHROME_PATH "${app_env.chrome_path}" does not exist — POST /study/render will answer 503.`);
+    if (app_env.ud_standin !== '') warnings.push(`UD_STANDIN is set — sign-in is faked and every UD request goes to ${app_env.ud_standin}, not to UD.`);
     return { ok: missing.length === 0, missing, warnings };
 }

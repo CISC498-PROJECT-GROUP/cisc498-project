@@ -4,10 +4,10 @@ import { join } from 'node:path';
 import { files_under, REPO, rel } from './walk';
 
 // Hard rule 1: every source file stays below 200 lines. Split proactively, not after. This covers
-// every workspace — backend, extension and the shared package — so one test guards the whole repo.
+// every workspace — backend, the site and the shared package — so one test guards the whole repo.
 
 const LIMIT = 200;
-const ROOTS = ['backend/src', 'backend/tests', 'extension/src', 'extension/scripts', 'extension/tests', 'packages/shared/src'];
+const ROOTS = ['backend/src', 'backend/tests', 'web/src', 'web/scripts', 'web/tests', 'web/preview', 'packages/shared/src'];
 
 describe('file length', () => {
     it(`no source file reaches ${LIMIT} lines`, () => {

@@ -1,5 +1,5 @@
-# The backend API as a container, for running it on a server. Only the backend ships: the extension
-# is built on a dev machine and loaded into Chrome, never served from here.
+# The backend API as a container, for running it on a server. Only the backend ships; the site's
+# static files (web/dist, `bun run build`) are served by whatever fronts it, with /api/* relayed here.
 #
 # Built from the repo root because the backend is a workspace member — it needs the root lockfile,
 # tsconfig.base.json and packages/shared. Bun runs the TypeScript directly; there is no build step.
@@ -18,10 +18,10 @@ ENV CHROME_PATH=/usr/bin/chromium
 WORKDIR /app
 
 # Every workspace member's package.json must be present for the frozen lockfile to match, even the
-# extension's; only production dependencies are installed.
+# site's; only production dependencies are installed.
 COPY package.json bun.lock bunfig.toml tsconfig.base.json ./
 COPY backend/package.json backend/
-COPY extension/package.json extension/
+COPY web/package.json web/
 COPY packages/shared/package.json packages/shared/
 RUN bun install --frozen-lockfile --production
 

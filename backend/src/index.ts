@@ -2,13 +2,16 @@
 // defines the top-level onError. The router import names/paths below are a fixed contract with
 // the route folders: `routes/<module>/<module>.ts` exports `router_<module>`.
 //
-// CORS is permissive on purpose: the caller is the browser extension, whose origin is
-// chrome-extension://<id> and differs per install, and this API serves only local development.
+// The caller is the site (web/), served from the same origin — its server relays /api/* here — so
+// there is no CORS: no other origin may call this API. Everything but /health and /auth needs a
+// signed-in student, and every write needs the site's own header (routes/auth/common.ts).
 import { Hono } from 'hono';
-import { cors } from 'hono/cors';
+import { requireClientHeader, requireSession } from '@/routes/auth/common';
+import { router_auth } from '@/routes/auth/auth';
 import { router_chat } from '@/routes/chat/chat';
 import { router_health } from '@/routes/health/health';
 import { router_study } from '@/routes/study/study';
+import { router_up } from '@/routes/up/up';
 import { chromePath } from '@/services/common/svc-browser';
 import { app_env, getEnvStatus } from '@/services/common/svc-env';
 
@@ -21,10 +24,14 @@ if (!env_status.ok) {
 
 const app = new Hono();
 
-app.use('*', cors({ origin: (origin) => origin ?? '*', allowMethods: ['GET', 'POST', 'OPTIONS'], allowHeaders: ['content-type'], maxAge: 86400 }));
+app.use('*', requireClientHeader);
+app.use('/chat/*', requireSession);
+app.use('/study/*', requireSession);
 
 // ── Feature routers ─────────────────────────────────────────────────────────
 app.route('/health', router_health);
+app.route('/auth', router_auth);
+app.route('/up', router_up);
 app.route('/chat', router_chat);
 app.route('/study', router_study);
 
@@ -35,7 +42,7 @@ app.onError((error, c) => {
 });
 
 console.log(
-    `[api] listening on ${app_env.host}:${app_env.port} — chat model ${app_env.chat_model}, effort ${app_env.chat_effort}; study model ${app_env.study_model}, PDF printing ${chromePath() === null ? 'unavailable (no Chrome found)' : 'ready'}`,
+    `[api] listening on ${app_env.host}:${app_env.port} — chat model ${app_env.chat_model}, effort ${app_env.chat_effort}; study model ${app_env.study_model}, UD ${app_env.ud_standin === '' ? 'live' : `stand-in at ${app_env.ud_standin}`}, PDF printing ${chromePath() === null ? 'unavailable (no Chrome found)' : 'ready'}`,
 );
 
 export default { port: app_env.port, hostname: app_env.host, fetch: app.fetch };
