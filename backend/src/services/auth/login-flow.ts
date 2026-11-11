@@ -20,6 +20,8 @@ import { createLogger } from '@/services/common/svc-log';
 
 const log = createLogger('auth');
 const LOGIN_TIMEOUT_MS = 4 * 60 * 1000;
+/** How long a Duo screen the site can't read may stay up before the sign-in gives up on it. */
+const UNKNOWN_DUO_MS = 45_000;
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const set = (session: Session, status: LoginStatus): void => {
@@ -49,6 +51,7 @@ async function followSignOn(session: Session, page: Page): Promise<void> {
         set(session, { step: 'working', message: 'Checking with Duo…' });
     };
     let quietOnCas = 0;
+    let unknownSince: number | null = null;
     while (Date.now() < deadline) {
         const url = new URL(page.url());
         if (canvas.signedIn(url)) return;
@@ -58,6 +61,8 @@ async function followSignOn(session: Session, page: Page): Promise<void> {
             if (error === '' && ++quietOnCas > 12) throw new LoginError("UD didn't accept that username and password.");
         }
         const view = await readDuo(page);
+        unknownSince = view.present && view.kind === 'unknown' ? (unknownSince ?? Date.now()) : null;
+        if (unknownSince !== null && Date.now() - unknownSince > UNKNOWN_DUO_MS) throw new LoginError("Duo showed a screen the site doesn't recognise. Sign in on Canvas directly, or try again later.");
         if (pending) {
             const reply: DuoAction = pending;
             pending = null;

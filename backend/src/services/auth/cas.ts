@@ -25,11 +25,15 @@ export async function submitCas(page: Page, username: string, password: string):
     await Promise.all([page.waitForNavigation({ waitUntil: 'domcontentloaded', timeout: 30_000 }).catch(() => undefined), page.click('button[name="submitButton"], button[type="submit"], input[type="submit"]')]);
 }
 
-/** Runs in the page (a string: the backend compiles without the DOM's types). */
-const CAS_ERROR = `(() => {
+/** Runs in the page (a string: the backend compiles without the DOM's types — so regex escapes are
+    doubled). CAS wraps the reason in "Correct the error below, and then click Log in"; keep the reason. */
+const CAS_ERROR = String.raw`(() => {
     if (!document.querySelector('#password')) return null;
     const panel = document.querySelector('#loginErrorsPanel, .alert-danger, .errors, [role="alert"], .banner-danger');
-    return panel ? (panel.textContent || '').replace(/\s+/g, ' ').trim() : '';
+    if (!panel) return '';
+    const lines = (panel.innerText || panel.textContent || '').split(/\n+/).map((l) => l.replace(/\s+/g, ' ').trim()).filter(Boolean);
+    const reasons = lines.filter((l) => !/correct the error|then click|^log ?in$/i.test(l));
+    return (reasons.length ? reasons : lines).join(' ');
 })()`;
 
 /** On the CAS form: its error text, '' when it shows none. Off it: null. */

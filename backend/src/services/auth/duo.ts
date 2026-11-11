@@ -12,6 +12,8 @@ import { isDuoHost } from '@/services/auth/ud-services';
 export type DuoKind = 'waiting' | 'passcode' | 'choose' | 'trust' | 'error' | 'unknown';
 
 export interface DuoView {
+    /** Whether a Duo page is open at all. */
+    present: boolean;
     kind: DuoKind;
     methods: DuoMethod[];
     /** Duo's own words for an error, shown to the student. */
@@ -54,17 +56,18 @@ function classify(raw: Raw): DuoView {
         (/(timed out|was denied|request denied|expired|too many|incorrect passcode|invalid passcode|couldn.t be completed)/i.exec(raw.text)
             ? (raw.text.split('\n').find((l) => /(timed out|denied|expired|too many|incorrect|invalid|couldn.t)/i.test(l)) ?? '').trim()
             : '');
-    if (/is this your device|trust this browser/i.test(raw.text)) return { kind: 'trust', methods, error: null };
-    if (error !== '' && raw.labels.some((l) => /try again/i.test(l))) return { kind: 'error', methods, error };
-    if (raw.passcode) return { kind: 'passcode', methods, error: error || null };
-    if (/check for a duo push|sent a request|sent a duo push|we.re calling|calling your phone|verify.*push/i.test(raw.text)) return { kind: 'waiting', methods, error: null };
-    if (/other options|choose an authentication method|how would you like to|select an option/i.test(all) && methods.length > 0) return { kind: 'choose', methods, error: error || null };
-    return { kind: 'unknown', methods, error: error || null };
+    if (/is this your device|trust this browser/i.test(raw.text)) return { present: true, kind: 'trust', methods, error: null };
+    if (error !== '' && raw.labels.some((l) => /try again/i.test(l))) return { present: true, kind: 'error', methods, error };
+    if (raw.passcode) return { present: true, kind: 'passcode', methods, error: error || null };
+    if (/check for a duo push|sent a request|sent a duo push|we.re calling|calling your phone|verify.*push/i.test(raw.text)) return { present: true, kind: 'waiting', methods, error: null };
+    if (/other options|choose an authentication method|how would you like to|select an option/i.test(all) && methods.length > 0) return { present: true, kind: 'choose', methods, error: error || null };
+    return { present: true, kind: 'unknown', methods, error: error || null };
 }
 
 /** What the Duo prompt is showing now; 'unknown' while it is still loading. */
 export async function readDuo(page: Page): Promise<DuoView> {
-    for (const frame of duoFrames(page)) {
+    const frames = duoFrames(page);
+    for (const frame of frames) {
         try {
             const view = classify((await frame.evaluate(READ)) as Raw);
             if (view.kind !== 'unknown') return view;
@@ -72,7 +75,7 @@ export async function readDuo(page: Page): Promise<DuoView> {
             // A frame navigating away mid-read; the next poll reads it again.
         }
     }
-    return { kind: 'unknown', methods: [], error: null };
+    return { present: frames.length > 0, kind: 'unknown', methods: [], error: null };
 }
 
 /** Runs in the page: click the first visible control whose label matches `pattern`. */
