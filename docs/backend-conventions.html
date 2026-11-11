@@ -14,7 +14,7 @@
 <div class="wrap">
     <div class="stackline">
         <strong>Bun</strong> runtime &middot; <strong>Hono</strong> router &middot; <strong>TypeScript</strong> strict
-        &middot; tests on the Bun test runner &middot; no database yet
+        &middot; tests on the Bun test runner &middot; no database &middot; sessions in memory
     </div>
 
     <nav class="toc">
@@ -28,6 +28,7 @@
             <li><a href="#l6"><span class="n">06</span> Tests</a></li>
             <li><a href="#l7"><span class="n">07</span> Deployment</a></li>
             <li><a href="#l8"><span class="n">08</span> Model output is checked</a></li>
+            <li><a href="#l9"><span class="n">09</span> Students' UD sessions</a></li>
         </ol>
     </nav>
 
@@ -97,10 +98,10 @@
         <div class="rule-body">
             <p>Log through <code>createLogger(tag)</code> from <code>svc-log.ts</code>: one line per event,
                 <code>[tag] message key=value</code>.</p>
-            <div class="note warn"><strong>Never log</strong> an API key, a student's question, Canvas content (lecture
-                transcripts included), or model
-                output. Counts, statuses, timings and field names only. Student data is used to answer the question asked
-                and is not stored.</div>
+            <div class="note warn"><strong>Never log</strong> an API key, a student's password, Duo code, session id
+                or UD cookie, a student's question, anything a UD system returned (Canvas content and lecture
+                transcripts, Stellic records, WebReg schedules), or model output. Counts, statuses, hosts, timings and
+                field names only. Student data is used to answer the question asked and is not stored.</div>
         </div>
     </section>
 
@@ -128,8 +129,9 @@
                 <code>fonts-lmodern</code> for their math; without a browser the API still runs and
                 <code>/study/render</code> answers 503.</p>
             <div class="note warn">The container listens on <code>0.0.0.0</code>, so the port mapping is the only
-                thing keeping it off the network. It stays <code>127.0.0.1:3010:3010</code>: this API has no auth and
-                spends the key for anyone who reaches it.</div>
+                thing keeping it off the network. It stays <code>127.0.0.1:3010:3010</code>, fronted by whatever
+                serves the site and relays <code>/api/*</code> over HTTPS: this API holds students' live UD sessions
+                and spends the key, and must never be reachable except through the site.</div>
         </div>
     </section>
 
@@ -150,6 +152,39 @@
                     posts.</li>
                 <li>Its markup: text is escaped; diagram SVG is rebuilt from an allowlist; the page is printed with
                     every network request refused.</li>
+            </ul>
+        </div>
+    </section>
+
+    <section class="rule" id="l9">
+        <div class="rule-head"><span class="num crit">09</span>
+            <h3>Students' UD sessions</h3>
+        </div>
+        <div class="rule-body">
+            <p>The site has no login of its own. <code>services/auth/</code> signs a student into UD once — their
+                username and password typed into CAS's own form in a headless Chrome, Duo answered on the site and
+                relayed — and the Canvas, Stellic and WebReg sessions that sign-in leaves behind are what
+                <code>services/upstream/</code> makes every request with.</p>
+            <ul>
+                <li><strong>The password is used once.</strong> It goes from the request into CAS's form and is dropped.
+                    It is never stored, logged, or kept on the session.</li>
+                <li><strong>Sessions live in memory only</strong> (<code>sessions.ts</code>): the cookie jar, the
+                    student's isolated browser context (kept so a lapsed service can be renewed through CAS single
+                    sign-on), nothing else. Sign-out or an hour idle ends one; a restart ends them all. No database, no
+                    disk.</li>
+                <li>The site holds only an unguessable session id, in an <code>HttpOnly</code>,
+                    <code>SameSite=Strict</code> cookie. Every non-GET must carry
+                    <code>X-Requested-With: canvas-assistant</code>. <code>/chat</code>, <code>/study</code> and
+                    <code>/up</code> need a signed-in session (<code>routes/auth/common.ts</code>).</li>
+                <li><strong>The proxy is not open.</strong> <code>upstream/policy.ts</code> lists the hosts, and on each
+                    the only writes allowed: Canvas assignment submissions, WebReg's <code>sisqueue</code> add / drop /
+                    swap / edit. A new write is a product decision, made there and in the docs, not a refactor.
+                    <code>/up</code> is the one route that answers with the upstream response itself rather than
+                    <code>rsp()</code>; its failures still use the envelope.</li>
+                <li>CAS and Duo are driven by what their pages say (<code>cas.ts</code>, <code>duo.ts</code>). When UD
+                    changes them, <code>LOGIN_BROWSER_VISIBLE=1</code> shows the browser so the new screen can be seen.</li>
+                <li><code>UD_STANDIN</code> fakes the sign-in and sends every UD request to the stand-in
+                    (<code>web/preview/</code>) — the only place registration writes may be exercised.</li>
             </ul>
         </div>
     </section>

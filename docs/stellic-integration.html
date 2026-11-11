@@ -6,8 +6,8 @@
 <header class="hero">
     <div class="wrap">
         <h1>Stellic integration</h1>
-        <p>How the dashboard page reads a student's degree plan and audit from UD's Stellic, which has no public
-            API. Read this before touching <code>extension/src/services/stellic/</code>. Everything here was worked out
+        <p>How the site reads a student's degree plan and audit from UD's Stellic, which has no public
+            API. Read this before touching <code>web/src/services/stellic/</code>. Everything here was worked out
             by watching UD's own Stellic web app (<code>stellic.udel.edu</code>) in November 2026, with permission from
             Stellic's technical team and the course instructor.</p>
     </div>
@@ -16,14 +16,14 @@
 <div class="wrap">
     <div class="stackline">
         <strong>Django</strong> session cookie &middot; <strong>CSRF</strong> token + Origin check &middot;
-        <strong>declarativeNetRequest</strong> header rule &middot; reads only
+        set by the <strong>backend's proxy</strong> &middot; reads only
     </div>
 
     <nav class="toc">
         <h2>Contents</h2>
         <ol>
             <li><a href="#s1"><span class="n">01</span> How Stellic signs a student in</a></li>
-            <li><a href="#s2"><span class="n">02</span> Why the extension rewrites Origin</a></li>
+            <li><a href="#s2"><span class="n">02</span> Why the proxy sets Origin</a></li>
             <li><a href="#s3"><span class="n">03</span> The endpoints the dashboard reads</a></li>
             <li><a href="#s4"><span class="n">04</span> Response quirks</a></li>
             <li><a href="#s5"><span class="n">05</span> Limits and risks</a></li>
@@ -43,20 +43,21 @@
                     and no OAuth.</li>
                 <li>The session times out after an hour idle (<code>/auth/getsessioninfo/</code> reports
                     <code>session_timeout: 3600</code>). Stellic's own app keeps it alive with
-                    <code>POST /auth/extendsession/</code>; the dashboard does not.</li>
-                <li>A request without a valid session gets a <strong>302 to the IdP</strong>, never a 401. The client
-                    fetches with <code>redirect: 'manual'</code> and treats the resulting <code>opaqueredirect</code> as
-                    "signed out".</li>
+                    <code>POST /auth/extendsession/</code>; the site does not need to.</li>
+                <li>A request without a valid session gets a <strong>302 to the IdP</strong>, never a 401. The backend's
+                    proxy follows redirects itself and treats one to the IdP or CAS as a lapsed session.</li>
             </ul>
-            <div class="note warn">The dashboard cannot sign the student in itself — the IdP answers with an
-                auto-submitting HTML form a <code>fetch</code> can't follow. It shows "Open Stellic to sign in", and
-                retries every failed card when the student comes back to the tab.</div>
+            <div class="note warn">A fetch can't sign Stellic in — the IdP answers with an auto-submitting HTML form. So
+                the backend opens Stellic in the student's sign-in browser instead: right after the CAS + Duo sign-in,
+                and again whenever the Stellic session lapses, the browser visits <code>/app/planner</code>, CAS single
+                sign-on answers without a prompt, and the new <code>sessionid</code> goes back into the student's cookie
+                jar (<code>backend/src/services/auth/renew.ts</code>).</div>
         </div>
     </section>
 
     <section class="rule" id="s2">
         <div class="rule-head"><span class="num crit">02</span>
-            <h3>Why the extension rewrites Origin</h3>
+            <h3>Why the proxy sets Origin</h3>
         </div>
         <div class="rule-body">
             <p>Stellic's read endpoints that take a body are POSTs, so Django's CSRF middleware runs on them. Replaying
@@ -68,20 +69,20 @@
                 <li>Origin right, no token → 403</li>
                 <li>GET endpoints → 200 with the cookie alone</li>
             </ul>
-            <p>A page can't set <code>Origin</code> or <code>Referer</code> on a <code>fetch</code>. So
-                <code>stellic-rule.ts</code> installs one dynamic declarativeNetRequest rule that sets both to Stellic's
-                own values, and the token comes from the <code>csrftoken</code> cookie via
-                <code>chrome.cookies</code>. Permissions: <code>cookies</code>,
-                <code>declarativeNetRequestWithHostAccess</code> and the <code>https://stellic.udel.edu/*</code> host.</p>
-            <div class="note warn">The rule is limited by <code>initiatorDomains: [chrome.runtime.id]</code>: it changes
-                only this extension's own requests. Never widen it — without that condition, any website's
-                cross-site POST to Stellic would pass the Origin check, and only the token would stand in the way.</div>
+            <p>A browser page can't set <code>Origin</code> or <code>Referer</code> on a <code>fetch</code> — the
+                extension this began as needed a declarativeNetRequest rule for it. The site's requests leave from the
+                backend instead, so <code>backend/src/services/upstream/headers.ts</code> simply sets both to Stellic's own
+                values on every Stellic POST, with <code>X-CSRFToken</code> from the <code>csrftoken</code> cookie in the
+                student's jar.</p>
+            <div class="note warn">Those headers go only on requests the proxy makes for a signed-in student, to the
+                Stellic read paths <code>policy.ts</code> lists. Never let the proxy POST elsewhere on Stellic: Django's
+                Origin check is part of what keeps Stellic's writes safe, and the proxy passes it by construction.</div>
         </div>
     </section>
 
     <section class="rule" id="s3">
         <div class="rule-head"><span class="num">03</span>
-            <h3>The endpoints the dashboard reads</h3>
+            <h3>The endpoints the site reads</h3>
         </div>
         <div class="rule-body">
             <ul>
@@ -100,7 +101,7 @@
                     reviewed, and with whom a review is open. Needs the username from the profile.</li>
             </ul>
             <p>Stellic's own app also calls <code>POST /planner/getinitdata/</code> first (~750 KB, ~10 s). The
-                dashboard skips it: the plan call needs no arguments and returns the plan id.</p>
+                site skips it: the plan call needs no arguments and returns the plan id.</p>
             <p>Seen but not used: <code>getplancredits</code> (transfer and exam credit),
                 <code>getmilestonesandcoursesandunitssummary</code> (course and credit totals), <code>getplanwarnings</code>
                 (per-term alerts and holds), <code>getgrades</code>, <code>getprereqchain</code>,
@@ -141,15 +142,16 @@
                     Every mapper tolerates missing fields, and every card fails on its own, so a change breaks one
                     card, not the page.</li>
                 <li><strong>One school.</strong> Stellic is deployed per institution; the origin lives in
-                    <code>services/school.ts</code> (with UD's Canvas, <code>udel.instructure.com</code>) and in the
-                    manifest's host permissions.</li>
+                    <code>web/src/services/school.ts</code> (with UD's Canvas and WebReg) and in the backend's proxy
+                    policy and sign-in (<code>backend/src/services/auth/ud-services.ts</code>).</li>
                 <li><strong>Reads only.</strong> Nothing writes to Stellic. A write would be a product decision and a
                     conversation with Stellic first, not a refactor.</li>
-                <li><strong>Source of record.</strong> The dashboard shows Stellic's figures as Stellic states them —
+                <li><strong>Source of record.</strong> The site shows Stellic's figures as Stellic states them —
                     satisfied flags, credit totals, GPA. It adds credits up but computes no GPA or requirement status
                     of its own.</li>
-                <li><strong>Privacy.</strong> Stellic data stays in the student's browser: it is fetched by the
-                    dashboard page and goes nowhere else — not to our backend, not to storage.</li>
+                <li><strong>Privacy.</strong> Stellic data passes through the backend's proxy on its way to the
+                    student's page and is neither stored nor logged; the assistant sees it only when its
+                    <code>get_degree_plan</code> tool is called to answer a question.</li>
             </ul>
         </div>
     </section>
@@ -163,9 +165,9 @@
                 you want; the call it makes is the endpoint. Copy it as cURL to see the body and headers. For a
                 scripted capture, launch Chromium with <code>--remote-debugging-port</code> and record
                 <code>Network.requestWillBeSent</code> / <code>Network.getResponseBody</code> over the DevTools
-                protocol — that is how this page was written.</p>
+                protocol — that is how this page and <a href="webreg-integration.html">WebReg integration</a> were written.</p>
         </div>
     </section>
 </div>
 
-<footer>Update this page in the same commit that changes how the extension talks to Stellic. See <code>CLAUDE.md</code>.</footer>
+<footer>Update this page in the same commit that changes how the site talks to Stellic. See <code>CLAUDE.md</code>.</footer>

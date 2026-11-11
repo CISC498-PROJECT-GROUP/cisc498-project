@@ -1,0 +1,176 @@
+<meta charset="utf-8" />
+<title>WebReg integration — Canvas Assistant</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="docs.css" />
+
+<header class="hero">
+    <div class="wrap">
+        <h1>WebReg integration</h1>
+        <p>How the site reads a student's registration from UD's WebReg and changes it on their say-so. WebReg has no
+            public API; everything here was worked out in November 2026 by watching UD's own WebReg page
+            (<code>webreg.nss.udel.edu/registration/schedule/&lt;term&gt;</code>) and reading its scripts
+            (<code>registration/js/schedule.js</code>). Read this before touching <code>web/src/services/webreg/</code>.</p>
+    </div>
+</header>
+
+<div class="wrap">
+    <div class="stackline">
+        <strong>Spring</strong> session cookie &middot; <strong>CSRF</strong> token in a meta tag &middot;
+        <strong>queued</strong> writes, polled &middot; <strong>real registration</strong> — test on the stand-in only
+    </div>
+
+    <nav class="toc">
+        <h2>Contents</h2>
+        <ol>
+            <li><a href="#s1"><span class="n">01</span> Writes are real registration</a></li>
+            <li><a href="#s2"><span class="n">02</span> Session and CSRF</a></li>
+            <li><a href="#s3"><span class="n">03</span> Reading: terms, schedule, search</a></li>
+            <li><a href="#s4"><span class="n">04</span> Writing: add, drop, swap, edit</a></li>
+            <li><a href="#s5"><span class="n">05</span> Shapes and quirks</a></li>
+            <li><a href="#s6"><span class="n">06</span> Limits and risks</a></li>
+        </ol>
+    </nav>
+
+    <section class="rule" id="s1">
+        <div class="rule-head"><span class="num crit">01</span>
+            <h3>Writes are real registration</h3>
+        </div>
+        <div class="rule-body">
+            <ul>
+                <li><code>POST /registration/sisqueue/add</code> enrolls the student — it is the same call as WebReg's own
+                    Add button and goes straight to UD's student information system. There is no cart and no undo; a
+                    drop is a second, separate change, and a seat given up may not come back.</li>
+                <li>The site makes a write only after the student has seen the exact change (every section, credits,
+                    grading) in a confirm dialog and pressed the button. The assistant never writes — its WebReg tool
+                    reads only.</li>
+                <li>The backend's proxy allows exactly four write paths on WebReg
+                    (<code>backend/src/services/upstream/policy.ts</code>): <code>sisqueue/add</code>, <code>drop</code>,
+                    <code>swap</code>, <code>edit</code>.</li>
+            </ul>
+            <div class="note warn">Never exercise a write against a real account. <code>bun run preview</code> runs the
+                site against the stand-in UD (<code>web/preview/webreg/</code>), where add, drop and swap change only
+                invented data in memory.</div>
+        </div>
+    </section>
+
+    <section class="rule" id="s2">
+        <div class="rule-head"><span class="num">02</span>
+            <h3>Session and CSRF</h3>
+        </div>
+        <div class="rule-body">
+            <ul>
+                <li>WebReg is a Java (Spring) app behind UD's CAS: <code>/registration/</code> redirects to
+                    <code>cas.nss.udel.edu</code>, and with a live CAS session straight back with a ticket. The backend's
+                    sign-in opens it this way after Canvas; a lapsed WebReg session is renewed the same way.</li>
+                <li>Writes need Spring Security's token: <code>&lt;meta name="_csrf" content="…"&gt;</code> and
+                    <code>&lt;meta name="_csrf_header" content="X-CSRF-TOKEN"&gt;</code> on every page. The proxy reads it
+                    off each WebReg page it relays and sends it as <code>X-CSRF-TOKEN</code>; with none known it reads
+                    <code>/registration/</code> first.</li>
+                <li><strong>The term is session state.</strong> Visiting <code>/registration/schedule/&lt;strm&gt;</code>
+                    makes that term current, and <code>sisqueue/*</code> act on the current term. The client therefore
+                    loads the term's schedule page right before every write.</li>
+                <li>WebReg's own page pings <code>GET /registration/keepAlive</code> while open; the site doesn't need to.</li>
+            </ul>
+        </div>
+    </section>
+
+    <section class="rule" id="s3">
+        <div class="rule-head"><span class="num">03</span>
+            <h3>Reading: terms, schedule, search</h3>
+        </div>
+        <div class="rule-body">
+            <ul>
+                <li><code>GET /registration/schedule/&lt;strm&gt;</code> (HTML) — the page itself carries the data, as inline
+                    script: <code>var schedule = [...]</code> (the registered sections), <code>var term = {...}</code>
+                    (dates and windows), <code>var maxCredits</code>, <code>var totalCredits</code>,
+                    <code>var readOnly</code>, <code>var isAddPossible</code>, <code>var swapOnly</code>. The terms the
+                    student may open are the options of <code>&lt;select id="term"&gt;</code> (value = strm, text =
+                    "2027 Spring Semester"). <code>/registration/</code> redirects to the current term.</li>
+                <li><code>GET /registration/lookupCourses/&lt;strm&gt;/&lt;prefix&gt;</code> — search as you type. A
+                    subject or partial course (<code>CISC1</code>) lists courses (<code>{label: "CISC108: INTRO TO
+                    COMPUTER SCIENCE I", value: "CISC108"}</code>); a whole course (<code>CISC108</code>) lists its
+                    sections (<code>{label: "CISC108010 (Open Seats)", value: "CISC108010"}</code>; labs end in
+                    <code>L</code>). Items are under <code>object.items</code>.</li>
+                <li><code>GET /registration/lookupCourseInfo/&lt;strm&gt;/&lt;section&gt;</code> — one section: meeting
+                    times (<code>calendar</code>), instructors, credits (<code>creditOpt</code>), grading options,
+                    <code>full</code>, <code>waitlistPossible</code>, <code>waitlistTotal</code>, required components
+                    (<code>components: [{type: "LAB", optional: false}]</code>) and the sections that satisfy them
+                    (<code>assoc.LAB</code>), notes, <code>longDescr</code>, <code>status</code>.</li>
+                <li><code>GET /registration/check/&lt;section&gt;</code> — the corequisites dropping this section would
+                    also drop (<code>object.corequisites</code>). WebReg calls it before a drop.</li>
+                <li><code>GET /CoursesSearch/</code> is UD's public course search page; the site doesn't use it.</li>
+            </ul>
+        </div>
+    </section>
+
+    <section class="rule" id="s4">
+        <div class="rule-head"><span class="num crit">04</span>
+            <h3>Writing: add, drop, swap, edit</h3>
+        </div>
+        <div class="rule-body">
+            <ul>
+                <li>Every write is JSON, <code>Content-Type: application/json</code>, and is <strong>queued</strong>: the
+                    answer is <code>{queueId, nextPollTime}</code>. Poll
+                    <code>GET /registration/sisqueue/poll?queueId=…</code> every <code>nextPollTime</code> ms until
+                    <code>object.complete</code>; then <code>object.results</code> says what happened
+                    (<code>successful</code>, <code>results: {section: bool}</code>, <code>messages</code>,
+                    <code>errors</code>) and <code>object.schedule</code> is the schedule afterwards.</li>
+                <li><code>add</code>: <code>{courses: ["CISC108010", "CISC108020L"], options: [{chosenInstructor: null,
+                    creditHr: "3", gradeOption: "SG"}, {chosenInstructor: null, creditHr: 0, gradeOption: "NON"}],
+                    overrides: [], waitlist: false}</code> — one option per course, in order. A lecture and its required
+                    lab are added together. <code>waitlist: true</code> when a section is full and waitlisting is
+                    possible.</li>
+                <li><code>drop</code>: <code>{courses: [...], withdraw: false, overrides: []}</code> — <code>withdraw</code>
+                    is true when the section is past drop and <code>withdrawable</code>.</li>
+                <li><code>swap</code>: <code>{coursesIn, options, coursesOut, overrides, component}</code> — drop and add in
+                    one step, so the seat held isn't lost if the add fails.</li>
+                <li><code>edit</code>: <code>{courses, options}</code> — change credits or grading on a registered section.</li>
+            </ul>
+        </div>
+    </section>
+
+    <section class="rule" id="s5">
+        <div class="rule-head"><span class="num">05</span>
+            <h3>Shapes and quirks</h3>
+        </div>
+        <div class="rule-body">
+            <ul>
+                <li>Every JSON answer is an envelope: <code>{result: "SUCCESS" | …, messages, errors, object}</code>.
+                    Anything but <code>SUCCESS</code> is a failure; its <code>errors</code> say why.</li>
+                <li>A section id is subject + number + section, no spaces: <code>CISC108010</code>, lab
+                    <code>CISC108020L</code>. The site shows it as "CISC 108-010".</li>
+                <li>A meeting (<code>calendar[]</code>): <code>days: ["T", "R"]</code> (M T W R F S U),
+                    <code>startTime: [15, 55]</code> and <code>endTime: [17, 15]</code> as [hour, minute] in 24-hour
+                    time, <code>startDate</code>/<code>endDate</code> as <code>MM/DD/YYYY</code>, <code>location</code>
+                    often empty before the term. Online sections have no calendar.</li>
+                <li><code>term</code> times are epoch ms: <code>sessions[].openEnrollment</code>,
+                    <code>addWithAppointment</code>, <code>endDropAdd</code>; flags <code>isOpenEnrollment</code>,
+                    <code>isAppointmentPeriod</code>, <code>isPenaltyPeriod</code>, <code>isWithdrawPeriod</code>.</li>
+                <li>Grade option values: <code>SG</code> standard, <code>PFS</code> pass/fail, <code>AUD</code> audit;
+                    <code>NON</code> for a component with no grade of its own.</li>
+                <li>A course the student took before adds with the message "Course previously taken and may be subject
+                    to institutional repeat policy." — success with a warning, shown to the student.</li>
+            </ul>
+        </div>
+    </section>
+
+    <section class="rule" id="s6">
+        <div class="rule-head"><span class="num">06</span>
+            <h3>Limits and risks</h3>
+        </div>
+        <div class="rule-body">
+            <ul>
+                <li><strong>Undocumented.</strong> These are WebReg's internal endpoints; a release can change them. The
+                    mappers tolerate missing fields, and a write's result is read from WebReg's own answer — the site
+                    never assumes a change happened.</li>
+                <li><strong>Source of record.</strong> The site shows WebReg's schedule as WebReg states it. A planned
+                    schedule the student builds on the site is a draft in their browser until they register it.</li>
+                <li><strong>Privacy.</strong> WebReg data goes from WebReg to the student's page through the backend's
+                    proxy and is not stored or logged; the assistant sees it only when it calls its WebReg tool to answer
+                    a question.</li>
+            </ul>
+        </div>
+    </section>
+</div>
+
+<footer>Update this page in the same commit that changes how the site talks to WebReg. See <code>CLAUDE.md</code>.</footer>
